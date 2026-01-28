@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CYN Tourism - Premium travel services including VIP transfers, exclusive tours, hotel reservations, air tickets, yacht rental, and helicopter tours worldwide. TURSAB certified since 2004.">
+    <title>CYN Tourism - Premium Travel & Tours | Worldwide Destinations</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #E8C547;
+            --gold-dark: #B8962E;
+            --navy: #0A1628;
+            --navy-light: #132238;
+            --midnight: #050D18;
+            --cream: #FAF8F5;
+            --white: #FFFFFF;
+            --text: #1A1A1A;
+            --text-muted: #6B7280;
+            --azure: #0092BC;
+            --red: #C41E3A;
+            --green: #25D366;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Poppins', sans-serif; background: var(--white); color: var(--text); line-height: 1.7; overflow-x: hidden; }
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 600; }
+        ::selection { background: var(--gold); color: var(--navy); }
+
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; transition: all 0.4s; background: transparent; }
+        .navbar.scrolled { background: rgba(10, 22, 40, 0.98); backdrop-filter: blur(20px); padding: 0.75rem 5%; box-shadow: 0 4px 30px rgba(0,0,0,0.3); }
+        .logo img { height: 60px; transition: height 0.3s ease; }
+        .navbar.scrolled .logo img { height: 50px; }
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; align-items: center; }
+        .nav-links a { color: white; text-decoration: none; font-size: 0.85rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px; position: relative; padding: 0.5rem 0; transition: color 0.3s ease; }
+        .nav-links a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); transition: width 0.3s ease; }
+        .nav-links a:hover { color: var(--gold); }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-cta { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy) !important; padding: 0.75rem 1.75rem !important; border-radius: 50px; font-weight: 600 !important; box-shadow: 0 10px 40px rgba(212,175,55,0.3); }
+        .nav-cta::after { display: none !important; }
+        .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(212,175,55,0.4); }
+        .lang-switcher { display: flex; gap: 6px; margin-left: 1.5rem; }
+        .lang-btn { width: 36px; height: 26px; border: 1px solid rgba(255,255,255,0.25); border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 700; color: white; background: rgba(255,255,255,0.08); transition: all 0.3s ease; }
+        .lang-btn:hover, .lang-btn.active { border-color: var(--gold); background: rgba(212,175,55,0.2); color: var(--gold); }
+        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 10px; z-index: 1002; }
+        .mobile-toggle span { width: 25px; height: 2px; background: white; transition: all 0.3s ease; display: block; }
+        .mobile-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .mobile-toggle.active span:nth-child(2) { opacity: 0; }
+        .mobile-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .hero { min-height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; background: url('istanbul.jpeg') center/cover no-repeat; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(5,13,24,0.75) 0%, rgba(10,22,40,0.6) 50%, rgba(5,13,24,0.8) 100%); }
+        .hero::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 200px; background: linear-gradient(to top, var(--cream), transparent); }
+        .hero-content { position: relative; z-index: 2; text-align: center; color: white; max-width: 1000px; padding: 0 2rem; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.4); padding: 0.6rem 1.5rem; border-radius: 50px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 2rem; backdrop-filter: blur(10px); animation: fadeInDown 1s ease; }
+        .hero-badge svg { width: 18px; height: 18px; fill: var(--gold); }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        .hero h1 { font-size: clamp(2.8rem, 7vw, 5rem); line-height: 1.1; margin-bottom: 1.5rem; animation: fadeInUp 1s ease 0.2s both; }
+        .hero h1 span { background: linear-gradient(135deg, var(--gold), var(--gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-style: italic; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        .hero-subtitle { font-size: 1.15rem; opacity: 0.9; max-width: 700px; margin: 0 auto 2.5rem; font-weight: 300; line-height: 1.9; animation: fadeInUp 1s ease 0.4s both; }
+        .hero-buttons { display: flex; gap: 1.25rem; justify-content: center; flex-wrap: wrap; animation: fadeInUp 1s ease 0.6s both; }
+        .btn { display: inline-flex; align-items: center; gap: 0.6rem; padding: 1rem 2.25rem; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.4s; border: none; cursor: pointer; }
+        .btn svg { width: 18px; height: 18px; }
+        .btn-primary { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy); box-shadow: 0 10px 40px rgba(212,175,55,0.3); }
+        .btn-primary svg { fill: var(--navy); }
+        .btn-primary:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(212,175,55,0.5); }
+        .btn-outline { background: rgba(255,255,255,0.1); color: white; border: 2px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px); }
+        .btn-outline svg { fill: white; }
+        .btn-outline:hover { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.1); }
+        .btn-outline:hover svg { fill: var(--gold); }
+        .hero-stats { display: flex; justify-content: center; gap: 5rem; margin-top: 4rem; padding-top: 3rem; border-top: 1px solid rgba(255,255,255,0.15); animation: fadeInUp 1s ease 0.8s both; }
+        .stat { text-align: center; }
+        .stat-number { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 700; background: linear-gradient(135deg, var(--gold), var(--gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
+        .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.7; margin-top: 0.5rem; }
+
+        section { padding: 7rem 5%; }
+        .section-header { text-align: center; max-width: 750px; margin: 0 auto 4rem; }
+        .section-tag { display: inline-block; color: var(--gold); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 1rem; font-weight: 600; }
+        .section-title { font-size: clamp(2.2rem, 4vw, 3.2rem); color: var(--navy); margin-bottom: 1rem; line-height: 1.2; }
+        .section-title span { color: var(--gold); font-style: italic; }
+        .section-desc { color: var(--text-muted); font-size: 1.1rem; }
+
+        .destinations { background: var(--cream); }
+        .destinations-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.25rem; max-width: 1400px; margin: 0 auto; }
+        .dest-card { position: relative; border-radius: 20px; overflow: hidden; aspect-ratio: 1; cursor: pointer; box-shadow: 0 8px 30px rgba(0,0,0,0.12); transition: all 0.5s; }
+        .dest-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+        .dest-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; }
+        .dest-card:hover img { transform: scale(1.15); }
+        .dest-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 30%, rgba(0,0,0,0.85)); z-index: 1; }
+        .dest-card .content { position: absolute; bottom: 0; left: 0; right: 0; padding: 1.5rem; color: white; z-index: 2; transform: translateY(10px); transition: transform 0.4s ease; }
+        .dest-card:hover .content { transform: translateY(0); }
+        .dest-card h3 { font-size: 1.25rem; margin-bottom: 0.25rem; }
+        .dest-card p { font-size: 0.85rem; opacity: 0.85; }
+
+        .services { background: var(--white); }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; max-width: 1400px; margin: 0 auto; }
+        .service-card { background: var(--cream); border-radius: 20px; padding: 2.5rem 2rem; text-align: center; transition: all 0.4s ease; border: 2px solid transparent; position: relative; overflow: hidden; }
+        .service-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); transform: scaleX(0); transition: transform 0.4s ease; }
+        .service-card:hover::before { transform: scaleX(1); }
+        .service-card:hover { transform: translateY(-8px); box-shadow: 0 20px 60px rgba(0,0,0,0.15); border-color: rgba(212,175,55,0.2); }
+        .service-icon { width: 80px; height: 80px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 10px 40px rgba(212,175,55,0.3); }
+        .service-icon svg { width: 36px; height: 36px; fill: var(--navy); }
+        .service-card h3 { font-size: 1.2rem; color: var(--navy); margin-bottom: 0.75rem; }
+        .service-card p { font-size: 0.9rem; color: var(--text-muted); }
+
+        .experiences { background: var(--cream); }
+        .experiences-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; max-width: 1300px; margin: 0 auto; }
+        .exp-card { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.12); transition: all 0.5s ease; }
+        .exp-card:hover { transform: translateY(-15px); box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+        .exp-card .img-wrap { height: 250px; overflow: hidden; }
+        .exp-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .exp-card:hover img { transform: scale(1.1); }
+        .exp-card .text { padding: 2rem; text-align: center; }
+        .exp-card h3 { font-size: 1.6rem; color: var(--navy); margin-bottom: 1rem; }
+        .exp-card p { color: var(--text-muted); line-height: 1.8; }
+
+        .transfers { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); color: white; }
+        .transfers .section-title { color: white; }
+        .transfers .section-desc { color: rgba(255,255,255,0.7); }
+        .airports-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 1400px; margin: 0 auto; }
+        .airport-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; transition: all 0.4s ease; }
+        .airport-card:hover { background: rgba(255,255,255,0.1); border-color: var(--gold); transform: translateY(-8px); }
+        .airport-card .img-wrap { height: 160px; overflow: hidden; }
+        .airport-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .airport-card:hover img { transform: scale(1.1); }
+        .airport-card .text { padding: 1.5rem; }
+        .airport-badge { display: inline-block; background: var(--gold); color: var(--navy); padding: 0.3rem 0.8rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .airport-badge.az { background: var(--azure); color: white; }
+        .airport-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .airport-card p { color: rgba(255,255,255,0.7); font-size: 0.85rem; }
+
+        .fleet { background: var(--cream); }
+        .fleet-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; max-width: 1300px; margin: 0 auto; }
+        .fleet-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.4s ease; }
+        .fleet-card:hover { transform: translateY(-10px); box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+        .fleet-card .img-wrap { height: 200px; overflow: hidden; }
+        .fleet-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .fleet-card:hover img { transform: scale(1.08); }
+        .fleet-card .text { padding: 1.5rem; text-align: center; }
+        .fleet-card h4 { font-size: 1.3rem; color: var(--navy); margin-bottom: 0.5rem; }
+        .fleet-card p { color: var(--text-muted); font-size: 0.9rem; }
+
+        .tours { background: linear-gradient(180deg, var(--navy) 0%, var(--midnight) 100%); color: white; }
+        .tours .section-title { color: white; }
+        .tours .section-desc { color: rgba(255,255,255,0.7); }
+        .tour-category { margin-bottom: 4rem; }
+        .category-title { font-size: 1.6rem; color: var(--gold); margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 0.75rem; }
+        .category-title svg { width: 28px; height: 28px; fill: var(--gold); }
+        .tours-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+        .tour-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; overflow: hidden; transition: all 0.4s ease; }
+        .tour-card:hover { background: rgba(255,255,255,0.08); border-color: var(--gold); transform: translateY(-10px); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .tour-card .img-wrap { height: 180px; overflow: hidden; position: relative; }
+        .tour-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .tour-card:hover img { transform: scale(1.15); }
+        .tour-badge { position: absolute; top: 1rem; right: 1rem; background: var(--gold); color: var(--navy); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; z-index: 2; }
+        .tour-card .text { padding: 1.5rem; }
+        .tour-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .tour-card .text p { color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 1rem; line-height: 1.7; }
+        .tour-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .tour-pdf { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; background: #DC2626; color: white; border-radius: 8px; font-size: 0.75rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+        .tour-pdf:hover { background: #B91C1C; transform: translateY(-2px); }
+        .tour-pdf svg { width: 14px; height: 14px; fill: white; }
+        .tour-link { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; background: rgba(212,175,55,0.15); color: var(--gold); border-radius: 8px; font-size: 0.8rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+        .tour-link:hover { background: rgba(212,175,55,0.25); gap: 0.6rem; }
+        .tour-link svg { width: 14px; height: 14px; fill: var(--gold); }
+
+        .hotels { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f172a 100%); color: white; }
+        .hotels .section-title { color: white; }
+        .hotels .section-desc { color: rgba(255,255,255,0.7); }
+        .hotels-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem; max-width: 1200px; margin: 0 auto; }
+        .hotel-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; transition: all 0.4s ease; }
+        .hotel-card:hover { border-color: var(--gold); transform: translateY(-8px); }
+        .hotel-card .img-wrap { height: 220px; overflow: hidden; }
+        .hotel-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .hotel-card:hover img { transform: scale(1.1); }
+        .hotel-card .text { padding: 2rem; }
+        .hotel-card h3 { font-size: 1.6rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+        .hotel-card h3 .flag { font-size: 1.8rem; }
+        .hotel-card .text > p { color: rgba(255,255,255,0.8); margin-bottom: 1.5rem; line-height: 1.8; }
+        .hotel-features { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .hotel-feature { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+        .hotel-feature svg { width: 18px; height: 18px; fill: var(--gold); }
+        .hotel-cities { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .hotel-cities h4 { font-size: 1rem; color: var(--gold); margin-bottom: 0.75rem; font-family: 'Poppins', sans-serif; }
+        .city-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .city-tag { background: rgba(212,175,55,0.2); color: var(--gold); padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.8rem; }
+
+        .featured-hotels { background: linear-gradient(135deg, var(--midnight) 0%, var(--navy) 100%); color: white; padding: 5rem 5%; }
+        .featured-hotels .section-title { color: white; }
+        .featured-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem; max-width: 1200px; margin: 0 auto; }
+        .featured-card { background: rgba(255,255,255,0.05); border: 2px solid rgba(212,175,55,0.3); border-radius: 24px; overflow: hidden; transition: all 0.4s ease; position: relative; }
+        .featured-card::before { content: '5-STAR'; position: absolute; top: 1.5rem; left: 1.5rem; background: var(--gold); color: var(--navy); padding: 0.5rem 1.25rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; z-index: 2; }
+        .featured-card:hover { border-color: var(--gold); transform: translateY(-10px); box-shadow: 0 30px 60px rgba(212,175,55,0.2); }
+        .featured-card .img-wrap { height: 280px; overflow: hidden; }
+        .featured-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .featured-card:hover img { transform: scale(1.1); }
+        .featured-card .text { padding: 2rem; }
+        .featured-card h3 { font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--gold); }
+        .featured-card .location { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 1rem; }
+        .featured-card .location svg { width: 16px; height: 16px; fill: var(--gold); }
+        .featured-card .text > p { color: rgba(255,255,255,0.8); line-height: 1.8; margin-bottom: 1.5rem; }
+        .featured-amenities { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .amenity { display: flex; align-items: center; gap: 0.4rem; background: rgba(212,175,55,0.15); color: var(--gold); padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.8rem; }
+        .amenity svg { width: 14px; height: 14px; fill: var(--gold); }
+
+        .azerbaijan { background: linear-gradient(135deg, var(--navy) 0%, #1B3A4B 100%); color: white; }
+        .az-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; max-width: 1200px; margin: 0 auto; }
+        .az-content h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .az-content h2 span { color: var(--azure); }
+        .az-content > p { color: rgba(255,255,255,0.8); font-size: 1.05rem; line-height: 1.9; margin-bottom: 2rem; }
+        .az-services { display: grid; gap: 1.25rem; }
+        .az-service { display: flex; align-items: flex-start; gap: 1rem; background: rgba(255,255,255,0.05); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
+        .az-service:hover { background: rgba(255,255,255,0.08); border-color: var(--azure); }
+        .az-service .icon { width: 50px; height: 50px; background: var(--azure); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .az-service .icon svg { width: 24px; height: 24px; fill: white; }
+        .az-service h4 { font-family: 'Poppins', sans-serif; font-weight: 600; margin-bottom: 0.25rem; }
+        .az-service p { color: rgba(255,255,255,0.7); font-size: 0.85rem; margin: 0; }
+        .az-destinations { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+        .az-dest { background: rgba(0,146,188,0.2); color: var(--azure); padding: 0.5rem 1.25rem; border-radius: 25px; font-size: 0.85rem; border: 1px solid rgba(0,146,188,0.3); }
+        .az-image img { width: 100%; max-width: 500px; border-radius: 20px; box-shadow: 0 30px 60px rgba(0,0,0,0.4); border: 3px solid rgba(0,146,188,0.3); }
+
+        .director { background: linear-gradient(135deg, var(--navy) 0%, var(--midnight) 100%); color: white; }
+        .director-grid { display: grid; grid-template-columns: 400px 1fr; gap: 5rem; align-items: center; max-width: 1200px; margin: 0 auto; }
+        .director-image { position: relative; }
+        .director-image img { width: 100%; height: 520px; object-fit: cover; object-position: top; border-radius: 16px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); }
+        .director-image::before { content: ''; position: absolute; top: 20px; left: 20px; right: -20px; bottom: -20px; border: 3px solid var(--gold); border-radius: 16px; z-index: -1; }
+        .director-badge { position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); background: var(--gold); color: var(--navy); padding: 1rem 2.5rem; border-radius: 50px; }
+        .director-badge h4 { font-family: 'Poppins', sans-serif; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; }
+        .director-content h2 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .director-content h2 span { color: var(--gold); font-style: italic; }
+        .director-name { font-size: 1.75rem; color: var(--gold); margin-bottom: 1.5rem; font-family: 'Playfair Display', serif; }
+        .director-content > p { color: rgba(255,255,255,0.8); font-size: 1.05rem; line-height: 1.9; margin-bottom: 1.5rem; }
+        .director-quote { font-style: italic; font-size: 1.25rem; color: var(--gold); border-left: 4px solid var(--gold); padding-left: 1.5rem; margin: 2rem 0; font-family: 'Playfair Display', serif; }
+        .director-stats { display: flex; gap: 3rem; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .director-stat .num { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; color: var(--gold); }
+        .director-stat span { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
+
+        .about { background: var(--cream); }
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; max-width: 1300px; margin: 0 auto; }
+        .about-image { position: relative; }
+        .about-image img { width: 100%; height: 520px; object-fit: cover; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+        .about-image::before { content: ''; position: absolute; top: -20px; left: -20px; right: 20px; bottom: 20px; border: 3px solid var(--gold); border-radius: 16px; z-index: -1; }
+        .years-badge { position: absolute; bottom: -30px; right: -30px; background: var(--navy); color: white; padding: 1.75rem 2.5rem; border-radius: 16px; }
+        .years-badge .years { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 700; color: var(--gold); line-height: 1; }
+        .years-badge span { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 0.5rem; }
+        .about-content h2 { font-size: 2.5rem; color: var(--navy); margin-bottom: 1.5rem; }
+        .about-content h2 span { color: var(--gold); font-style: italic; }
+        .about-content > p { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.9; }
+        .about-features { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+        .about-feature { display: flex; align-items: flex-start; gap: 1rem; }
+        .about-feature .icon { width: 48px; height: 48px; background: rgba(212,175,55,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .about-feature .icon svg { width: 22px; height: 22px; fill: var(--gold); }
+        .about-feature h4 { font-family: 'Poppins', sans-serif; font-weight: 600; margin-bottom: 0.25rem; color: var(--navy); }
+        .about-feature p { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
+
+        .certification { background: var(--cream); padding: 4rem 5%; }
+        .cert-content { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 3rem; background: white; padding: 3rem 4rem; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+        .cert-badge { width: 120px; flex-shrink: 0; }
+        .cert-badge img { width: 100%; }
+        .cert-text h3 { font-size: 1.5rem; color: var(--navy); margin-bottom: 0.5rem; }
+        .cert-text p { color: var(--text-muted); font-size: 1rem; }
+        .cert-text strong { color: var(--red); }
+
+        .contact { background: var(--white); }
+        .contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; max-width: 1200px; margin: 0 auto; }
+        .contact-cards { display: flex; flex-direction: column; gap: 1.5rem; }
+        .contact-card { background: linear-gradient(135deg, var(--navy), var(--navy-light)); padding: 2rem; border-radius: 20px; color: white; }
+        .contact-card h3 { font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+        .contact-card h3 .flag { font-size: 1.5rem; }
+        .contact-details { display: flex; flex-direction: column; gap: 1rem; }
+        .contact-item { display: flex; align-items: flex-start; gap: 1rem; }
+        .contact-item .icon { width: 44px; height: 44px; background: rgba(212,175,55,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .contact-item .icon svg { width: 20px; height: 20px; fill: var(--gold); }
+        .contact-item h5 { font-family: 'Poppins', sans-serif; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; margin-bottom: 0.2rem; font-weight: 500; }
+        .contact-item a, .contact-item p { color: white; text-decoration: none; margin: 0; font-size: 0.95rem; transition: color 0.3s ease; }
+        .contact-item a:hover { color: var(--gold); }
+        .contact-map { margin-top: 1.5rem; border-radius: 12px; overflow: hidden; height: 150px; }
+        .contact-map iframe { width: 100%; height: 100%; border: 0; }
+        .contact-form { background: var(--cream); padding: 3rem; border-radius: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+        .contact-form h3 { font-size: 1.75rem; color: var(--navy); margin-bottom: 2rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--navy); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 1rem 1.25rem; border: 2px solid #E5E7EB; border-radius: 12px; font-family: 'Poppins', sans-serif; font-size: 0.95rem; transition: all 0.3s ease; background: white; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 4px rgba(212,175,55,0.15); }
+        .form-group textarea { resize: vertical; min-height: 120px; }
+        .btn-whatsapp { width: 100%; padding: 1.25rem; background: linear-gradient(135deg, #25D366, #128C7E); color: white; border: none; border-radius: 12px; font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+        .btn-whatsapp svg { width: 24px; height: 24px; fill: white; }
+        .btn-whatsapp:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(37,211,102,0.4); }
+
+        .footer { background: linear-gradient(180deg, var(--navy) 0%, var(--midnight) 100%); color: white; padding: 5rem 5% 2rem; }
+        .footer-main { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 3rem; max-width: 1300px; margin: 0 auto; padding-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .footer-brand .logo { margin-bottom: 1.5rem; }
+        .footer-brand .logo img { height: 70px; }
+        .footer-brand > p { color: rgba(255,255,255,0.7); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.5rem; }
+        .tursab-badge { display: inline-flex; align-items: center; gap: 0.85rem; background: rgba(196,30,58,0.15); padding: 0.75rem 1.5rem; border-radius: 12px; border: 1px solid rgba(196,30,58,0.25); }
+        .tursab-badge img { height: 36px; }
+        .tursab-badge span { font-size: 0.85rem; color: rgba(255,255,255,0.85); font-weight: 500; }
+        .footer h4 { font-family: 'Poppins', sans-serif; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1.5rem; color: var(--gold); font-weight: 600; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.75rem; }
+        .footer-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.95rem; transition: all 0.3s ease; }
+        .footer-links a:hover { color: var(--gold); padding-left: 5px; }
+        .footer-bottom { display: flex; justify-content: space-between; align-items: center; max-width: 1300px; margin: 0 auto; padding-top: 2rem; font-size: 0.85rem; color: rgba(255,255,255,0.5); }
+
+        .whatsapp-float { position: fixed; bottom: 2rem; right: 2rem; width: 64px; height: 64px; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 10px 30px rgba(37,211,102,0.4); z-index: 999; transition: all 0.3s ease; animation: float 3s ease-in-out infinite; }
+        .whatsapp-float::before { content: '1'; position: absolute; top: -2px; right: -2px; width: 22px; height: 22px; background: #DC2626; border-radius: 50%; font-size: 12px; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; }
+        .whatsapp-float svg { width: 34px; height: 34px; fill: white; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .whatsapp-float:hover { transform: scale(1.15); box-shadow: 0 20px 50px rgba(37,211,102,0.5); animation: none; }
+        .phone-float { position: fixed; bottom: 7.5rem; right: 2rem; width: 54px; height: 54px; background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 10px 40px rgba(212,175,55,0.3); z-index: 999; transition: all 0.3s ease; animation: float 3s ease-in-out infinite 0.5s; }
+        .phone-float svg { width: 26px; height: 26px; fill: white; }
+        .phone-float:hover { transform: scale(1.15); box-shadow: 0 20px 50px rgba(212,175,55,0.5); animation: none; }
+
+        @media (max-width: 1200px) { .destinations-grid, .tours-grid, .airports-grid { grid-template-columns: repeat(3, 1fr); } .fleet-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 1024px) { .nav-links { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10,22,40,0.98); flex-direction: column; padding: 6rem 2rem 2rem; gap: 1.5rem; justify-content: flex-start; align-items: center; z-index: 999; } .nav-links.active { display: flex; } .mobile-toggle { display: flex; z-index: 1001; } .about-grid, .director-grid, .az-grid, .contact-grid, .featured-grid { grid-template-columns: 1fr; gap: 3rem; } .director-image { max-width: 400px; margin: 0 auto; } .experiences-grid, .hotels-grid { grid-template-columns: 1fr; } .footer-main { grid-template-columns: 1fr 1fr; } .destinations-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { section { padding: 4rem 5%; } .hero-stats { flex-direction: column; gap: 1.5rem; } .form-row { grid-template-columns: 1fr; } .tours-grid, .airports-grid, .fleet-grid { grid-template-columns: 1fr; } .about-features, .hotel-features { grid-template-columns: 1fr; } .footer-main { grid-template-columns: 1fr; } .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; } .years-badge { bottom: -20px; right: 10px; padding: 1.25rem 1.5rem; } .years-badge .years { font-size: 2.5rem; } .director-stats { flex-direction: column; gap: 1.5rem; } .destinations-grid { grid-template-columns: repeat(2, 1fr); } .cert-content { flex-direction: column; text-align: center; padding: 2rem; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="#" class="logo"><img src="logo.png" alt="CYN Tourism"></a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#tours">Tours</a></li>
+            <li><a href="#hotels">Hotels</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact" class="nav-cta">Book Now</a></li>
+            <li><div class="lang-switcher"><button class="lang-btn active" data-lang="en">EN</button><button class="lang-btn" data-lang="fr">FR</button><button class="lang-btn" data-lang="ar">ع</button><button class="lang-btn" data-lang="tr">TR</button></div></li>
+        </ul>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <div class="hero-badge"><svg viewBox="0 0 24 24"><path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5M19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z"/></svg><span>Premium Experiences Since 2004</span></div>
+            <h1>Your Gateway to <span>Worldwide</span> Travel</h1>
+            <p class="hero-subtitle">Experience luxury and comfort with our premium services. VIP transfers, exclusive tours, hotel reservations, air tickets, yacht rental and helicopter tours.</p>
+            <div class="hero-buttons">
+                <a href="#contact" class="btn btn-primary"><svg viewBox="0 0 24 24"><path d="M19 3H5C3.89 3 3 3.89 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.89 20.1 3 19 3M19 19H5V8H19V19M17 10H7V12H17V10M15 14H7V16H15V14Z"/></svg><span>Book Now</span></a>
+                <a href="#tours" class="btn btn-outline"><svg viewBox="0 0 24 24"><path d="M12 2C15.9 2 19 5.1 19 9C19 14.2 12 22 12 22S5 14.2 5 9C5 5.1 8.1 2 12 2M12 4C9.2 4 7 6.2 7 9C7 10 7 12 12 18.7C17 12 17 10 17 9C17 6.2 14.8 4 12 4M12 6C13.7 6 15 7.3 15 9S13.7 12 12 12 9 10.7 9 9 10.3 6 12 6Z"/></svg><span>Explore Tours</span></a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat"><div class="stat-number">20+</div><div class="stat-label">Years Experience</div></div>
+                <div class="stat"><div class="stat-number">50K+</div><div class="stat-label">Happy Travelers</div></div>
+                <div class="stat"><div class="stat-number">30+</div><div class="stat-label">Destinations</div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="destinations">
+        <div class="section-header"><span class="section-tag">Explore Destinations</span><h2 class="section-title">Stunning Destinations <span>Await</span></h2><p class="section-desc">From Istanbul to Dubai, Maldives to Europe - we take you everywhere worldwide.</p></div>
+        <div class="destinations-grid">
+            <div class="dest-card"><img src="istanbul.jpeg" alt="Istanbul"><div class="content"><h3>Istanbul</h3><p>Where East meets West</p></div></div>
+            <div class="dest-card"><img src="Baku.png" alt="Baku"><div class="content"><h3>Baku</h3><p>Pearl of the Caspian</p></div></div>
+            <div class="dest-card"><img src="antalya-tour.jpg" alt="Antalya"><div class="content"><h3>Antalya</h3><p>Turkish Riviera</p></div></div>
+            <div class="dest-card"><img src="cappadocia-sky-tour.jpg" alt="Cappadocia"><div class="content"><h3>Cappadocia</h3><p>Land of Fairy Chimneys</p></div></div>
+            <div class="dest-card"><img src="dubai.jpeg" alt="Dubai"><div class="content"><h3>Dubai</h3><p>City of Gold</p></div></div>
+            <div class="dest-card"><img src="malaysia.jpeg" alt="Malaysia"><div class="content"><h3>Malaysia</h3><p>Truly Asia</p></div></div>
+            <div class="dest-card"><img src="maldives.jpeg" alt="Maldives"><div class="content"><h3>Maldives</h3><p>Paradise on Earth</p></div></div>
+            <div class="dest-card"><img src="egypt.jpeg" alt="Egypt"><div class="content"><h3>Egypt</h3><p>Land of Pharaohs</p></div></div>
+            <div class="dest-card"><img src="europe.jpeg" alt="Europe"><div class="content"><h3>Europe</h3><p>Historic Wonders</p></div></div>
+            <div class="dest-card"><img src="asia.jpeg" alt="Asia"><div class="content"><h3>Asia</h3><p>Eastern Treasures</p></div></div>
+        </div>
+    </section>
+
+    <section class="services" id="services">
+        <div class="section-header"><span class="section-tag">Our Services</span><h2 class="section-title">Complete Travel <span>Solutions</span></h2><p class="section-desc">Everything you need for an unforgettable journey.</p></div>
+        <div class="services-grid">
+            <div class="service-card"><div class="service-icon"><svg viewBox="0 0 24 24"><path d="M21 16V14L13 9V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9L2 14V16L10 13.5V19L8 20.5V22L11.5 21L15 22V20.5L13 19V13.5L21 16Z"/></svg></div><h3>Air Tickets</h3><p>Best deals on flights worldwide.</p></div>
+            <div class="service-card"><div class="service-icon"><svg viewBox="0 0 24 24"><path d="M19 7H5V14H19V7M21 17H3V5H21V17M1 11V19H23V11H1Z"/></svg></div><h3>Hotel Reservations</h3><p>From 5-star luxury to boutique stays.</p></div>
+            <div class="service-card"><div class="service-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2M12 11.5C10.62 11.5 9.5 10.38 9.5 9S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5Z"/></svg></div><h3>Guided Tours</h3><p>Expert-guided multilingual tours.</p></div>
+            <div class="service-card"><div class="service-icon"><svg viewBox="0 0 24 24"><path d="M20 21C20 21 18 20 15 20S10 21 10 21V14C10 14 12 13 15 13S20 14 20 14V21M15 11C14.1 11 13.3 11.1 12.6 11.2C10.6 9 7.5 8 7.5 8L3 9.5V18L7 17C8.3 18.1 10.6 19.2 12.6 19.7L4 22L5 24L22 17L21.5 15.5C20.4 14.7 19.2 14 18 13.5C17.6 11.4 16.5 11 15 11Z"/></svg></div><h3>Yacht Rental</h3><p>Private yacht charters.</p></div>
+            <div class="service-card"><div class="service-icon"><svg viewBox="0 0 24 24"><path d="M12 2L4 5V6.09C4 6.32 4.12 6.53 4.31 6.66L12 11L19.69 6.66C19.88 6.53 20 6.32 20 6.09V5L12 2M12 12.54L4 8.09V16.03L4.31 16.34L12 21L19.69 16.34L20 16.03V8.09L12 12.54Z"/></svg></div><h3>Helicopter Tours</h3><p>See Istanbul from above.</p></div>
+            <div class="service-card"><div class="service-icon"><svg viewBox="0 0 24 24"><path d="M5 11L6.5 6.5H17.5L19 11M17.5 16A1.5 1.5 0 1 1 16 14.5A1.5 1.5 0 0 1 17.5 16M6.5 16A1.5 1.5 0 1 1 5 14.5A1.5 1.5 0 0 1 6.5 16M18.92 6C18.72 5.42 18.16 5 17.5 5H6.5C5.84 5 5.28 5.42 5.08 6L3 12V20A1 1 0 0 0 4 21H5A1 1 0 0 0 6 20V19H18V20A1 1 0 0 0 19 21H20A1 1 0 0 0 21 20V12L18.92 6Z"/></svg></div><h3>Car Rental</h3><p>Luxury vehicles for adventures.</p></div>
+        </div>
+    </section>
+
+    <section class="experiences">
+        <div class="section-header"><span class="section-tag">Premium Experiences</span><h2 class="section-title">Excellence in Every <span>Journey</span></h2></div>
+        <div class="experiences-grid">
+            <div class="exp-card"><div class="img-wrap"><img src="mercedes-vito.jpeg" alt="Luxury Transfer"></div><div class="text"><h3>Luxury Transfers</h3><p>Premium transportation from all major airports with our modern Mercedes fleet.</p></div></div>
+            <div class="exp-card"><div class="img-wrap"><img src="cappadocia-sky-tour.jpg" alt="Exclusive Tours"></div><div class="text"><h3>Exclusive Tours</h3><p>Discover hidden gems from Istanbul to Cappadocia with expert multilingual guides.</p></div></div>
+            <div class="exp-card"><div class="img-wrap"><img src="istanbulhotels.png" alt="Hotel Reservations"></div><div class="text"><h3>Hotel Reservations</h3><p>Book the finest hotels worldwide. From beachfront resorts to historic boutique hotels.</p></div></div>
+        </div>
+    </section>
+
+    <section class="transfers" id="transfers">
+        <div class="section-header"><span class="section-tag">VIP Transfer Services</span><h2 class="section-title">Premium Airport <span>Transfers</span></h2><p class="section-desc">Professional VIP transfer services from all major airports.</p></div>
+        <div class="airports-grid">
+            <div class="airport-card"><div class="img-wrap"><img src="Istanbul-international-airport.jpeg" alt="Istanbul Airport"></div><div class="text"><span class="airport-badge">Türkiye</span><h3>Istanbul International Airport</h3><p>One of the largest airports in the world.</p></div></div>
+            <div class="airport-card"><div class="img-wrap"><img src="Sabiha-airport.jpeg" alt="Sabiha Gokcen Airport"></div><div class="text"><span class="airport-badge">Türkiye</span><h3>Sabiha Gökçen Airport</h3><p>Located on the Asian side of Istanbul.</p></div></div>
+            <div class="airport-card"><div class="img-wrap"><img src="Antalya-airport.jpeg" alt="Antalya Airport"></div><div class="text"><span class="airport-badge">Türkiye</span><h3>Antalya Airport</h3><p>Gateway to Turkish Riviera.</p></div></div>
+            <div class="airport-card"><div class="img-wrap"><img src="bakuairport.png" alt="Baku Airport"></div><div class="text"><span class="airport-badge az">Azerbaijan</span><h3>Baku Heydar Aliyev Airport</h3><p>Azerbaijan main international airport.</p></div></div>
+        </div>
+    </section>
+
+    <section class="fleet" id="fleet">
+        <div class="section-header"><span class="section-tag">Our Fleet</span><h2 class="section-title">Luxury Vehicles for <span>Every Need</span></h2></div>
+        <div class="fleet-grid">
+            <div class="fleet-card"><div class="img-wrap"><img src="mercedes-vito.jpeg" alt="Mercedes Vito"></div><div class="text"><h4>Mercedes Vito</h4><p>Perfect for small groups and families</p></div></div>
+            <div class="fleet-card"><div class="img-wrap"><img src="mercedes-sprinter-van.jpeg" alt="Mercedes Sprinter"></div><div class="text"><h4>Mercedes Sprinter</h4><p>Spacious comfort for larger groups</p></div></div>
+            <div class="fleet-card"><div class="img-wrap"><img src="mercedes-luxury-sedan.jpeg" alt="Luxury Sedan"></div><div class="text"><h4>Luxury Sedans</h4><p>Executive and VIP transfers</p></div></div>
+            <div class="fleet-card"><div class="img-wrap"><img src="mercedes-bus.jpeg" alt="Modern Bus"></div><div class="text"><h4>Modern Buses</h4><p>Ideal for group excursions</p></div></div>
+        </div>
+    </section>
+    <section class="tours" id="tours">
+        <div class="section-header"><span class="section-tag">Discover Tours</span><h2 class="section-title">Explore Our Amazing <span>Tours</span></h2></div>
+        <div class="tours-categories">
+            <div class="tour-category">
+                <h3 class="category-title"><svg viewBox="0 0 24 24"><path d="M15 11V5L12 2L9 5V7H3V21H21V11H15M7 19H5V17H7V19M7 15H5V13H7V15M7 11H5V9H7V11M13 19H11V17H13V19M13 15H11V13H13V15M13 11H11V9H13V11M13 7H11V5H13V7M19 19H17V17H19V19M19 15H17V13H19V15Z"/></svg>Istanbul & Marmara Region</h3>
+                <div class="tours-grid">
+                    <div class="tour-card"><div class="img-wrap"><img src="istanbul.jpeg" alt="Istanbul Tour"><span class="tour-badge">Popular</span></div><div class="text"><h3>Istanbul City Tour</h3><p>Explore Hagia Sophia, Blue Mosque, Grand Bazaar.</p><div class="tour-actions"><a href="pdf/Istanbultour.pdf" target="_blank" class="tour-pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/></svg> PDF</a><a href="#contact" class="tour-link">Book Now <svg viewBox="0 0 24 24"><path d="M4 11V13H16L10.5 18.5L11.92 19.92L19.84 12L11.92 4.08L10.5 5.5L16 11H4Z"/></svg></a></div></div></div>
+                    <div class="tour-card"><div class="img-wrap"><img src="Bursa.jpg" alt="Bursa Tour"></div><div class="text"><h3>Bursa Tour</h3><p>Historic Ottoman sites and hot springs.</p><div class="tour-actions"><a href="pdf/bursatour.pdf" target="_blank" class="tour-pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/></svg> PDF</a><a href="#contact" class="tour-link">Book Now <svg viewBox="0 0 24 24"><path d="M4 11V13H16L10.5 18.5L11.92 19.92L19.84 12L11.92 4.08L10.5 5.5L16 11H4Z"/></svg></a></div></div></div>
+                    <div class="tour-card"><div class="img-wrap"><img src="Princess-Island.png" alt="Princes Islands"><span class="tour-badge">Recommended</span></div><div class="text"><h3>Princes Islands</h3><p>Peaceful islands with Victorian mansions.</p><div class="tour-actions"><a href="pdf/Princessisland.pdf" target="_blank" class="tour-pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/></svg> PDF</a><a href="#contact" class="tour-link">Book Now <svg viewBox="0 0 24 24"><path d="M4 11V13H16L10.5 18.5L11.92 19.92L19.84 12L11.92 4.08L10.5 5.5L16 11H4Z"/></svg></a></div></div></div>
+                    <div class="tour-card"><div class="img-wrap"><img src="bosphorus-cruise.jpg" alt="Bosphorus Cruise"></div><div class="text"><h3>Bosphorus Cruise</h3><p>Sail between two continents.</p><div class="tour-actions"><a href="pdf/Bosphorecruise.pdf" target="_blank" class="tour-pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/></svg> PDF</a><a href="#contact" class="tour-link">Book Now <svg viewBox="0 0 24 24"><path d="M4 11V13H16L10.5 18.5L11.92 19.92L19.84 12L11.92 4.08L10.5 5.5L16 11H4Z"/></svg></a></div></div></div>
+                    <div class="tour-card"><div class="img-wrap"><img src="Sapanca.png" alt="Sapanca Tour"></div><div class="text"><h3>Sapanca Lake Tour</h3><p>Natural beauty of Sapanca Lake.</p><div class="tour-actions"><a href="pdf/Sapancatour.pdf" target="_blank" class="tour-pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/></svg> PDF</a><a href="#contact" class="tour-link">Book Now <svg viewBox="0 0 24 24"><path d="M4 11V13H16L10.5 18.5L11.92 19.92L19.84 12L11.92 4.08L10.5 5.5L16 11H4Z"/></svg></a></div></div></div>
+                    <div class="tour-card"><div class="img-wrap"><img src="izmit-tour.jpg" alt="Izmit Tour"></div><div class="text"><h3>Izmit Tour</h3><p>Beautiful coastal views.</p><div class="tour-actions"><a href="pdf/izmittour.pdf" target="_blank" class="tour-pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/></svg> PDF</a><a href="#contact" class="tour-link">Book Now <svg viewBox="0 0 24 24"><path d="M4 11V13H16L10.5 18.5L11.92 19.92L19.84 12L11.92 4.08L10.5 5.5L16 11H4Z"/></svg></a></div></div></div>
+                    <div class="tour-card"><div class="img-wrap"><img src="Yalova.png" alt="Yalova Tour"></div><div class="text"><h3>Yalova Tour</h3><p>Famous thermal baths and waterfalls.</p><div class="tour-actions"><a href="pdf/Yalovatour.pdf" target="_blank" class="tour-pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/></svg> PDF</a><a href="#contact" class="tour-link">Book Now <svg viewBox="0 0 24 24"><path d="M4 11V13H16L10.5 18.5L11.92 19.92L19.84 12L11.92 4.08L10.5 5.5L16 11H4Z"/></svg></a></div></div></div>
+                    <div class="tour-card"><div class="img-wrap"><img src="Sile.png" alt="Sile Tour"></div><div class="text"><h3>Sile & Agva Tour</h3><p>Black Sea coast beaches.</p><div class="tour-actions"><a href="pdf/sile.pdf" target="_blank" class="tour-pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/></svg> PDF</a><a href="#contact" class="tour-link">Book Now <svg viewBox="0 0 24 24"><path d="M4 11V13H16L10.5 18.5L11.92 19.92L19.84 12L11.92 4.08L10.5 5.5L16 11H4Z"/></svg></a></div></div></div>
+                </div>
+            </div>
+            <div class="tour-category">
+                <h3 class="category-title"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9C5 10.5 5.47 11.87 6.26 13H6.24L12 21L17.74 13H17.72C18.5 11.87 19 10.5 19 9C19 5.13 15.87 2 12 2Z"/></svg>Cappadocia Adventures</h3>
+                <div class="tours-grid">
+                    <div class="tour-card"><div class="img-wrap"><img src="cappadocia-sky-tour.jpg" alt="Red Tour"><span class="tour-badge">Best Seller</span></div><div class="text"><h3>Red Tour</h3><p>Fairy chimneys, Goreme Museum, Uchisar Castle.</p><div class="tour-actions"><a href="pdf/RED TOUR (2).pdf" target="_blank" class="tour-pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/></svg> PDF</a><a href="#contact" class="tour-link">Book Now <svg viewBox="0 0 24 24"><path d="M4 11V13H16L10.5 18.5L11.92 19.92L19.84 12L11.92 4.08L10.5 5.5L16 11H4Z"/></svg></a></div></div></div>
+                    <div class="tour-card"><div class="img-wrap"><img src="Capadocia-jungle-tour.jpg" alt="Green Tour"></div><div class="text"><h3>Green Tour</h3><p>Underground cities, Ihlara Valley.</p><div class="tour-actions"><a href="pdf/GREEN TOUR.pdf" target="_blank" class="tour-pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/></svg> PDF</a><a href="#contact" class="tour-link">Book Now <svg viewBox="0 0 24 24"><path d="M4 11V13H16L10.5 18.5L11.92 19.92L19.84 12L11.92 4.08L10.5 5.5L16 11H4Z"/></svg></a></div></div></div>
+                    <div class="tour-card"><div class="img-wrap"><img src="Cappadocia-bike-tour.jpg" alt="ATV Tour"></div><div class="text"><h3>ATV Quadbike Tour</h3><p>Thrill ride through Cappadocia.</p><div class="tour-actions"><a href="pdf/ATV QUATBIKE TOURS.pdf" target="_blank" class="tour-pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/></svg> PDF</a><a href="#contact" class="tour-link">Book Now <svg viewBox="0 0 24 24"><path d="M4 11V13H16L10.5 18.5L11.92 19.92L19.84 12L11.92 4.08L10.5 5.5L16 11H4Z"/></svg></a></div></div></div>
+                    <div class="tour-card"><div class="img-wrap"><img src="Kapadokya-horse-tour.jpg" alt="Horse Tour"></div><div class="text"><h3>Horseback Riding</h3><p>Explore valleys on horseback.</p><div class="tour-actions"><a href="pdf/HORSE BACK RİDING.pdf" target="_blank" class="tour-pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/></svg> PDF</a><a href="#contact" class="tour-link">Book Now <svg viewBox="0 0 24 24"><path d="M4 11V13H16L10.5 18.5L11.92 19.92L19.84 12L11.92 4.08L10.5 5.5L16 11H4Z"/></svg></a></div></div></div>
+                    <div class="tour-card"><div class="img-wrap"><img src="turkish-night.jpg" alt="Turkish Night"><span class="tour-badge">Cultural</span></div><div class="text"><h3>Turkish Night Show</h3><p>Folk dances and traditional cuisine.</p><div class="tour-actions"><a href="pdf/cappadocia-turkish-night.pdf" target="_blank" class="tour-pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/></svg> PDF</a><a href="#contact" class="tour-link">Book Now <svg viewBox="0 0 24 24"><path d="M4 11V13H16L10.5 18.5L11.92 19.92L19.84 12L11.92 4.08L10.5 5.5L16 11H4Z"/></svg></a></div></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="hotels" id="hotels">
+        <div class="section-header"><span class="section-tag">Accommodation</span><h2 class="section-title">Premium Hotel <span>Reservations</span></h2></div>
+        <div class="hotels-grid">
+            <div class="hotel-card"><div class="img-wrap"><img src="istanbulhotels.png" alt="Turkiye Hotels"></div><div class="text"><h3><span class="flag">🇹🇷</span> Turkiye Hotels</h3><p>From luxurious 5-star resorts to boutique hotels and unique cave hotels in Cappadocia.</p><div class="hotel-features"><div class="hotel-feature"><svg viewBox="0 0 24 24"><path d="M19 7H5V14H19V7M21 17H3V5H21V17M1 11V19H23V11H1Z"/></svg> 5-Star Resorts</div><div class="hotel-feature"><svg viewBox="0 0 24 24"><path d="M12 3L2 12H5V20H19V12H22L12 3Z"/></svg> Boutique Hotels</div><div class="hotel-feature"><svg viewBox="0 0 24 24"><path d="M14 6L10.25 11L13.1 14.8L11.5 16C9.81 13.75 7 10 7 10L1 18H23L14 6Z"/></svg> Cave Hotels</div><div class="hotel-feature"><svg viewBox="0 0 24 24"><path d="M14.4 6L14 4H5V21H7V14H12.6L13 16H20V6H14.4Z"/></svg> Beach Resorts</div></div><div class="hotel-cities"><h4>Popular Cities</h4><div class="city-tags"><span class="city-tag">Istanbul</span><span class="city-tag">Antalya</span><span class="city-tag">Cappadocia</span><span class="city-tag">Bodrum</span></div></div></div></div>
+            <div class="hotel-card"><div class="img-wrap"><img src="Bakuhotels.png" alt="Azerbaijan Hotels"></div><div class="text"><h3><span class="flag">🇦🇿</span> Azerbaijan Hotels</h3><p>Experience the best of Azerbaijani hospitality from modern towers to mountain retreats.</p><div class="hotel-features"><div class="hotel-feature"><svg viewBox="0 0 24 24"><path d="M19 7H5V14H19V7M21 17H3V5H21V17M1 11V19H23V11H1Z"/></svg> Luxury Towers</div><div class="hotel-feature"><svg viewBox="0 0 24 24"><path d="M12 3L2 12H5V20H19V12H22L12 3Z"/></svg> Historic Hotels</div><div class="hotel-feature"><svg viewBox="0 0 24 24"><path d="M14 6L10.25 11L13.1 14.8L11.5 16C9.81 13.75 7 10 7 10L1 18H23L14 6Z"/></svg> Mountain Resorts</div><div class="hotel-feature"><svg viewBox="0 0 24 24"><path d="M2 15C2 15 2 9 7 9C7 9 7 3 12 3C17 3 17 9 17 9C22 9 22 15 22 15H2Z"/></svg> Spa & Wellness</div></div><div class="hotel-cities"><h4>Popular Cities</h4><div class="city-tags"><span class="city-tag">Baku</span><span class="city-tag">Gabala</span><span class="city-tag">Sheki</span><span class="city-tag">Guba</span></div></div></div></div>
+        </div>
+    </section>
+
+    <section class="featured-hotels">
+        <div class="section-header"><span class="section-tag">Featured Partners</span><h2 class="section-title">5-Star <span>Luxury Hotels</span></h2><p class="section-desc">Experience world-class hospitality at our premium partner hotels in Istanbul.</p></div>
+        <div class="featured-grid">
+            <div class="featured-card">
+                <div class="img-wrap"><img src="swissotel-bosphorus.jpg" alt="Swissotel The Bosphorus"></div>
+                <div class="text">
+                    <h3>Swissôtel The Bosphorus</h3>
+                    <div class="location"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2M12 11.5A2.5 2.5 0 1 1 14.5 9A2.5 2.5 0 0 1 12 11.5Z"/></svg>Besiktas, Istanbul</div>
+                    <p>Iconic luxury hotel set within 65 acres of historic gardens with breathtaking Bosphorus views. World-class spa, multiple restaurants, and exceptional service.</p>
+                    <div class="featured-amenities">
+                        <span class="amenity"><svg viewBox="0 0 24 24"><path d="M2 15C2 15 2 9 7 9C7 9 7 3 12 3C17 3 17 9 17 9C22 9 22 15 22 15H2Z"/></svg>Spa</span>
+                        <span class="amenity"><svg viewBox="0 0 24 24"><path d="M20 12V16C20 17.1 19.1 18 18 18H13V16H18V12H20M4 12V16H9V18H4C2.9 18 2 17.1 2 16V12H4M9 4V6H4V10H2V6C2 4.9 2.9 4 4 4H9M20 6V10H18V6H13V4H18C19.1 4 20 4.9 20 6Z"/></svg>Pool</span>
+                        <span class="amenity"><svg viewBox="0 0 24 24"><path d="M11 9H9V2H7V9H5V2H3V9C3 11.12 4.66 12.84 6.75 12.97V22H9.25V12.97C11.34 12.84 13 11.12 13 9V2H11V9Z"/></svg>Fine Dining</span>
+                        <span class="amenity"><svg viewBox="0 0 24 24"><path d="M12 2C15.9 2 19 5.1 19 9C19 14.2 12 22 12 22S5 14.2 5 9C5 5.1 8.1 2 12 2Z"/></svg>Bosphorus View</span>
+                    </div>
+                </div>
+            </div>
+            <div class="featured-card">
+                <div class="img-wrap"><img src="cvk-park-bosphorus.jpg" alt="CVK Park Bosphorus Hotel"></div>
+                <div class="text">
+                    <h3>CVK Park Bosphorus Hotel</h3>
+                    <div class="location"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2M12 11.5A2.5 2.5 0 1 1 14.5 9A2.5 2.5 0 0 1 12 11.5Z"/></svg>Taksim, Istanbul</div>
+                    <p>Prestigious 5-star hotel in the heart of Istanbul overlooking the Bosphorus. Features elegant rooms, rooftop restaurant, and premium amenities for discerning travelers.</p>
+                    <div class="featured-amenities">
+                        <span class="amenity"><svg viewBox="0 0 24 24"><path d="M2 15C2 15 2 9 7 9C7 9 7 3 12 3C17 3 17 9 17 9C22 9 22 15 22 15H2Z"/></svg>Spa</span>
+                        <span class="amenity"><svg viewBox="0 0 24 24"><path d="M12 7V3H2V21H22V7H12M6 19H4V17H6V19M6 15H4V13H6V15M6 11H4V9H6V11M6 7H4V5H6V7M10 19H8V17H10V19M10 15H8V13H10V15M10 11H8V9H10V11M10 7H8V5H10V7M20 19H12V17H14V15H12V13H14V11H12V9H20V19Z"/></svg>City View</span>
+                        <span class="amenity"><svg viewBox="0 0 24 24"><path d="M11 9H9V2H7V9H5V2H3V9C3 11.12 4.66 12.84 6.75 12.97V22H9.25V12.97C11.34 12.84 13 11.12 13 9V2H11V9Z"/></svg>Rooftop Dining</span>
+                        <span class="amenity"><svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5H6.5C5.84 5 5.28 5.42 5.08 6.01L3 12V20C3 20.55 3.45 21 4 21H5C5.55 21 6 20.55 6 20V19H18V20C18 20.55 18.45 21 19 21H20C20.55 21 21 20.55 21 20V12L18.92 6.01Z"/></svg>Valet Parking</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="azerbaijan" id="baku">
+        <div class="az-grid">
+            <div class="az-content"><span class="section-tag">New Destination</span><h2>Discover <span>Azerbaijan</span></h2><p>Experience the perfect blend of ancient history and modern luxury in the Land of Fire.</p><div class="az-services"><div class="az-service"><div class="icon"><svg viewBox="0 0 24 24"><path d="M21 16V14L13 9V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9L2 14V16L10 13.5V19L8 20.5V22L11.5 21L15 22V20.5L13 19V13.5L21 16Z"/></svg></div><div><h4>Airport Transfers</h4><p>VIP transfers from Baku Heydar Aliyev Airport.</p></div></div><div class="az-service"><div class="icon"><svg viewBox="0 0 24 24"><path d="M19 7H5V14H19V7M21 17H3V5H21V17M1 11V19H23V11H1Z"/></svg></div><div><h4>Hotel Reservations</h4><p>Book premium hotels in Baku, Gabala, Sheki.</p></div></div><div class="az-service"><div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2M12 11.5C10.62 11.5 9.5 10.38 9.5 9S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5Z"/></svg></div><div><h4>Guided Tours</h4><p>Explore Baku Old City, Flame Towers, Gobustan.</p></div></div></div><div class="az-destinations"><span class="az-dest">Baku Old City</span><span class="az-dest">Flame Towers</span><span class="az-dest">Gobustan</span><span class="az-dest">Sheki Palace</span><span class="az-dest">Gabala</span></div></div>
+            <div class="az-image"><img src="Baku.png" alt="Baku Azerbaijan"></div>
+        </div>
+    </section>
+
+    <section class="director" id="director">
+        <div class="director-grid">
+            <div class="director-image"><img src="Director.png" alt="Cuneyt Yedikardesh"><div class="director-badge"><h4>General Director</h4></div></div>
+            <div class="director-content"><span class="section-tag">Leadership</span><h2>Meet Our <span>Visionary Leader</span></h2><div class="director-name">Cuneyt Yedikardesh</div><p>With over 20 years of experience in the tourism industry, Cuneyt Yedikardesh founded CYN Tourism with a vision to bridge Algeria, Turkiye, and Azerbaijan through exceptional travel experiences.</p><div class="director-quote">"Our mission is simple: to make every traveler feel like a VIP, creating memories that last a lifetime."</div><div class="director-stats"><div class="director-stat"><div class="num">20+</div><span>Years Leading</span></div><div class="director-stat"><div class="num">50K+</div><span>Happy Clients</span></div><div class="director-stat"><div class="num">30+</div><span>Destinations</span></div></div></div>
+        </div>
+    </section>
+    <section class="about" id="about">
+        <div class="about-grid">
+            <div class="about-image"><img src="istanbul.jpeg" alt="Istanbul"><div class="years-badge"><div class="years">20+</div><span>Years of Excellence</span></div></div>
+            <div class="about-content"><span class="section-tag">About Us</span><h2>Your Trusted Partner for <span>Premium Travel</span></h2><p>CYN Tourism offers a wide range of transfer services to and from airports in Turkiye and Azerbaijan, including Istanbul International Airport, Sabiha Gokcen Airport, Antalya Airport, and Baku Heydar Aliyev International Airport.</p><p>Since 2004, our primary goal has been the highest quality of services. This is why CYN Tour became one of the traveler's top choices.</p><div class="about-features"><div class="about-feature"><div class="icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z"/></svg></div><div><h4>Safe & Secure</h4><p>Licensed and insured vehicles</p></div></div><div class="about-feature"><div class="icon"><svg viewBox="0 0 24 24"><path d="M12 4A4 4 0 0 1 16 8A4 4 0 0 1 12 12A4 4 0 0 1 8 8A4 4 0 0 1 12 4M12 14C16.42 14 20 15.79 20 18V20H4V18C4 15.79 7.58 14 12 14Z"/></svg></div><div><h4>Professional Drivers</h4><p>Multilingual local experts</p></div></div><div class="about-feature"><div class="icon"><svg viewBox="0 0 24 24"><path d="M5 11L6.5 6.5H17.5L19 11M17.5 16A1.5 1.5 0 1 1 16 14.5A1.5 1.5 0 0 1 17.5 16M6.5 16A1.5 1.5 0 1 1 5 14.5A1.5 1.5 0 0 1 6.5 16M18.92 6C18.72 5.42 18.16 5 17.5 5H6.5C5.84 5 5.28 5.42 5.08 6L3 12V20A1 1 0 0 0 4 21H5A1 1 0 0 0 6 20V19H18V20A1 1 0 0 0 19 21H20A1 1 0 0 0 21 20V12L18.92 6Z"/></svg></div><div><h4>Luxury Fleet</h4><p>Mercedes & premium vehicles</p></div></div><div class="about-feature"><div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12A10 10 0 0 0 12 22A10 10 0 0 0 22 12A10 10 0 0 0 12 2M16.2 16.2L11 13V7H12.5V12.2L17 14.9L16.2 16.2Z"/></svg></div><div><h4>24/7 Support</h4><p>Always here to assist you</p></div></div></div></div>
+        </div>
+    </section>
+
+    <section class="certification"><div class="cert-content"><div class="cert-badge"><img src="Toursablogo.png" alt="TURSAB Logo"></div><div class="cert-text"><h3>Official Certification</h3><p>CYN Tourism is certified by <strong>TURSAB</strong> (Association of Turkish Travel Agencies) under license no: <strong>11738</strong></p></div></div></section>
+
+    <section class="contact" id="contact">
+        <div class="section-header"><span class="section-tag">Get In Touch</span><h2 class="section-title">Book Your <span>Service Today</span></h2></div>
+        <div class="contact-grid">
+            <div class="contact-cards">
+                <div class="contact-card"><h3><span class="flag">🇩🇿</span> Algeria Office</h3><div class="contact-details"><div class="contact-item"><div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2M12 11.5A2.5 2.5 0 1 1 14.5 9A2.5 2.5 0 0 1 12 11.5Z"/></svg></div><div><h5>Address</h5><p>08, Route du Kadous<br>Hydra - Alger, Algeria</p></div></div><div class="contact-item"><div class="icon"><svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/></svg></div><div><h5>WhatsApp</h5><a href="https://wa.me/213770127157">+213 770 127 157</a></div></div><div class="contact-item"><div class="icon"><svg viewBox="0 0 24 24"><path d="M20 8L12 13L4 8V6L12 11L20 6M20 4H4C2.89 4 2 4.89 2 6V18A2 2 0 0 0 4 20H20A2 2 0 0 0 22 18V6C22 4.89 21.1 4 20 4Z"/></svg></div><div><h5>Email</h5><a href="/cdn-cgi/l/email-protection#7910171f16391a00170d160c0b18151e1c0b1018571a1614"><span class="__cf_email__" data-cfemail="01686f676e4162786f756e7473606d66647368602f626e6c">[email&#160;protected]</span></a></div></div></div><div class="contact-map"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3197.4!2d3.0253!3d36.7466!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x128fb2646b6b28f1%3A0x8c1c!2sHydra%2C%20Algiers!5e0!3m2!1sen!2sdz!4v1" loading="lazy"></iframe></div></div>
+                <div class="contact-card"><h3><span class="flag">🇹🇷</span> Turkiye Office</h3><div class="contact-details"><div class="contact-item"><div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2M12 11.5A2.5 2.5 0 1 1 14.5 9A2.5 2.5 0 0 1 12 11.5Z"/></svg></div><div><h5>Address</h5><p>Molla Gurani, Karakoyunlu Sok.<br>No:2 D:4, 34093 Fatih/Istanbul</p></div></div><div class="contact-item"><div class="icon"><svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/></svg></div><div><h5>WhatsApp</h5><a href="https://wa.me/905318176770">+90 531 817 67 70</a></div></div><div class="contact-item"><div class="icon"><svg viewBox="0 0 24 24"><path d="M20 8L12 13L4 8V6L12 11L20 6M20 4H4C2.89 4 2 4.89 2 6V18A2 2 0 0 0 4 20H20A2 2 0 0 0 22 18V6C22 4.89 21.1 4 20 4Z"/></svg></div><div><h5>Email</h5><a href="/cdn-cgi/l/email-protection#dfb6b1b9b09fbca6b1abb0aaadf1bcb0b2"><span class="__cf_email__" data-cfemail="0861666e67486b71667c677d7a266b6765">[email&#160;protected]</span></a></div></div></div><div class="contact-map"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.6!2d28.9456!3d41.0122!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caba9cc3a4b87d%3A0x4f1c!2sFatih%2C%20Istanbul!5e0!3m2!1sen!2str!4v1" loading="lazy"></iframe></div></div>
+            </div>
+            <div class="contact-form"><h3>Request a Quote</h3><form id="quoteForm"><div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" id="fullName" required placeholder="Your name"></div><div class="form-group"><label>Email Address</label><input type="email" id="email" required placeholder="your@email.com"></div></div><div class="form-row"><div class="form-group"><label>Phone Number</label><input type="tel" id="phone" placeholder="+213 XXX XXX XXX"></div><div class="form-group"><label>Service Type</label><select id="serviceType"><option value="">Select a service</option><option value="Airport Transfer">Airport Transfer</option><option value="Tour Package">Tour Package</option><option value="Hotel Reservation">Hotel Reservation</option><option value="Air Ticket">Air Ticket</option><option value="Yacht Rental">Yacht Rental</option><option value="Other">Other</option></select></div></div><div class="form-row"><div class="form-group"><label>Travel Date</label><input type="date" id="travelDate"></div><div class="form-group"><label>Number of Passengers</label><input type="number" id="passengers" min="1" max="50" placeholder="Enter number"></div></div><div class="form-group"><label>Your Message</label><textarea id="message" placeholder="Tell us about your travel plans..."></textarea></div><button type="submit" class="btn-whatsapp"><svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/></svg>Send via WhatsApp</button></form></div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-main">
+            <div class="footer-brand"><a href="#" class="logo"><img src="logo.png" alt="CYN Tourism"></a><p>Your trusted partner for premium travel services worldwide since 2004. TURSAB certified.</p><div class="tursab-badge"><img src="Toursablogo.png" alt="TURSAB"><span>TURSAB: 11738</span></div></div>
+            <div><h4>Quick Links</h4><ul class="footer-links"><li><a href="#home">Home</a></li><li><a href="#services">Services</a></li><li><a href="#tours">Tours</a></li><li><a href="#hotels">Hotels</a></li><li><a href="#about">About</a></li><li><a href="#contact">Contact</a></li></ul></div>
+            <div><h4>Services</h4><ul class="footer-links"><li><a href="#transfers">Airport Transfers</a></li><li><a href="#tours">Guided Tours</a></li><li><a href="#hotels">Hotel Reservations</a></li><li><a href="#services">Air Tickets</a></li><li><a href="#baku">Azerbaijan Services</a></li></ul></div>
+            <div><h4>Turkiye Office</h4><ul class="footer-links"><li>Fatih, Istanbul</li><li>+90 531 817 67 70</li><li><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="650c0b030a25061c0b110a10174b060a08">[email&#160;protected]</a></li></ul></div>
+        </div>
+        <div class="footer-bottom"><p>2025 CYN Tourism. All rights reserved. | TURSAB License: 11738</p><p>@cyn__turizm</p></div>
+    </footer>
+
+    <a href="https://wa.me/905318176770" class="whatsapp-float" target="_blank"><svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/></svg></a>
+    <a href="tel:+905318176770" class="phone-float"><svg viewBox="0 0 24 24"><path d="M6.62 10.79C8.06 13.62 10.38 15.94 13.21 17.38L15.41 15.18C15.69 14.9 16.08 14.82 16.43 14.93C17.55 15.3 18.75 15.5 20 15.5A1 1 0 0 1 21 16.5V20A1 1 0 0 1 20 21A17 17 0 0 1 3 4A1 1 0 0 1 4 3H7.5A1 1 0 0 1 8.5 4C8.5 5.25 8.7 6.45 9.07 7.57C9.18 7.92 9.1 8.31 8.82 8.59L6.62 10.79Z"/></svg></a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form submission
+            var form = document.getElementById('quoteForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var name = document.getElementById('fullName').value;
+                    var email = document.getElementById('email').value;
+                    var phone = document.getElementById('phone').value;
+                    var service = document.getElementById('serviceType').value;
+                    var date = document.getElementById('travelDate').value;
+                    var passengers = document.getElementById('passengers').value;
+                    var message = document.getElementById('message').value;
+                    var text = '*New Booking Request - CYN Tourism*%0A%0A' +
+                        '*Name:* ' + name + '%0A' +
+                        '*Email:* ' + email + '%0A' +
+                        '*Phone:* ' + phone + '%0A' +
+                        '*Service:* ' + service + '%0A' +
+                        '*Travel Date:* ' + date + '%0A' +
+                        '*Passengers:* ' + passengers + '%0A' +
+                        '*Message:* ' + message;
+                    window.open('https://wa.me/905318176770?text=' + text, '_blank');
+                });
+            }
+
+            // Navbar scroll
+            window.addEventListener('scroll', function() {
+                var navbar = document.querySelector('.navbar');
+                if (navbar) {
+                    if (window.scrollY > 50) {
+                        navbar.classList.add('scrolled');
+                    } else {
+                        navbar.classList.remove('scrolled');
+                    }
+                }
+            });
+
+            // Mobile toggle
+            var mobileToggle = document.getElementById('mobileToggle');
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', function() {
+                    var navLinks = document.getElementById('navLinks');
+                    if (navLinks) navLinks.classList.toggle('active');
+                    this.classList.toggle('active');
+                });
+            }
+
+            // Smooth scroll
+            var links = document.querySelectorAll('a[href^="#"]');
+            links.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    var href = this.getAttribute('href');
+                    if (href && href !== '#') {
+                        var target = document.querySelector(href);
+                        if (target) {
+                            e.preventDefault();
+                            target.scrollIntoView({ behavior: 'smooth' });
+                            var navLinks = document.getElementById('navLinks');
+                            var mobileToggle = document.getElementById('mobileToggle');
+                            if (navLinks) navLinks.classList.remove('active');
+                            if (mobileToggle) mobileToggle.classList.remove('active');
+                        }
+                    }
+                });
+            });
+
+
+            // ========================================
+            // COMPREHENSIVE TRANSLATION SYSTEM v2.0
+            // Languages: English, French, Arabic, Turkish
+            // ========================================
+            
+            var translations = {
+                en: {
+                    nav: ['Home', 'Services', 'Tours', 'Hotels', 'About', 'Book Now'],
+                    heroBadge: 'Premium Experiences Since 2004',
+                    heroTitle: 'Your Gateway to <span>Worldwide</span> Travel',
+                    heroSubtitle: 'Experience luxury and comfort with our premium services. VIP transfers, exclusive tours, hotel reservations, air tickets, yacht rental and helicopter tours.',
+                    heroBtn1: 'Book Now', heroBtn2: 'Explore Tours',
+                    stats: ['Years Experience', 'Happy Travelers', 'Destinations'],
+                    
+                    destTag: 'Explore Destinations', destTitle: 'Stunning Destinations <span>Await</span>',
+                    destDesc: 'From Istanbul to Dubai, Maldives to Europe - we take you everywhere worldwide.',
+                    destNames: ['Istanbul', 'Baku', 'Antalya', 'Cappadocia', 'Dubai', 'Malaysia', 'Maldives', 'Egypt', 'Europe', 'Asia'],
+                    destDescs: ['Where East meets West', 'Pearl of the Caspian', 'Turkish Riviera', 'Land of Fairy Chimneys', 'City of Gold', 'Truly Asia', 'Paradise on Earth', 'Land of Pharaohs', 'Historic Wonders', 'Eastern Treasures'],
+                    
+                    servTag: 'Our Services', servTitle: 'Complete Travel <span>Solutions</span>',
+                    servDesc: 'Everything you need for an unforgettable journey.',
+                    servNames: ['Air Tickets', 'Hotel Reservations', 'Guided Tours', 'Yacht Rental', 'Helicopter Tours', 'Car Rental'],
+                    servDescs: ['Best deals on flights worldwide.', 'From 5-star luxury to boutique stays.', 'Expert-guided multilingual tours.', 'Private yacht charters.', 'See Istanbul from above.', 'Luxury vehicles for adventures.'],
+                    
+                    expTag: 'Premium Experiences', expTitle: 'Excellence in Every <span>Journey</span>',
+                    expNames: ['Luxury Transfers', 'Exclusive Tours', 'Hotel Reservations'],
+                    expDescs: ['Premium transportation from all major airports with our modern Mercedes fleet.', 'Discover hidden gems from Istanbul to Cappadocia with expert multilingual guides.', 'Book the finest hotels worldwide. From beachfront resorts to historic boutique hotels.'],
+                    
+                    transTag: 'VIP Transfer Services', transTitle: 'Premium Airport <span>Transfers</span>',
+                    transDesc: 'Professional VIP transfer services from all major airports.',
+                    
+                    fleetTag: 'Our Fleet', fleetTitle: 'Luxury Vehicles for <span>Every Need</span>',
+                    fleetNames: ['Mercedes Vito', 'Mercedes Sprinter', 'Luxury Sedans', 'Modern Buses'],
+                    fleetDescs: ['Perfect for small groups and families', 'Spacious comfort for larger groups', 'Executive and VIP transfers', 'Ideal for group excursions'],
+                    
+                    toursTag: 'Discover Tours', toursTitle: 'Explore Our Amazing <span>Tours</span>',
+                    toursCat1: 'Istanbul & Marmara Region', toursCat2: 'Cappadocia Adventures',
+                    tourBadges: { popular: 'Popular', recommended: 'Recommended', bestSeller: 'Best Seller', cultural: 'Cultural' },
+                    bookNow: 'Book Now',
+                    
+                    hotelsTag: 'Accommodation', hotelsTitle: 'Premium Hotel <span>Reservations</span>',
+                    hotelsTR: 'Türkiye Hotels', hotelsTRDesc: 'From luxurious 5-star resorts to boutique hotels and unique cave hotels in Cappadocia.',
+                    hotelsAZ: 'Azerbaijan Hotels', hotelsAZDesc: 'Experience the best of Azerbaijani hospitality from modern towers to mountain retreats.',
+                    popularCities: 'Popular Cities',
+                    
+                    featuredTag: 'Featured Partners', featuredTitle: '5-Star <span>Luxury Hotels</span>',
+                    featuredDesc: 'Experience world-class hospitality at our premium partner hotels in Istanbul.',
+                    
+                    azTag: 'New Destination', azTitle: 'Discover <span>Azerbaijan</span>',
+                    azDesc: 'Experience the perfect blend of ancient history and modern luxury in the Land of Fire.',
+                    azServNames: ['Airport Transfers', 'Hotel Reservations', 'Guided Tours'],
+                    azServDescs: ['VIP transfers from Baku Heydar Aliyev Airport.', 'Book premium hotels in Baku, Gabala, Sheki.', 'Explore Baku Old City, Flame Towers, Gobustan.'],
+                    
+                    dirTag: 'Leadership', dirTitle: 'Meet Our <span>Visionary Leader</span>',
+                    dirRole: 'General Director',
+                    dirDesc: 'With over 20 years of experience in the tourism industry, Cüneyt Yedikardeş founded CYN Tourism with a vision to bridge Algeria, Türkiye, and Azerbaijan through exceptional travel experiences.',
+                    dirQuote: '"Our mission is simple: to make every traveler feel like a VIP, creating memories that last a lifetime."',
+                    dirStats: ['Years Leading', 'Happy Clients', 'Destinations'],
+                    
+                    aboutTag: 'About Us', aboutTitle: 'Your Trusted Partner for <span>Premium Travel</span>',
+                    yearsLabel: 'Years of Excellence',
+                    aboutDesc1: 'CYN Tourism offers a wide range of transfer services to and from airports in Türkiye and Azerbaijan.',
+                    aboutDesc2: 'Since 2004, our primary goal has been the highest quality of services. This is why CYN Tour became one of the traveler\'s top choices.',
+                    aboutFeatures: [['Safe & Secure', 'Licensed and insured vehicles'], ['Professional Drivers', 'Multilingual local experts'], ['Luxury Fleet', 'Mercedes & premium vehicles'], ['24/7 Support', 'Always here to assist you']],
+                    
+                    certTitle: 'Official Certification',
+                    certDesc: 'CYN Tourism is certified by <strong>TURSAB</strong> (Association of Turkish Travel Agencies) under license no: <strong>11738</strong>',
+                    
+                    contactTag: 'Get In Touch', contactTitle: 'Book Your <span>Service Today</span>',
+                    algeriaOffice: 'Algeria Office', turkiyeOffice: 'Türkiye Office', address: 'Address',
+                    formTitle: 'Request a Quote',
+                    formLabels: ['Full Name', 'Email Address', 'Phone Number', 'Service Type', 'Travel Date', 'Number of Passengers', 'Your Message'],
+                    formPlaceholder: 'Tell us about your travel plans...',
+                    selectService: 'Select a service',
+                    formOptions: ['Airport Transfer', 'Tour Package', 'Hotel Reservation', 'Air Ticket', 'Yacht Rental', 'Other'],
+                    sendBtn: 'Send via WhatsApp',
+                    
+                    footerDesc: 'Your trusted partner for premium travel services worldwide since 2004. TURSAB certified.',
+                    quickLinks: 'Quick Links', footerServices: 'Services',
+                    copyright: '© 2025 CYN Tourism. All rights reserved. | TURSAB License: 11738'
+                },
+                
+                fr: {
+                    nav: ['Accueil', 'Services', 'Circuits', 'Hôtels', 'À Propos', 'Réserver'],
+                    heroBadge: 'Expériences Premium Depuis 2004',
+                    heroTitle: 'Votre Passerelle vers le <span>Monde Entier</span>',
+                    heroSubtitle: 'Vivez le luxe et le confort avec nos services premium. Transferts VIP, circuits exclusifs, réservations d\'hôtels, billets d\'avion, location de yachts et tours en hélicoptère.',
+                    heroBtn1: 'Réserver', heroBtn2: 'Explorer les Circuits',
+                    stats: ['Ans d\'Expérience', 'Voyageurs Satisfaits', 'Destinations'],
+                    
+                    destTag: 'Explorer les Destinations', destTitle: 'Des Destinations <span>Magnifiques</span>',
+                    destDesc: 'D\'Istanbul à Dubaï, des Maldives à l\'Europe - nous vous emmenons partout.',
+                    destNames: ['Istanbul', 'Bakou', 'Antalya', 'Cappadoce', 'Dubaï', 'Malaisie', 'Maldives', 'Égypte', 'Europe', 'Asie'],
+                    destDescs: ['Où l\'Est rencontre l\'Ouest', 'Perle de la Caspienne', 'Riviera Turque', 'Pays des Cheminées', 'Cité de l\'Or', 'La Vraie Asie', 'Paradis sur Terre', 'Pays des Pharaons', 'Merveilles Historiques', 'Trésors de l\'Orient'],
+                    
+                    servTag: 'Nos Services', servTitle: 'Solutions de Voyage <span>Complètes</span>',
+                    servDesc: 'Tout ce dont vous avez besoin pour un voyage inoubliable.',
+                    servNames: ['Billets d\'Avion', 'Réservations d\'Hôtels', 'Visites Guidées', 'Location de Yacht', 'Tours en Hélicoptère', 'Location de Voiture'],
+                    servDescs: ['Meilleures offres de vols.', 'Du luxe 5 étoiles aux boutiques.', 'Visites multilingues par experts.', 'Charters de yacht privés.', 'Voir Istanbul d\'en haut.', 'Véhicules de luxe.'],
+                    
+                    expTag: 'Expériences Premium', expTitle: 'L\'Excellence à Chaque <span>Voyage</span>',
+                    expNames: ['Transferts de Luxe', 'Circuits Exclusifs', 'Réservations d\'Hôtels'],
+                    expDescs: ['Transport premium depuis tous les aéroports avec notre flotte Mercedes.', 'Découvrez des joyaux cachés d\'Istanbul à la Cappadoce.', 'Réservez les meilleurs hôtels du monde.'],
+                    
+                    transTag: 'Services de Transfert VIP', transTitle: 'Transferts Aéroport <span>Premium</span>',
+                    transDesc: 'Services de transfert VIP professionnels depuis tous les aéroports.',
+                    
+                    fleetTag: 'Notre Flotte', fleetTitle: 'Véhicules de Luxe pour <span>Tous Besoins</span>',
+                    fleetNames: ['Mercedes Vito', 'Mercedes Sprinter', 'Berlines de Luxe', 'Bus Modernes'],
+                    fleetDescs: ['Parfait pour petits groupes', 'Confort spacieux pour grands groupes', 'Transferts exécutifs VIP', 'Idéal pour excursions'],
+                    
+                    toursTag: 'Découvrir les Circuits', toursTitle: 'Explorez Nos <span>Circuits Incroyables</span>',
+                    toursCat1: 'Istanbul & Région de Marmara', toursCat2: 'Aventures en Cappadoce',
+                    tourBadges: { popular: 'Populaire', recommended: 'Recommandé', bestSeller: 'Meilleure Vente', cultural: 'Culturel' },
+                    bookNow: 'Réserver',
+                    
+                    hotelsTag: 'Hébergement', hotelsTitle: 'Réservations d\'Hôtels <span>Premium</span>',
+                    hotelsTR: 'Hôtels Türkiye', hotelsTRDesc: 'Des complexes 5 étoiles aux hôtels boutique et hôtels troglodytes.',
+                    hotelsAZ: 'Hôtels Azerbaïdjan', hotelsAZDesc: 'Meilleure hospitalité azerbaïdjanaise, des tours aux retraites de montagne.',
+                    popularCities: 'Villes Populaires',
+                    
+                    featuredTag: 'Partenaires Vedettes', featuredTitle: 'Hôtels <span>5 Étoiles de Luxe</span>',
+                    featuredDesc: 'Hospitalité de classe mondiale dans nos hôtels partenaires à Istanbul.',
+                    
+                    azTag: 'Nouvelle Destination', azTitle: 'Découvrez <span>l\'Azerbaïdjan</span>',
+                    azDesc: 'Mélange parfait d\'histoire ancienne et de luxe moderne au Pays du Feu.',
+                    azServNames: ['Transferts Aéroport', 'Réservations d\'Hôtels', 'Visites Guidées'],
+                    azServDescs: ['Transferts VIP depuis l\'aéroport de Bakou.', 'Hôtels premium à Bakou, Gabala, Sheki.', 'Explorez Bakou, Tours de Flamme, Gobustan.'],
+                    
+                    dirTag: 'Direction', dirTitle: 'Rencontrez Notre <span>Leader Visionnaire</span>',
+                    dirRole: 'Directeur Général',
+                    dirDesc: 'Fort de plus de 20 ans d\'expérience, Cüneyt Yedikardeş a fondé CYN Tourism pour relier l\'Algérie, la Türkiye et l\'Azerbaïdjan.',
+                    dirQuote: '"Notre mission: faire que chaque voyageur se sente VIP, créant des souvenirs inoubliables."',
+                    dirStats: ['Années de Direction', 'Clients Satisfaits', 'Destinations'],
+                    
+                    aboutTag: 'À Propos de Nous', aboutTitle: 'Partenaire de Confiance pour <span>Voyages Premium</span>',
+                    yearsLabel: 'Années d\'Excellence',
+                    aboutDesc1: 'CYN Tourism offre des services de transfert depuis tous les aéroports en Türkiye et Azerbaïdjan.',
+                    aboutDesc2: 'Depuis 2004, notre objectif est la plus haute qualité. CYN Tour est devenu un choix préféré.',
+                    aboutFeatures: [['Sûr et Sécurisé', 'Véhicules licenciés et assurés'], ['Chauffeurs Pro', 'Experts locaux multilingues'], ['Flotte de Luxe', 'Mercedes et premium'], ['Support 24/7', 'Toujours là pour vous']],
+                    
+                    certTitle: 'Certification Officielle',
+                    certDesc: 'CYN Tourism certifié par <strong>TURSAB</strong> sous licence: <strong>11738</strong>',
+                    
+                    contactTag: 'Contactez-Nous', contactTitle: 'Réservez Votre <span>Service</span>',
+                    algeriaOffice: 'Bureau Algérie', turkiyeOffice: 'Bureau Türkiye', address: 'Adresse',
+                    formTitle: 'Demander un Devis',
+                    formLabels: ['Nom Complet', 'Adresse Email', 'Téléphone', 'Type de Service', 'Date de Voyage', 'Nombre de Passagers', 'Votre Message'],
+                    formPlaceholder: 'Parlez-nous de vos projets de voyage...',
+                    selectService: 'Sélectionnez un service',
+                    formOptions: ['Transfert Aéroport', 'Forfait Circuit', 'Réservation Hôtel', 'Billet Avion', 'Location Yacht', 'Autre'],
+                    sendBtn: 'Envoyer via WhatsApp',
+                    
+                    footerDesc: 'Partenaire de confiance pour voyages premium depuis 2004. Certifié TURSAB.',
+                    quickLinks: 'Liens Rapides', footerServices: 'Services',
+                    copyright: '© 2025 CYN Tourism. Tous droits réservés. | Licence TURSAB: 11738'
+                },
+                
+                ar: {
+                    nav: ['الرئيسية', 'الخدمات', 'الجولات', 'الفنادق', 'من نحن', 'احجز الآن'],
+                    heroBadge: 'تجارب مميزة منذ 2004',
+                    heroTitle: 'بوابتك إلى السفر <span>حول العالم</span>',
+                    heroSubtitle: 'استمتع بالفخامة والراحة مع خدماتنا المميزة. نقل VIP، جولات حصرية، حجوزات فنادق، تذاكر طيران، تأجير يخوت وجولات بالمروحية.',
+                    heroBtn1: 'احجز الآن', heroBtn2: 'استكشف الجولات',
+                    stats: ['سنوات الخبرة', 'مسافر سعيد', 'وجهة'],
+                    
+                    destTag: 'استكشف الوجهات', destTitle: 'وجهات <span>مذهلة بانتظارك</span>',
+                    destDesc: 'من إسطنبول إلى دبي، من المالديف إلى أوروبا - نأخذك إلى كل مكان.',
+                    destNames: ['إسطنبول', 'باكو', 'أنطاليا', 'كابادوكيا', 'دبي', 'ماليزيا', 'المالديف', 'مصر', 'أوروبا', 'آسيا'],
+                    destDescs: ['حيث يلتقي الشرق بالغرب', 'لؤلؤة بحر قزوين', 'الريفييرا التركية', 'أرض المداخن الخيالية', 'مدينة الذهب', 'آسيا الحقيقية', 'جنة على الأرض', 'أرض الفراعنة', 'عجائب تاريخية', 'كنوز الشرق'],
+                    
+                    servTag: 'خدماتنا', servTitle: 'حلول سفر <span>متكاملة</span>',
+                    servDesc: 'كل ما تحتاجه لرحلة لا تُنسى.',
+                    servNames: ['تذاكر الطيران', 'حجوزات الفنادق', 'جولات مع مرشدين', 'تأجير اليخوت', 'جولات بالمروحية', 'تأجير السيارات'],
+                    servDescs: ['أفضل عروض الرحلات.', 'من 5 نجوم إلى البوتيك.', 'جولات بإرشاد خبراء.', 'استئجار يخوت خاصة.', 'شاهد إسطنبول من الأعلى.', 'سيارات فاخرة لمغامراتك.'],
+                    
+                    expTag: 'تجارب مميزة', expTitle: 'التميز في كل <span>رحلة</span>',
+                    expNames: ['نقل فاخر', 'جولات حصرية', 'حجوزات الفنادق'],
+                    expDescs: ['نقل متميز من جميع المطارات بأسطول مرسيدس.', 'اكتشف الجواهر المخفية من إسطنبول إلى كابادوكيا.', 'احجز أفضل الفنادق في العالم.'],
+                    
+                    transTag: 'خدمات النقل VIP', transTitle: 'نقل المطار <span>المتميز</span>',
+                    transDesc: 'خدمات نقل VIP احترافية من جميع المطارات.',
+                    
+                    fleetTag: 'أسطولنا', fleetTitle: 'سيارات فاخرة <span>لكل احتياج</span>',
+                    fleetNames: ['مرسيدس فيتو', 'مرسيدس سبرينتر', 'سيدان فاخرة', 'حافلات حديثة'],
+                    fleetDescs: ['مثالي للمجموعات الصغيرة', 'راحة للمجموعات الكبيرة', 'نقل تنفيذي وVIP', 'مثالية للرحلات الجماعية'],
+                    
+                    toursTag: 'اكتشف الجولات', toursTitle: 'استكشف جولاتنا <span>المذهلة</span>',
+                    toursCat1: 'إسطنبول ومنطقة مرمرة', toursCat2: 'مغامرات كابادوكيا',
+                    tourBadges: { popular: 'شائع', recommended: 'موصى به', bestSeller: 'الأكثر مبيعاً', cultural: 'ثقافي' },
+                    bookNow: 'احجز الآن',
+                    
+                    hotelsTag: 'الإقامة', hotelsTitle: 'حجوزات فنادق <span>متميزة</span>',
+                    hotelsTR: 'فنادق تركيا', hotelsTRDesc: 'من المنتجعات 5 نجوم إلى فنادق الكهوف الفريدة.',
+                    hotelsAZ: 'فنادق أذربيجان', hotelsAZDesc: 'أفضل الضيافة من الأبراج الحديثة إلى المنتجعات الجبلية.',
+                    popularCities: 'المدن الشائعة',
+                    
+                    featuredTag: 'شركاؤنا المميزون', featuredTitle: 'فنادق <span>5 نجوم فاخرة</span>',
+                    featuredDesc: 'ضيافة عالمية في فنادقنا الشريكة في إسطنبول.',
+                    
+                    azTag: 'وجهة جديدة', azTitle: 'اكتشف <span>أذربيجان</span>',
+                    azDesc: 'المزيج المثالي بين التاريخ العريق والفخامة الحديثة في أرض النار.',
+                    azServNames: ['نقل المطار', 'حجوزات الفنادق', 'جولات مع مرشدين'],
+                    azServDescs: ['نقل VIP من مطار حيدر علييف.', 'فنادق متميزة في باكو وقبالا وشيكي.', 'استكشف باكو القديمة وأبراج اللهب.'],
+                    
+                    dirTag: 'القيادة', dirTitle: 'تعرف على <span>قائدنا الرؤيوي</span>',
+                    dirRole: 'المدير العام',
+                    dirDesc: 'بخبرة 20 عاماً، أسس جونيت يديكارديش CYN Tourism لربط الجزائر وتركيا وأذربيجان بتجارب استثنائية.',
+                    dirQuote: '"مهمتنا: جعل كل مسافر يشعر بأنه VIP، وخلق ذكريات تدوم."',
+                    dirStats: ['سنوات القيادة', 'عملاء سعداء', 'وجهة'],
+                    
+                    aboutTag: 'من نحن', aboutTitle: 'شريكك الموثوق للسفر <span>المتميز</span>',
+                    yearsLabel: 'سنوات من التميز',
+                    aboutDesc1: 'تقدم CYN Tourism خدمات نقل من وإلى المطارات في تركيا وأذربيجان.',
+                    aboutDesc2: 'منذ 2004، هدفنا أعلى جودة. لهذا أصبحت CYN Tour من أفضل الخيارات.',
+                    aboutFeatures: [['آمن ومضمون', 'سيارات مرخصة ومؤمنة'], ['سائقون محترفون', 'خبراء متعددو اللغات'], ['أسطول فاخر', 'مرسيدس وسيارات متميزة'], ['دعم 24/7', 'دائماً لمساعدتك']],
+                    
+                    certTitle: 'شهادة رسمية',
+                    certDesc: 'CYN Tourism معتمدة من <strong>TURSAB</strong> برقم: <strong>11738</strong>',
+                    
+                    contactTag: 'تواصل معنا', contactTitle: 'احجز خدمتك <span>اليوم</span>',
+                    algeriaOffice: 'مكتب الجزائر', turkiyeOffice: 'مكتب تركيا', address: 'العنوان',
+                    formTitle: 'طلب عرض سعر',
+                    formLabels: ['الاسم الكامل', 'البريد الإلكتروني', 'رقم الهاتف', 'نوع الخدمة', 'تاريخ السفر', 'عدد المسافرين', 'رسالتك'],
+                    formPlaceholder: 'أخبرنا عن خطط سفرك...',
+                    selectService: 'اختر خدمة',
+                    formOptions: ['نقل المطار', 'باقة جولة', 'حجز فندق', 'تذكرة طيران', 'تأجير يخت', 'أخرى'],
+                    sendBtn: 'إرسال عبر واتساب',
+                    
+                    footerDesc: 'شريكك الموثوق لخدمات السفر المتميزة منذ 2004. معتمد من TURSAB.',
+                    quickLinks: 'روابط سريعة', footerServices: 'الخدمات',
+                    copyright: '© 2025 CYN Tourism. جميع الحقوق محفوظة. | ترخيص: 11738'
+                },
+                
+                tr: {
+                    nav: ['Ana Sayfa', 'Hizmetler', 'Turlar', 'Oteller', 'Hakkımızda', 'Rezervasyon'],
+                    heroBadge: '2004\'ten Beri Premium Deneyimler',
+                    heroTitle: '<span>Dünya</span> Seyahatine Açılan Kapınız',
+                    heroSubtitle: 'Premium hizmetlerimizle lüks ve konforu yaşayın. VIP transferler, özel turlar, otel rezervasyonları, uçak biletleri, yat kiralama ve helikopter turları.',
+                    heroBtn1: 'Rezervasyon', heroBtn2: 'Turları Keşfet',
+                    stats: ['Yıllık Deneyim', 'Mutlu Gezgin', 'Destinasyon'],
+                    
+                    destTag: 'Destinasyonları Keşfedin', destTitle: 'Muhteşem Destinasyonlar <span>Sizi Bekliyor</span>',
+                    destDesc: 'İstanbul\'dan Dubai\'ye, Maldivler\'den Avrupa\'ya - sizi her yere götürüyoruz.',
+                    destNames: ['İstanbul', 'Bakü', 'Antalya', 'Kapadokya', 'Dubai', 'Malezya', 'Maldivler', 'Mısır', 'Avrupa', 'Asya'],
+                    destDescs: ['Doğu Batı\'yla Buluşuyor', 'Hazar\'ın İncisi', 'Türk Rivierası', 'Peri Bacaları Diyarı', 'Altın Şehir', 'Gerçek Asya', 'Yeryüzü Cenneti', 'Firavunlar Diyarı', 'Tarihi Harikalar', 'Doğu\'nun Hazineleri'],
+                    
+                    servTag: 'Hizmetlerimiz', servTitle: 'Eksiksiz Seyahat <span>Çözümleri</span>',
+                    servDesc: 'Unutulmaz yolculuk için ihtiyacınız olan her şey.',
+                    servNames: ['Uçak Biletleri', 'Otel Rezervasyonları', 'Rehberli Turlar', 'Yat Kiralama', 'Helikopter Turları', 'Araç Kiralama'],
+                    servDescs: ['En iyi uçuş fırsatları.', '5 yıldızdan butik otellere.', 'Çok dilli uzman rehberler.', 'Özel yat charterları.', 'İstanbul\'u yukarıdan görün.', 'Maceralar için lüks araçlar.'],
+                    
+                    expTag: 'Premium Deneyimler', expTitle: 'Her <span>Yolculukta</span> Mükemmellik',
+                    expNames: ['Lüks Transferler', 'Özel Turlar', 'Otel Rezervasyonları'],
+                    expDescs: ['Modern Mercedes filomuzla tüm havalimanlarından premium ulaşım.', 'İstanbul\'dan Kapadokya\'ya gizli hazineleri keşfedin.', 'Dünyanın en iyi otellerini rezerve edin.'],
+                    
+                    transTag: 'VIP Transfer Hizmetleri', transTitle: 'Premium Havalimanı <span>Transferleri</span>',
+                    transDesc: 'Tüm havalimanlarından profesyonel VIP transfer.',
+                    
+                    fleetTag: 'Filomuz', fleetTitle: 'Her İhtiyaç İçin <span>Lüks Araçlar</span>',
+                    fleetNames: ['Mercedes Vito', 'Mercedes Sprinter', 'Lüks Sedanlar', 'Modern Otobüsler'],
+                    fleetDescs: ['Küçük gruplar için ideal', 'Büyük gruplar için konfor', 'Yönetici ve VIP transferler', 'Grup gezileri için ideal'],
+                    
+                    toursTag: 'Turları Keşfedin', toursTitle: 'Harika <span>Turlarımızı</span> Keşfedin',
+                    toursCat1: 'İstanbul & Marmara Bölgesi', toursCat2: 'Kapadokya Maceraları',
+                    tourBadges: { popular: 'Popüler', recommended: 'Önerilen', bestSeller: 'En Çok Satan', cultural: 'Kültürel' },
+                    bookNow: 'Rezervasyon',
+                    
+                    hotelsTag: 'Konaklama', hotelsTitle: 'Premium Otel <span>Rezervasyonları</span>',
+                    hotelsTR: 'Türkiye Otelleri', hotelsTRDesc: 'Lüks 5 yıldızlı resortlardan butik ve mağara otellerine.',
+                    hotelsAZ: 'Azerbaycan Otelleri', hotelsAZDesc: 'Modern kulelerden dağ kaçamakalarına en iyi misafirperverlik.',
+                    popularCities: 'Popüler Şehirler',
+                    
+                    featuredTag: 'Öne Çıkan Partnerler', featuredTitle: '5 Yıldızlı <span>Lüks Oteller</span>',
+                    featuredDesc: 'İstanbul\'daki premium partner otellerimizde dünya standartlarında konukseverlik.',
+                    
+                    azTag: 'Yeni Destinasyon', azTitle: '<span>Azerbaycan\'ı</span> Keşfedin',
+                    azDesc: 'Ateş Ülkesi\'nde kadim tarih ve modern lüksün mükemmel karışımı.',
+                    azServNames: ['Havalimanı Transferleri', 'Otel Rezervasyonları', 'Rehberli Turlar'],
+                    azServDescs: ['Bakü Havalimanı\'ndan VIP transferler.', 'Bakü, Gabala, Şeki\'de premium oteller.', 'Bakü Eski Şehir, Alev Kuleleri keşfi.'],
+                    
+                    dirTag: 'Liderlik', dirTitle: 'Vizyoner <span>Liderimizle</span> Tanışın',
+                    dirRole: 'Genel Müdür',
+                    dirDesc: '20 yılı aşkın deneyimle Cüneyt Yedikardeş, Cezayir, Türkiye ve Azerbaycan\'ı birleştirmek için CYN Tourism\'u kurdu.',
+                    dirQuote: '"Misyonumuz: her gezginin VIP hissetmesini sağlamak, unutulmaz anılar yaratmak."',
+                    dirStats: ['Yıllık Liderlik', 'Mutlu Müşteri', 'Destinasyon'],
+                    
+                    aboutTag: 'Hakkımızda', aboutTitle: '<span>Premium Seyahat</span> İçin Güvenilir Ortağınız',
+                    yearsLabel: 'Yıllık Mükemmellik',
+                    aboutDesc1: 'CYN Tourism, Türkiye ve Azerbaycan havalimanlarına geniş transfer hizmetleri sunar.',
+                    aboutDesc2: '2004\'ten beri hedefimiz en yüksek kalite. Bu yüzden CYN Tour en çok tercih edilenlerden.',
+                    aboutFeatures: [['Güvenli ve Emniyetli', 'Lisanslı ve sigortalı araçlar'], ['Profesyonel Sürücüler', 'Çok dilli yerel uzmanlar'], ['Lüks Filo', 'Mercedes ve premium araçlar'], ['7/24 Destek', 'Her zaman yardıma hazırız']],
+                    
+                    certTitle: 'Resmi Sertifika',
+                    certDesc: 'CYN Tourism, <strong>TURSAB</strong> tarafından <strong>11738</strong> lisansıyla sertifikalıdır.',
+                    
+                    contactTag: 'İletişime Geçin', contactTitle: 'Hizmetinizi <span>Bugün Rezerve Edin</span>',
+                    algeriaOffice: 'Cezayir Ofisi', turkiyeOffice: 'Türkiye Ofisi', address: 'Adres',
+                    formTitle: 'Teklif İste',
+                    formLabels: ['Ad Soyad', 'E-posta Adresi', 'Telefon', 'Hizmet Türü', 'Seyahat Tarihi', 'Yolcu Sayısı', 'Mesajınız'],
+                    formPlaceholder: 'Seyahat planlarınızı bize anlatın...',
+                    selectService: 'Bir hizmet seçin',
+                    formOptions: ['Havalimanı Transferi', 'Tur Paketi', 'Otel Rezervasyonu', 'Uçak Bileti', 'Yat Kiralama', 'Diğer'],
+                    sendBtn: 'WhatsApp ile Gönder',
+                    
+                    footerDesc: '2004\'ten beri dünya genelinde premium seyahat için güvenilir ortağınız.',
+                    quickLinks: 'Hızlı Linkler', footerServices: 'Hizmetler',
+                    copyright: '© 2025 CYN Tourism. Tüm hakları saklıdır. | TURSAB: 11738'
+                }
+            };
+
+            function switchLanguage(lang) {
+                var t = translations[lang];
+                if (!t) return;
+                
+                // RTL for Arabic
+                document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+                document.documentElement.lang = lang;
+                
+                // Navigation
+                var navItems = document.querySelectorAll('.nav-links > li > a');
+                for (var i = 0; i < navItems.length && i < 6; i++) {
+                    if (t.nav[i]) navItems[i].textContent = t.nav[i];
+                }
+                
+                // Hero
+                var heroBadge = document.querySelector('.hero-badge span');
+                if (heroBadge) heroBadge.textContent = t.heroBadge;
+                var heroTitle = document.querySelector('.hero h1');
+                if (heroTitle) heroTitle.innerHTML = t.heroTitle;
+                var heroSub = document.querySelector('.hero-subtitle');
+                if (heroSub) heroSub.textContent = t.heroSubtitle;
+                var heroBtn1 = document.querySelector('.btn-primary span');
+                var heroBtn2 = document.querySelector('.btn-outline span');
+                if (heroBtn1) heroBtn1.textContent = t.heroBtn1;
+                if (heroBtn2) heroBtn2.textContent = t.heroBtn2;
+                
+                // Stats
+                var statLabels = document.querySelectorAll('.stat-label');
+                for (var i = 0; i < statLabels.length && i < 3; i++) {
+                    if (t.stats[i]) statLabels[i].textContent = t.stats[i];
+                }
+                
+                // Destinations
+                updateSection('.destinations', t.destTag, t.destTitle, t.destDesc);
+                var destCards = document.querySelectorAll('.dest-card');
+                destCards.forEach(function(card, i) {
+                    if (t.destNames[i]) {
+                        var h3 = card.querySelector('h3');
+                        var p = card.querySelector('p');
+                        if (h3) h3.textContent = t.destNames[i];
+                        if (p) p.textContent = t.destDescs[i];
+                    }
+                });
+                
+                // Services
+                updateSection('.services', t.servTag, t.servTitle, t.servDesc);
+                var servCards = document.querySelectorAll('.service-card');
+                servCards.forEach(function(card, i) {
+                    if (t.servNames[i]) {
+                        var h3 = card.querySelector('h3');
+                        var p = card.querySelector('p');
+                        if (h3) h3.textContent = t.servNames[i];
+                        if (p) p.textContent = t.servDescs[i];
+                    }
+                });
+                
+                // Experiences
+                updateSection('.experiences', t.expTag, t.expTitle);
+                var expCards = document.querySelectorAll('.exp-card');
+                expCards.forEach(function(card, i) {
+                    if (t.expNames[i]) {
+                        var h3 = card.querySelector('h3');
+                        var p = card.querySelector('p');
+                        if (h3) h3.textContent = t.expNames[i];
+                        if (p) p.textContent = t.expDescs[i];
+                    }
+                });
+                
+                // Transfers
+                updateSection('.transfers', t.transTag, t.transTitle, t.transDesc);
+                
+                // Fleet
+                updateSection('.fleet', t.fleetTag, t.fleetTitle);
+                var fleetCards = document.querySelectorAll('.fleet-card');
+                fleetCards.forEach(function(card, i) {
+                    if (t.fleetNames[i]) {
+                        var h4 = card.querySelector('h4');
+                        var p = card.querySelector('p');
+                        if (h4) h4.textContent = t.fleetNames[i];
+                        if (p) p.textContent = t.fleetDescs[i];
+                    }
+                });
+                
+                // Tours
+                updateSection('.tours', t.toursTag, t.toursTitle);
+                var tourCats = document.querySelectorAll('.category-title');
+                if (tourCats[0]) {
+                    var svg1 = tourCats[0].querySelector('svg');
+                    tourCats[0].innerHTML = (svg1 ? svg1.outerHTML : '') + t.toursCat1;
+                }
+                if (tourCats[1]) {
+                    var svg2 = tourCats[1].querySelector('svg');
+                    tourCats[1].innerHTML = (svg2 ? svg2.outerHTML : '') + t.toursCat2;
+                }
+                var tourBadges = document.querySelectorAll('.tour-badge');
+                tourBadges.forEach(function(badge) {
+                    var txt = badge.textContent.toLowerCase();
+                    if (txt.includes('popular') || txt === 'شائع' || txt === 'populaire' || txt === 'popüler') badge.textContent = t.tourBadges.popular;
+                    else if (txt.includes('recommend') || txt === 'موصى به' || txt === 'recommandé' || txt === 'önerilen') badge.textContent = t.tourBadges.recommended;
+                    else if (txt.includes('best') || txt.includes('seller') || txt === 'الأكثر مبيعاً' || txt === 'meilleure vente' || txt === 'en çok satan') badge.textContent = t.tourBadges.bestSeller;
+                    else if (txt.includes('cultural') || txt === 'ثقافي' || txt === 'culturel' || txt === 'kültürel') badge.textContent = t.tourBadges.cultural;
+                });
+                var tourLinks = document.querySelectorAll('.tour-link');
+                tourLinks.forEach(function(link) {
+                    var svg = link.querySelector('svg');
+                    link.innerHTML = t.bookNow + ' ' + (svg ? svg.outerHTML : '');
+                });
+                
+                // Hotels
+                updateSection('.hotels', t.hotelsTag, t.hotelsTitle);
+                var hotelCards = document.querySelectorAll('.hotel-card');
+                if (hotelCards[0]) {
+                    var h3_0 = hotelCards[0].querySelector('h3');
+                    var p_0 = hotelCards[0].querySelector('.text > p');
+                    var cities_0 = hotelCards[0].querySelector('.hotel-cities h4');
+                    if (h3_0) h3_0.innerHTML = '<span class="flag">🇹🇷</span> ' + t.hotelsTR;
+                    if (p_0) p_0.textContent = t.hotelsTRDesc;
+                    if (cities_0) cities_0.textContent = t.popularCities;
+                }
+                if (hotelCards[1]) {
+                    var h3_1 = hotelCards[1].querySelector('h3');
+                    var p_1 = hotelCards[1].querySelector('.text > p');
+                    var cities_1 = hotelCards[1].querySelector('.hotel-cities h4');
+                    if (h3_1) h3_1.innerHTML = '<span class="flag">🇦🇿</span> ' + t.hotelsAZ;
+                    if (p_1) p_1.textContent = t.hotelsAZDesc;
+                    if (cities_1) cities_1.textContent = t.popularCities;
+                }
+                
+                // Featured Hotels
+                updateSection('.featured-hotels', t.featuredTag, t.featuredTitle, t.featuredDesc);
+                
+                // Azerbaijan
+                var azContent = document.querySelector('.az-content');
+                if (azContent) {
+                    var azTag = azContent.querySelector('.section-tag');
+                    var azTitle = azContent.querySelector('h2');
+                    if (azTag) azTag.textContent = t.azTag;
+                    if (azTitle) azTitle.innerHTML = t.azTitle;
+                    var azP = azContent.querySelector('p:not(.az-service p)');
+                    if (azP) azP.textContent = t.azDesc;
+                    var azServs = azContent.querySelectorAll('.az-service');
+                    azServs.forEach(function(serv, i) {
+                        if (t.azServNames[i]) {
+                            var h4 = serv.querySelector('h4');
+                            var p = serv.querySelector('p');
+                            if (h4) h4.textContent = t.azServNames[i];
+                            if (p) p.textContent = t.azServDescs[i];
+                        }
+                    });
+                }
+                
+                // Director
+                var dirContent = document.querySelector('.director-content');
+                if (dirContent) {
+                    var dirTag = dirContent.querySelector('.section-tag');
+                    var dirTitle = dirContent.querySelector('h2');
+                    var dirP = dirContent.querySelector('p');
+                    var dirQuote = dirContent.querySelector('.director-quote');
+                    if (dirTag) dirTag.textContent = t.dirTag;
+                    if (dirTitle) dirTitle.innerHTML = t.dirTitle;
+                    if (dirP) dirP.textContent = t.dirDesc;
+                    if (dirQuote) dirQuote.textContent = t.dirQuote;
+                    var dirStats = dirContent.querySelectorAll('.director-stat span');
+                    for (var i = 0; i < dirStats.length && i < 3; i++) {
+                        if (t.dirStats[i]) dirStats[i].textContent = t.dirStats[i];
+                    }
+                }
+                var dirBadge = document.querySelector('.director-badge h4');
+                if (dirBadge) dirBadge.textContent = t.dirRole;
+                
+                // About
+                var aboutContent = document.querySelector('.about-content');
+                if (aboutContent) {
+                    var aboutTag = aboutContent.querySelector('.section-tag');
+                    var aboutTitle = aboutContent.querySelector('h2');
+                    if (aboutTag) aboutTag.textContent = t.aboutTag;
+                    if (aboutTitle) aboutTitle.innerHTML = t.aboutTitle;
+                    var aboutPs = aboutContent.querySelectorAll(':scope > p');
+                    if (aboutPs[0]) aboutPs[0].textContent = t.aboutDesc1;
+                    if (aboutPs[1]) aboutPs[1].textContent = t.aboutDesc2;
+                    var aboutFeats = aboutContent.querySelectorAll('.about-feature');
+                    aboutFeats.forEach(function(feat, i) {
+                        if (t.aboutFeatures[i]) {
+                            var h4 = feat.querySelector('h4');
+                            var p = feat.querySelector('p');
+                            if (h4) h4.textContent = t.aboutFeatures[i][0];
+                            if (p) p.textContent = t.aboutFeatures[i][1];
+                        }
+                    });
+                }
+                var yearsBadge = document.querySelector('.years-badge span');
+                if (yearsBadge) yearsBadge.textContent = t.yearsLabel;
+                
+                // Certification
+                var certTitle = document.querySelector('.cert-text h3');
+                var certDesc = document.querySelector('.cert-text p');
+                if (certTitle) certTitle.textContent = t.certTitle;
+                if (certDesc) certDesc.innerHTML = t.certDesc;
+                
+                // Contact
+                updateSection('.contact', t.contactTag, t.contactTitle);
+                var contactCards = document.querySelectorAll('.contact-card h3');
+                if (contactCards[0]) contactCards[0].innerHTML = '<span class="flag">🇩🇿</span> ' + t.algeriaOffice;
+                if (contactCards[1]) contactCards[1].innerHTML = '<span class="flag">🇹🇷</span> ' + t.turkiyeOffice;
+                
+                // Form
+                var formTitle = document.querySelector('.contact-form h3');
+                if (formTitle) formTitle.textContent = t.formTitle;
+                var formLabels = document.querySelectorAll('.contact-form .form-group label');
+                formLabels.forEach(function(label, i) {
+                    if (t.formLabels[i]) label.textContent = t.formLabels[i];
+                });
+                var textarea = document.querySelector('#message');
+                if (textarea) textarea.placeholder = t.formPlaceholder;
+                var sendBtn = document.querySelector('.btn-whatsapp');
+                if (sendBtn) {
+                    var svg = sendBtn.querySelector('svg');
+                    sendBtn.innerHTML = (svg ? svg.outerHTML : '') + t.sendBtn;
+                }
+                var options = document.querySelectorAll('#serviceType option');
+                options.forEach(function(opt, i) {
+                    if (i === 0) opt.textContent = t.selectService;
+                    else if (t.formOptions[i-1]) opt.textContent = t.formOptions[i-1];
+                });
+                
+                // Footer
+                var footerDesc = document.querySelector('.footer-brand > p');
+                if (footerDesc) footerDesc.textContent = t.footerDesc;
+                var footerHeadings = document.querySelectorAll('.footer h4');
+                if (footerHeadings[0]) footerHeadings[0].textContent = t.quickLinks;
+                if (footerHeadings[1]) footerHeadings[1].textContent = t.footerServices;
+                var copyright = document.querySelector('.footer-bottom p');
+                if (copyright) copyright.textContent = t.copyright;
+                
+                // Update active button
+                document.querySelectorAll('.lang-btn').forEach(function(btn) { btn.classList.remove('active'); });
+                var activeBtn = document.querySelector('.lang-btn[data-lang="' + lang + '"]');
+                if (activeBtn) activeBtn.classList.add('active');
+                
+                // Save preference
+                try { localStorage.setItem('cynLang', lang); } catch(e) {}
+            }
+            
+            function updateSection(selector, tag, title, desc) {
+                var section = document.querySelector(selector);
+                if (section) {
+                    var tagEl = section.querySelector('.section-tag');
+                    var titleEl = section.querySelector('.section-title');
+                    var descEl = section.querySelector('.section-desc');
+                    if (tagEl && tag) tagEl.textContent = tag;
+                    if (titleEl && title) titleEl.innerHTML = title;
+                    if (descEl && desc) descEl.textContent = desc;
+                }
+            }
+
+            // Initialize language buttons
+            document.querySelectorAll('.lang-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    switchLanguage(this.getAttribute('data-lang'));
+                });
+            });
+            
+            // Load saved language
+            try {
+                var savedLang = localStorage.getItem('cynLang');
+                if (savedLang && translations[savedLang]) {
+                    setTimeout(function() { switchLanguage(savedLang); }, 100);
+                }
+            } catch(e) {}
+        });
+    </script>
+</body>
+</html>
