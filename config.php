@@ -113,6 +113,7 @@ function initializeDatabaseTables($conn) {
 
 /**
  * Get PDO database connection
+ * Tables are automatically created if they don't exist.
  * @return PDO
  * @throws PDOException
  */
@@ -120,6 +121,7 @@ function getDbConnection() {
     global $db_dsn, $db_config, $db_options;
     
     static $pdo = null;
+    static $initialized = false;
     
     if ($pdo === null) {
         try {
@@ -127,6 +129,13 @@ function getDbConnection() {
         } catch (PDOException $e) {
             error_log('Database connection failed: ' . $e->getMessage());
             throw new PDOException('Database connection failed. Please check your configuration.');
+        }
+        
+        // Initialize database tables if needed (only once per process)
+        if (!$initialized) {
+            // Use mysqli for table initialization since it handles multi-query better
+            $mysqli = getMysqliConnection();
+            $initialized = true;
         }
     }
     
