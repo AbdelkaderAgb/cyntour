@@ -17,18 +17,52 @@ A comprehensive tourism management system for CYN Turizm, featuring hotel bookin
 ```
 cyntour/
 ├── config.php              # Database configuration with auto-table creation
+├── image_config.php        # Image paths configuration (local/CDN)
 ├── database/
 │   └── schema.sql          # Complete database schema with sample data
 ├── includes/
 │   ├── navigation.php      # Shared navigation component
-│   └── footer.php          # Shared footer component
+│   ├── footer.php          # Shared footer component
+│   └── assets.php          # CDN assets configuration
 ├── img/                    # Images and assets
-├── css/                    # Stylesheets
-├── js/                     # JavaScript files
 ├── pdf/                    # Tour program PDFs
-├── uploads/                # User uploads
-└── vendor/                 # PHP dependencies
+└── uploads/                # User uploads
 ```
+
+## File Naming Convention
+
+PHP files follow these naming patterns:
+- **Pages**: `module.php` (e.g., `tours.php`, `transfer.php`)
+- **API/AJAX**: `fetch_module.php` or `get_module.php` (e.g., `fetch_hotels.php`)
+- **Actions**: `action_module.php` (e.g., `save_voucher.php`, `remove_hotel.php`)
+- **Forms**: `module_form.php` (e.g., `invoice_form.php`)
+- **Vouchers**: `module_voucher.php` (e.g., `tour_voucher.php`)
+
+## Image Management
+
+Images can be hosted locally or via CDN for better performance.
+
+### Local Images (Default)
+Images are stored in:
+- Root directory: Tour, hotel, and destination images
+- `/img/` folder: UI elements, logos, icons
+
+### CDN Migration (Recommended for Production)
+To reduce repository size and improve load times:
+
+1. Upload images to a CDN (Cloudinary, AWS S3, etc.)
+2. Edit `image_config.php`:
+   ```php
+   define('USE_CDN', true);
+   define('CDN_BASE_URL', 'https://your-cdn.com/images');
+   ```
+3. Remove images from git tracking:
+   ```bash
+   git rm --cached *.jpg *.jpeg *.png *.gif *.webp
+   git rm --cached img/*.jpg img/*.jpeg img/*.png
+   ```
+
+See `image_config.php` for detailed migration instructions.
 
 ## Setup
 
@@ -115,7 +149,7 @@ The system supports three types of vouchers:
 - MySQL 5.7+ / MariaDB 10+
 - Bootstrap 5
 - Font Awesome 6
-- jQuery 3.6
+- jQuery 3.7
 
 ## License
 
