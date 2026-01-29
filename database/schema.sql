@@ -307,7 +307,10 @@ CREATE TABLE IF NOT EXISTS receipts (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_receipt_no (receipt_no),
-    INDEX idx_payment_status (payment_status)
+    INDEX idx_payment_status (payment_status),
+    INDEX idx_customer_company (customer_company(100)),
+    INDEX idx_created_at (created_at),
+    INDEX idx_company_currency (customer_company(100), currency)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Receipt items
@@ -358,7 +361,8 @@ CREATE TABLE IF NOT EXISTS partners (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_partner_type (partner_type),
-    INDEX idx_status (status)
+    INDEX idx_status (status),
+    INDEX idx_company_name (company_name(100))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =====================================================

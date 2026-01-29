@@ -19,6 +19,9 @@ class Application
     /** @var array Configuration settings */
     private array $config = [];
     
+    /** @var array Cache for resolved config keys */
+    private array $configCache = [];
+    
     /** @var \PDO|null PDO connection */
     private ?\PDO $pdo = null;
     
@@ -77,20 +80,27 @@ class Application
     }
     
     /**
-     * Get configuration value
+     * Get configuration value with caching for repeated lookups
      */
     public function config(string $key, $default = null)
     {
+        // Check cache first for faster repeated lookups
+        if (array_key_exists($key, $this->configCache)) {
+            return $this->configCache[$key];
+        }
+        
         $keys = explode('.', $key);
         $value = $this->config;
         
         foreach ($keys as $k) {
             if (!isset($value[$k])) {
+                $this->configCache[$key] = $default;
                 return $default;
             }
             $value = $value[$k];
         }
         
+        $this->configCache[$key] = $value;
         return $value;
     }
     
@@ -172,6 +182,7 @@ class Application
     /**
      * Check if tables exist and initialize database if needed
      * Uses file-based locking to prevent race conditions
+     * Uses double-check pattern for efficiency
      * 
      * @return bool True if tables exist or were created successfully
      */
@@ -187,17 +198,19 @@ class Application
         $lockFile = sys_get_temp_dir() . '/cyntour_db_init.lock';
         $fp = fopen($lockFile, 'c');
         
+        // Try non-blocking lock first
         if (!flock($fp, LOCK_EX | LOCK_NB)) {
-            // Another process is initializing, wait for it
+            // Another process is initializing, wait for it then verify tables exist
             flock($fp, LOCK_EX);
+            flock($fp, LOCK_UN);
             fclose($fp);
-            // Recheck if tables were created by another process
+            // Tables should have been created by the other process
             $result = $this->mysqli->query("SHOW TABLES LIKE 'users'");
             return ($result && $result->num_rows > 0);
         }
         
         try {
-            // Double-check after acquiring lock
+            // Double-check after acquiring lock (another process may have created tables)
             $result = $this->mysqli->query("SHOW TABLES LIKE 'users'");
             if ($result && $result->num_rows > 0) {
                 flock($fp, LOCK_UN);
