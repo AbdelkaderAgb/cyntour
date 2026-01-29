@@ -28,7 +28,7 @@ if (!$id) {
 }
 
 // --- Step 2: Fetch the Main Receipt and Partner Data ---
-$sql_receipt = "SELECT r.*, p.company AS partner_company, p.address AS partner_address
+$sql_receipt = "SELECT r.*, p.company_name AS partner_company, p.address AS partner_address
                 FROM receipts r
                 LEFT JOIN partners p ON p.id = r.partner_id
                 WHERE r.id = ? 

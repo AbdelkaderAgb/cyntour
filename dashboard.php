@@ -44,7 +44,7 @@ $companyId = isset($_GET['company']) ? intval($_GET['company']) : 0;
 
 if ($companyId) {
     // Tek bir şirketin makbuzlarını görüntüleme mantığı
-    $sql_receipts = "SELECT r.id, r.receipt_date, r.subject, r.received_by, p.company 
+    $sql_receipts = "SELECT r.id, r.receipt_date, r.subject, r.received_by, p.company_name 
                      FROM receipts r 
                      JOIN partners p ON r.partner_id = p.id 
                      WHERE r.partner_id = ? 
@@ -68,7 +68,7 @@ if ($companyId) {
         $payments_by_receipt[$payment['receipt_id']][] = $payment;
     }
 
-    $companyName = $receipts ? $receipts[0]['company'] : 'Şirket Bulunamadı';
+    $companyName = $receipts ? $receipts[0]['company_name'] : 'Şirket Bulunamadı';
 
     // Bu şirket için receipt_payments tablosundan toplamları hesapla
     $sql_totals = "SELECT rp.currency, SUM(rp.amount) as total_sum
@@ -89,10 +89,10 @@ if ($companyId) {
 } else {
     // Ana panel görünümü mantığı (tüm şirketler)
     // Adım 1: Tüm şirketleri ve toplam makbuz sayılarını al.
-    $sql_companies = "SELECT p.id, p.company, 
+    $sql_companies = "SELECT p.id, p.company_name, 
                           (SELECT COUNT(*) FROM receipts r WHERE r.partner_id = p.id) AS receipt_count
                       FROM partners p
-                      ORDER BY p.company";
+                      ORDER BY p.company_name";
     $all_companies = $pdo->query($sql_companies)->fetchAll(PDO::FETCH_ASSOC);
 
     // Adım 2: Şirket ve para birimine göre gruplandırılmış tüm ödeme toplamlarını al.
@@ -114,7 +114,7 @@ if ($companyId) {
         $id = $company_row['id'];
         $companies[$id] = [
             'id' => $id,
-            'company' => $company_row['company'],
+            'company' => $company_row['company_name'],
             'receipt_count' => $company_row['receipt_count'],
             'totals' => $totals_by_company[$id] ?? []
         ];
