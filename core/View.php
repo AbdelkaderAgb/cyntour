@@ -18,12 +18,12 @@ class View
      * @param string $title Page title
      * @param string $additionalCss Additional CSS styles
      */
-    public static function renderHead(string $title = 'CynTour - Premium Travel Services', string $additionalCss = ''): void
+    public static function renderHead(string $title = 'CynTour - Receipt Management', string $additionalCss = ''): void
     {
         ?>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="CynTour - Premium travel services in Turkey. Hotels, tours, transfers and more.">
+        <meta name="description" content="CynTour - Receipt and payment management system.">
         <meta name="author" content="CYN Turizm">
         <title><?php echo htmlspecialchars($title); ?></title>
         
@@ -56,7 +56,7 @@ class View
         ?>
         <nav class="<?php echo $navClass; ?>" id="mainNav">
             <div class="cyn-navbar-container">
-                <a class="cyn-navbar-brand" href="home.php">
+                <a class="cyn-navbar-brand" href="dashboard.php">
                     <img src="assets/images/logo.png" alt="CynTour Logo">
                 </a>
                 
@@ -67,28 +67,17 @@ class View
                 </button>
                 
                 <ul class="cyn-navbar-nav" id="navMenu">
-                    <li><a class="cyn-nav-link <?php echo Helper::isActivePage('home.php'); ?>" href="home.php">
-                        <i class="fas fa-home"></i> Home
+                    <li><a class="cyn-nav-link <?php echo Helper::isActivePage('dashboard.php'); ?>" href="dashboard.php">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
                     </a></li>
-                    <li><a class="cyn-nav-link <?php echo Helper::isActivePage('hotels.php'); ?>" href="hotels.php">
-                        <i class="fas fa-hotel"></i> Hotels
+                    <li><a class="cyn-nav-link <?php echo Helper::isActivePage('receipt-create.php'); ?>" href="receipt-create.php">
+                        <i class="fas fa-plus-circle"></i> New Receipt
                     </a></li>
-                    <li><a class="cyn-nav-link <?php echo Helper::isActivePage('tours.php'); ?>" href="tours.php">
-                        <i class="fas fa-map-marked-alt"></i> Tours
-                    </a></li>
-                    <li><a class="cyn-nav-link <?php echo Helper::isActivePage('transfers.php'); ?>" href="transfers.php">
-                        <i class="fas fa-car"></i> Transfer
-                    </a></li>
-                    <li><a class="cyn-nav-link <?php echo Helper::isActivePage('contact.php'); ?>" href="contact.php">
-                        <i class="fas fa-envelope"></i> Contact
+                    <li><a class="cyn-nav-link <?php echo Helper::isActivePage('receipt-form.php'); ?>" href="receipt-form.php">
+                        <i class="fas fa-receipt"></i> Receipt Form
                     </a></li>
                     
                     <?php if ($app->isAuthenticated()): ?>
-                        <?php if ($app->isAdmin()): ?>
-                        <li><a class="cyn-nav-link <?php echo Helper::isActivePage('dashboard.php'); ?>" href="dashboard.php">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a></li>
-                        <?php endif; ?>
                         <li><a class="cyn-nav-link" href="logout.php">
                             <i class="fas fa-sign-out-alt"></i> Logout
                         </a></li>
@@ -112,7 +101,7 @@ class View
         ?>
         <aside class="cyn-sidebar" id="sidebar">
             <div class="cyn-sidebar-brand">
-                <a href="home.php">
+                <a href="dashboard.php">
                     <img src="assets/images/logo.png" alt="CynTour">
                 </a>
             </div>
@@ -127,96 +116,32 @@ class View
                     </a>
                 </li>
                 
-                <li class="cyn-sidebar-nav-item">
-                    <a class="cyn-sidebar-nav-link <?php echo Helper::isActivePage('hotels.php'); ?>" href="hotels.php">
-                        <i class="fas fa-hotel"></i>
-                        <span>Hotels</span>
-                    </a>
-                </li>
-                
                 <li class="cyn-sidebar-divider"></li>
-                <li class="cyn-sidebar-heading">Vouchers</li>
+                <li class="cyn-sidebar-heading">Receipts</li>
                 
                 <li class="cyn-sidebar-nav-item">
-                    <a class="cyn-sidebar-nav-link <?php echo Helper::isActivePage('hotel-vouchers.php'); ?>" href="hotel-vouchers.php">
-                        <i class="fas fa-file-alt"></i>
-                        <span>Hotel Vouchers</span>
+                    <a class="cyn-sidebar-nav-link <?php echo Helper::isActivePage('receipt-create.php'); ?>" href="receipt-create.php">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>New Receipt</span>
                     </a>
                 </li>
                 
                 <li class="cyn-sidebar-nav-item">
-                    <a class="cyn-sidebar-nav-link <?php echo Helper::isActivePage('transfer-vouchers.php'); ?>" href="transfer-vouchers.php">
-                        <i class="fas fa-car"></i>
-                        <span>Transfer Vouchers</span>
-                    </a>
-                </li>
-                
-                <li class="cyn-sidebar-nav-item">
-                    <a class="cyn-sidebar-nav-link <?php echo Helper::isActivePage('tour-vouchers.php'); ?>" href="tour-vouchers.php">
-                        <i class="fas fa-map"></i>
-                        <span>Tour Vouchers</span>
-                    </a>
-                </li>
-                
-                <li class="cyn-sidebar-divider"></li>
-                <li class="cyn-sidebar-heading">Services</li>
-                
-                <li class="cyn-sidebar-nav-item">
-                    <a class="cyn-sidebar-nav-link <?php echo Helper::isActivePage('tours.php'); ?>" href="tours.php">
-                        <i class="fas fa-map-marked-alt"></i>
-                        <span>Tours</span>
-                    </a>
-                </li>
-                
-                <li class="cyn-sidebar-nav-item">
-                    <a class="cyn-sidebar-nav-link <?php echo Helper::isActivePage('transfers.php'); ?>" href="transfers.php">
-                        <i class="fas fa-shuttle-van"></i>
-                        <span>Transfers</span>
-                    </a>
-                </li>
-                
-                <li class="cyn-sidebar-divider"></li>
-                <li class="cyn-sidebar-heading">Finance</li>
-                
-                <li class="cyn-sidebar-nav-item">
-                    <a class="cyn-sidebar-nav-link <?php echo Helper::isActivePage('invoices.php'); ?>" href="invoices.php">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                        <span>Invoices</span>
-                    </a>
-                </li>
-                
-                <li class="cyn-sidebar-nav-item">
-                    <a class="cyn-sidebar-nav-link <?php echo Helper::isActivePage('receipts.php'); ?>" href="receipts.php">
+                    <a class="cyn-sidebar-nav-link <?php echo Helper::isActivePage('receipt-form.php'); ?>" href="receipt-form.php">
                         <i class="fas fa-receipt"></i>
-                        <span>Receipts</span>
+                        <span>Receipt Form</span>
                     </a>
                 </li>
                 
-                <?php if ($app->isAdmin()): ?>
                 <li class="cyn-sidebar-divider"></li>
-                <li class="cyn-sidebar-heading">Admin</li>
+                <li class="cyn-sidebar-heading">Account</li>
                 
                 <li class="cyn-sidebar-nav-item">
-                    <a class="cyn-sidebar-nav-link <?php echo Helper::isActivePage('users.php'); ?>" href="users.php">
-                        <i class="fas fa-users"></i>
-                        <span>Users</span>
+                    <a class="cyn-sidebar-nav-link" href="logout.php">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
                     </a>
                 </li>
-                
-                <li class="cyn-sidebar-nav-item">
-                    <a class="cyn-sidebar-nav-link <?php echo Helper::isActivePage('import-data.php'); ?>" href="import-data.php">
-                        <i class="fas fa-file-import"></i>
-                        <span>Import Data</span>
-                    </a>
-                </li>
-                
-                <li class="cyn-sidebar-nav-item">
-                    <a class="cyn-sidebar-nav-link <?php echo Helper::isActivePage('backup.php'); ?>" href="backup.php">
-                        <i class="fas fa-database"></i>
-                        <span>Backup</span>
-                    </a>
-                </li>
-                <?php endif; ?>
             </ul>
         </aside>
         <?php
@@ -240,9 +165,6 @@ class View
             </div>
             
             <div class="d-flex align-items-center gap-3">
-                <a href="home.php" class="cyn-btn cyn-btn-outline cyn-btn-sm">
-                    <i class="fas fa-globe"></i> View Site
-                </a>
                 <div class="d-flex align-items-center gap-2">
                     <div class="cyn-stat-icon" style="width: 40px; height: 40px; font-size: 1rem;">
                         <i class="fas fa-user"></i>
@@ -269,7 +191,7 @@ class View
                     <!-- Brand Section -->
                     <div class="cyn-footer-brand">
                         <img src="assets/images/logo.png" alt="CynTour">
-                        <p class="cyn-footer-text">Your trusted partner for premium travel services in Turkey since 2006. We provide unforgettable experiences with the highest quality standards.</p>
+                        <p class="cyn-footer-text">Your trusted partner for premium travel services in Turkey since 2006.</p>
                         <div style="margin-top: var(--spacing-md);">
                             <img src="assets/images/tursab-seeklogo-removebg.png" alt="TURSAB" style="height: 40px;">
                             <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-top: var(--spacing-xs);">License No: 11738</p>
@@ -280,22 +202,9 @@ class View
                     <div>
                         <h4 class="cyn-footer-title">Quick Links</h4>
                         <ul class="cyn-footer-links">
-                            <li><a href="home.php"><i class="fas fa-angle-right"></i> Home</a></li>
-                            <li><a href="hotels.php"><i class="fas fa-angle-right"></i> Hotels</a></li>
-                            <li><a href="tours.php"><i class="fas fa-angle-right"></i> Tours</a></li>
-                            <li><a href="transfers.php"><i class="fas fa-angle-right"></i> Transfer</a></li>
-                            <li><a href="contact.php"><i class="fas fa-angle-right"></i> Contact</a></li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Services -->
-                    <div>
-                        <h4 class="cyn-footer-title">Services</h4>
-                        <ul class="cyn-footer-links">
-                            <li><a href="hotels.php"><i class="fas fa-angle-right"></i> Hotel Booking</a></li>
-                            <li><a href="tours.php"><i class="fas fa-angle-right"></i> City Tours</a></li>
-                            <li><a href="transfers.php"><i class="fas fa-angle-right"></i> Airport Transfer</a></li>
-                            <li><a href="tours.php"><i class="fas fa-angle-right"></i> Day Trips</a></li>
+                            <li><a href="dashboard.php"><i class="fas fa-angle-right"></i> Dashboard</a></li>
+                            <li><a href="receipt-create.php"><i class="fas fa-angle-right"></i> New Receipt</a></li>
+                            <li><a href="receipt-form.php"><i class="fas fa-angle-right"></i> Receipt Form</a></li>
                         </ul>
                     </div>
                     
@@ -316,12 +225,6 @@ class View
                                 </a>
                             </li>
                             <li>
-                                <a href="mailto:sales@cyntourim.com">
-                                    <i class="fas fa-envelope" style="color: var(--primary); margin-right: var(--spacing-sm);"></i>
-                                    sales@cyntourim.com
-                                </a>
-                            </li>
-                            <li>
                                 <span style="display: flex; align-items: flex-start; gap: var(--spacing-sm);">
                                     <i class="fas fa-map-marker-alt" style="color: var(--primary); margin-top: 4px;"></i>
                                     <span>Molla Gürani, Karakoyunlu Sokağı No:2 D:4, 34093 Fatih/İstanbul</span>
@@ -331,12 +234,6 @@ class View
                         <div class="cyn-social-links" style="margin-top: var(--spacing-md);">
                             <a href="https://www.instagram.com/cyn__turizm/" target="_blank" title="Instagram">
                                 <i class="fab fa-instagram"></i>
-                            </a>
-                            <a href="#" title="Facebook">
-                                <i class="fab fa-facebook-f"></i>
-                            </a>
-                            <a href="#" title="Twitter">
-                                <i class="fab fa-twitter"></i>
                             </a>
                             <a href="https://wa.me/905318176770" target="_blank" title="WhatsApp">
                                 <i class="fab fa-whatsapp"></i>

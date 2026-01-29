@@ -38,7 +38,7 @@ function getActiveClass($page, $current) {
 <!-- Navigation Bar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="index.php">
+        <a class="navbar-brand" href="dashboard.php">
             <img src="img/logo.png" alt="CYN Tourism Logo" style="height: 60px;">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
@@ -48,34 +48,22 @@ function getActiveClass($page, $current) {
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link <?php echo getActiveClass('index.php', $current_page); ?>" href="index.php">
-                        <i class="fas fa-home me-1"></i>Home
+                    <a class="nav-link <?php echo getActiveClass('dashboard.php', $current_page); ?>" href="dashboard.php">
+                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?php echo getActiveClass('tours.php', $current_page); ?>" href="tours.php">
-                        <i class="fas fa-map-marked-alt me-1"></i>Tours
+                    <a class="nav-link <?php echo getActiveClass('receipt-create.php', $current_page); ?>" href="receipt-create.php">
+                        <i class="fas fa-plus-circle me-1"></i>New Receipt
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?php echo getActiveClass('transfer.php', $current_page); ?>" href="transfer.php">
-                        <i class="fas fa-car me-1"></i>Transfer
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?php echo getActiveClass('contact.php', $current_page); ?>" href="contact.php">
-                        <i class="fas fa-envelope me-1"></i>Contact
+                    <a class="nav-link <?php echo getActiveClass('receipt-form.php', $current_page); ?>" href="receipt-form.php">
+                        <i class="fas fa-receipt me-1"></i>Receipt Form
                     </a>
                 </li>
                 
                 <?php if (isLoggedIn()): ?>
-                    <?php if (isAdmin()): ?>
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo getActiveClass('admin.php', $current_page); ?>" href="admin.php">
-                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
-                        </a>
-                    </li>
-                    <?php endif; ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
                            data-bs-toggle="dropdown" aria-expanded="false">
@@ -83,11 +71,6 @@ function getActiveClass($page, $current) {
                             <?php echo isset($_SESSION['user']['first_name']) ? htmlspecialchars($_SESSION['user']['first_name']) : 'Account'; ?>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <?php if (isAdmin()): ?>
-                            <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>Profile</a></li>
-                            <li><a class="dropdown-item" href="users.php"><i class="fas fa-users me-2"></i>Users</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <?php endif; ?>
                             <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                         </ul>
                     </li>
@@ -95,11 +78,6 @@ function getActiveClass($page, $current) {
                     <li class="nav-item">
                         <a class="nav-link <?php echo getActiveClass('login.php', $current_page); ?>" href="login.php">
                             <i class="fas fa-sign-in-alt me-1"></i>Login
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo getActiveClass('register.php', $current_page); ?>" href="register.php">
-                            <i class="fas fa-user-plus me-1"></i>Register
                         </a>
                     </li>
                 <?php endif; ?>

@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Gerekli dosyaları dahil et
-require_once 'database.php';
+require_once 'database-config.php';
 require_once 'helpers.php';
 
 // Makbuz silme işlemini yönet
@@ -325,7 +325,7 @@ if ($companyId) {
             <i class="fas fa-file-invoice-dollar text-gold"></i>
             Makbuzlar
         </a>
-        <a href="create_receipt.php" class="btn btn-gradient ml-auto">
+        <a href="receipt-create.php" class="btn btn-gradient ml-auto">
             <i class="fas fa-plus-circle mr-1"></i> Yeni Makbuz
         </a>
     </div>
@@ -426,7 +426,7 @@ if ($companyId) {
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-center">
-                                    <a class="btn btn-sm btn-outline-gold" href="view_receipt.php?id=<?= $row['id'] ?>" target="_blank" title="Makbuzu Görüntüle">
+                                    <a class="btn btn-sm btn-outline-gold" href="receipt-view.php?id=<?= $row['id'] ?>" target="_blank" title="Makbuzu Görüntüle">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     <form action="dashboard.php?company=<?= $companyId ?>" method="POST" class="d-inline" onsubmit="return confirm('#<?= $row['id'] ?> numaralı makbuzu silmek istediğinizden emin misiniz?');">

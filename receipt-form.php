@@ -77,7 +77,7 @@ include 'auth.php';
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <a href="admin.php" class="back-link"><i class="fas fa-arrow-left mr-2"></i>Back to Dashboard</a>
+                    <a href="dashboard.php" class="back-link"><i class="fas fa-arrow-left mr-2"></i>Back to Dashboard</a>
                     <h1 class="mt-2"><i class="fas fa-receipt mr-2"></i>Receipt Form</h1>
                 </div>
                 <img src="logo.png" alt="CYN Tourism" style="height: 50px; filter: brightness(0) invert(1);">
@@ -153,7 +153,7 @@ include 'auth.php';
                         <input type="number" class="form-control" id="remaining_amount" name="remaining_amount" min="0" step="0.01">
                     </div>
                     <div class="d-flex justify-content-between mt-4">
-                        <a href="admin.php" class="btn btn-outline-secondary"><i class="fas fa-times mr-1"></i>Cancel</a>
+                        <a href="dashboard.php" class="btn btn-outline-secondary"><i class="fas fa-times mr-1"></i>Cancel</a>
                         <button type="submit" class="btn btn-primary"><i class="fas fa-receipt mr-1"></i>Generate Receipt</button>
                     </div>
                 </form>
