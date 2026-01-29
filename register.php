@@ -5,6 +5,11 @@
  * Handles new user registration with custom design (no Bootstrap)
  */
 
+// Start session at the top to avoid "headers already sent" issues
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once 'config.php';
 
 $errors = array();
@@ -79,7 +84,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("ssssss", $formData['company_name'], $formData['first_name'], $formData['last_name'], $formData['email'], $formData['phone_number'], $password_hash);
 
         if ($stmt->execute()) {
-            session_start();
             $_SESSION['registration_success'] = true;
             header("Location: login.php");
             exit();

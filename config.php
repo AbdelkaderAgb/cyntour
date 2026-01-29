@@ -113,6 +113,7 @@ function initializeDatabaseTables($conn) {
 
 /**
  * Get PDO database connection
+ * Tables are automatically created if they don't exist.
  * @return PDO
  * @throws PDOException
  */
@@ -128,6 +129,11 @@ function getDbConnection() {
             error_log('Database connection failed: ' . $e->getMessage());
             throw new PDOException('Database connection failed. Please check your configuration.');
         }
+        
+        // Initialize database tables if needed by calling mysqli connection
+        // which handles table initialization. This ensures tables exist
+        // regardless of which connection type is used first.
+        getMysqliConnection();
     }
     
     return $pdo;
