@@ -22,3 +22,35 @@ function generate_initials_avatar($name) {
     }
     return '<div class="avatar-initials">' . ($initials ?: 'C') . '</div>';
 }
+
+/**
+ * Safe redirect function with fallback mechanisms
+ * 
+ * This function attempts to redirect using PHP headers first.
+ * If headers have already been sent, it falls back to JavaScript
+ * and HTML meta refresh redirects.
+ * 
+ * @param string $url The URL to redirect to
+ * @return void (exits the script)
+ */
+function safe_redirect($url) {
+    // Sanitize the URL for HTML output
+    $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+    
+    // Flush output buffer if active
+    if (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    // Try PHP header redirect first
+    if (!headers_sent()) {
+        header("Location: " . $url);
+        exit();
+    }
+    
+    // Fallback to JavaScript redirect
+    echo '<script>window.location.href = "' . $safeUrl . '";</script>';
+    // Fallback for browsers with JavaScript disabled
+    echo '<noscript><meta http-equiv="refresh" content="0;url=' . $safeUrl . '"></noscript>';
+    exit();
+}

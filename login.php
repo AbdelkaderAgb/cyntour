@@ -5,8 +5,12 @@
  * Handles user authentication with custom design (no Bootstrap)
  */
 
+// Start output buffering to ensure headers can be sent
+ob_start();
+
 session_start();
 require_once "config.php";
+require_once "helpers.php";
 
 $errors = [];
 $success = '';
@@ -19,8 +23,7 @@ if (isset($_SESSION['registration_success'])) {
 
 // Redirect if already logged in
 if (isset($_SESSION['auth']) && $_SESSION['auth'] === true) {
-    header("Location: home.php");
-    exit();
+    safe_redirect('home.php');
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
@@ -60,13 +63,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
                 setcookie('remember_me', $token, time() + (30 * 24 * 60 * 60), '/', '', $secure, true);
             }
             
-            // Redirect based on role
-            if ($user['role'] === 'admin') {
-                header("Location: admin.php");
-            } else {
-                header("Location: home.php");
-            }
-            exit();
+            // Redirect based on role using safe_redirect helper
+            $redirectUrl = ($user['role'] === 'admin') ? 'admin.php' : 'home.php';
+            safe_redirect($redirectUrl);
         } else {
             $errors[] = "Invalid email or password.";
         }
