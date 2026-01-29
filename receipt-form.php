@@ -8,162 +8,223 @@ include 'auth.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receipt Form - CYN Tourism</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>Receipt Form - CynTour</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="css/cyntour-style.css" rel="stylesheet">
     <style>
-        :root {
-            --primary: #e74a3b;
-            --primary-dark: #be2617;
-            --light: #f8f9fc;
-        }
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: var(--light);
-            padding: 0;
-            margin: 0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
         }
+
         .page-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: var(--secondary-gradient);
             color: white;
-            padding: 20px 0;
-            margin-bottom: 30px;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
         }
-        .page-header h1 {
-            margin: 0;
-            font-size: 1.75rem;
-        }
-        .form-container {
-            max-width: 700px;
+
+        .page-header-content {
+            max-width: 800px;
             margin: 0 auto;
-            padding: 0 20px 40px;
+            padding: 0 1.5rem;
         }
-        .card {
-            border: none;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
-            border-radius: 0.5rem;
+
+        .page-header h1 {
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            color: white;
+            margin: 0.5rem 0 0;
         }
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid #e3e6f0;
-            padding: 1rem 1.25rem;
-        }
-        .card-header h5 {
-            margin: 0;
-            color: var(--primary);
-            font-weight: 600;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border: none;
-        }
-        .btn-primary:hover {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
-        }
+
         .back-link {
             color: rgba(255,255,255,0.8);
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: color var(--transition-fast);
         }
+
         .back-link:hover {
             color: white;
-            text-decoration: none;
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1.5rem 3rem;
+        }
+
+        .form-card {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid var(--gray-100);
+        }
+
+        .form-card-header {
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-card-header h5 {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            color: var(--secondary);
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .form-card-header i {
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+
+        .form-card-body {
+            padding: 2rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-field-full {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-field-full {
+                grid-column: auto;
+            }
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-100);
         }
     </style>
 </head>
 
 <body>
     <div class="page-header">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <a href="dashboard.php" class="back-link"><i class="fas fa-arrow-left mr-2"></i>Back to Dashboard</a>
-                    <h1 class="mt-2"><i class="fas fa-receipt mr-2"></i>Receipt Form</h1>
-                </div>
-                <img src="logo.png" alt="CYN Tourism" style="height: 50px; filter: brightness(0) invert(1);">
-            </div>
+        <div class="page-header-content">
+            <a href="dashboard.php" class="back-link"><i class="fas fa-arrow-left"></i>Back to Dashboard</a>
+            <h1><i class="fas fa-receipt"></i> Receipt Form</h1>
         </div>
     </div>
     
     <div class="form-container">
-        <div class="card">
-            <div class="card-header">
-                <h5><i class="fas fa-file-invoice-dollar mr-2"></i>Create New Receipt</h5>
+        <div class="form-card">
+            <div class="form-card-header">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <h5>Create New Receipt</h5>
             </div>
-            <div class="card-body">
+            <div class="form-card-body">
                 <form action="receipt.php" method="post">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="form-group">
-                                <label for="company_name"><i class="fas fa-building mr-1 text-muted"></i>Company Name:</label>
-                                <input type="text" class="form-control" id="company_name" name="company_name" required>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="date"><i class="fas fa-calendar mr-1 text-muted"></i>Date:</label>
-                                <input type="date" class="form-control" id="date" name="date" required>
-                            </div>
+                    <div class="form-row">
+                        <div class="cyn-form-group form-field-full">
+                            <label class="cyn-form-label" for="company_name">
+                                <i class="fas fa-building"></i> Company Name
+                            </label>
+                            <input type="text" class="cyn-form-control" id="company_name" name="company_name" placeholder="Enter company name" required>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="amount"><i class="fas fa-money-bill mr-1 text-muted"></i>Amount:</label>
-                                <input type="number" class="form-control" id="amount" name="amount" min="0" step="0.01" required>
-                            </div>
+                    
+                    <div class="form-row">
+                        <div class="cyn-form-group">
+                            <label class="cyn-form-label" for="amount">
+                                <i class="fas fa-money-bill"></i> Amount
+                            </label>
+                            <input type="number" class="cyn-form-control" id="amount" name="amount" min="0" step="0.01" placeholder="0.00" required>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="currency"><i class="fas fa-coins mr-1 text-muted"></i>Currency:</label>
-                                <select class="form-control" id="currency" name="currency" required>
-                                    <option value="$">USD ($)</option>
-                                    <option value="€">EUR (€)</option>
-                                    <option value="₺">TRY (₺)</option>
-                                    <option value="د.ج">DZD (د.ج)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="reason"><i class="fas fa-info-circle mr-1 text-muted"></i>Reason:</label>
-                        <input type="text" class="form-control" id="reason" name="reason" required>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="payment_method"><i class="fas fa-credit-card mr-1 text-muted"></i>Payment Method:</label>
-                                <select class="form-control" id="payment_method" name="payment_method" required>
-                                    <option value="Cash">Cash</option>
-                                    <option value="Bank Transfer">Bank Transfer</option>
-                                    <option value="Credit Card">Credit Card</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="received_by"><i class="fas fa-user mr-1 text-muted"></i>Received By:</label>
-                                <input type="text" class="form-control" id="received_by" name="received_by" required>
-                            </div>
+                        <div class="cyn-form-group">
+                            <label class="cyn-form-label" for="currency">
+                                <i class="fas fa-coins"></i> Currency
+                            </label>
+                            <select class="cyn-form-control cyn-form-select" id="currency" name="currency" required>
+                                <option value="$">USD ($)</option>
+                                <option value="€">EUR (€)</option>
+                                <option value="₺">TRY (₺)</option>
+                                <option value="د.ج">DZD (د.ج)</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="remaining_amount"><i class="fas fa-balance-scale mr-1 text-muted"></i>Remaining Amount (optional):</label>
-                        <input type="number" class="form-control" id="remaining_amount" name="remaining_amount" min="0" step="0.01">
+                    
+                    <div class="form-row">
+                        <div class="cyn-form-group">
+                            <label class="cyn-form-label" for="date">
+                                <i class="fas fa-calendar"></i> Date
+                            </label>
+                            <input type="date" class="cyn-form-control" id="date" name="date" required>
+                        </div>
+                        <div class="cyn-form-group">
+                            <label class="cyn-form-label" for="payment_method">
+                                <i class="fas fa-credit-card"></i> Payment Method
+                            </label>
+                            <select class="cyn-form-control cyn-form-select" id="payment_method" name="payment_method" required>
+                                <option value="Cash">Cash</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                                <option value="Credit Card">Credit Card</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="dashboard.php" class="btn btn-outline-secondary"><i class="fas fa-times mr-1"></i>Cancel</a>
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-receipt mr-1"></i>Generate Receipt</button>
+                    
+                    <div class="cyn-form-group">
+                        <label class="cyn-form-label" for="reason">
+                            <i class="fas fa-info-circle"></i> Reason / Description
+                        </label>
+                        <input type="text" class="cyn-form-control" id="reason" name="reason" placeholder="Enter payment reason" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="cyn-form-group">
+                            <label class="cyn-form-label" for="received_by">
+                                <i class="fas fa-user"></i> Received By
+                            </label>
+                            <input type="text" class="cyn-form-control" id="received_by" name="received_by" placeholder="Name of receiver" required>
+                        </div>
+                        <div class="cyn-form-group">
+                            <label class="cyn-form-label" for="remaining_amount">
+                                <i class="fas fa-balance-scale"></i> Remaining Amount (optional)
+                            </label>
+                            <input type="number" class="cyn-form-control" id="remaining_amount" name="remaining_amount" min="0" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="dashboard.php" class="cyn-btn cyn-btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="cyn-btn cyn-btn-primary cyn-btn-lg">
+                            <i class="fas fa-receipt"></i> Generate Receipt
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>

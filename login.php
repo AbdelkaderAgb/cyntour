@@ -120,6 +120,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
             justify-content: center;
             background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
             padding: var(--spacing-lg);
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+            pointer-events: none;
         }
         
         .login-container {
@@ -127,16 +139,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
             max-width: 1000px;
             width: 100%;
             background: var(--white);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-xl);
+            border-radius: var(--radius-2xl);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.25);
             overflow: hidden;
             animation: fadeInUp 0.6s ease forwards;
+            position: relative;
+            z-index: 1;
         }
         
         .login-image {
             flex: 1;
-            background: url('istanbul.jpeg') center/cover no-repeat;
-            min-height: 500px;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+            min-height: 550px;
             position: relative;
             display: none;
         }
@@ -145,13 +159,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(42, 77, 105, 0.8) 0%, rgba(26, 51, 72, 0.9) 100%);
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
         }
         
         .login-image-content {
             position: relative;
             z-index: 2;
-            padding: var(--spacing-2xl);
+            padding: var(--spacing-3xl);
             color: var(--white);
             height: 100%;
             display: flex;
@@ -160,23 +174,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
         }
         
         .login-image-content h2 {
-            font-size: 2rem;
+            font-size: 2.25rem;
             color: var(--white);
-            margin-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.3;
         }
         
         .login-image-content h2 span {
             color: var(--primary-light);
+            font-style: italic;
         }
         
         .login-image-content p {
-            color: rgba(255,255,255,0.8);
-            font-size: 1rem;
+            color: rgba(255,255,255,0.85);
+            font-size: 1.05rem;
+            line-height: 1.7;
         }
         
         .login-form-container {
             flex: 1;
-            padding: var(--spacing-3xl);
+            padding: 3rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -184,11 +201,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
         
         .login-logo {
             text-align: center;
-            margin-bottom: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
         }
         
-        .login-logo img {
-            height: 70px;
+        .login-logo-text {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+        
+        .login-logo-text span {
+            color: var(--primary);
         }
         
         .login-header {
@@ -208,7 +232,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
         }
         
         .login-form .cyn-form-group {
-            margin-bottom: var(--spacing-lg);
+            margin-bottom: 1.25rem;
         }
         
         .password-toggle {
@@ -217,7 +241,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
         
         .password-toggle .toggle-btn {
             position: absolute;
-            right: var(--spacing-lg);
+            right: 1rem;
             top: 50%;
             transform: translateY(-50%);
             background: none;
@@ -225,6 +249,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
             color: var(--gray-500);
             cursor: pointer;
             padding: var(--spacing-sm);
+            transition: color var(--transition-fast);
         }
         
         .password-toggle .toggle-btn:hover {
@@ -357,8 +382,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
         
         <div class="login-form-container">
             <div class="login-logo">
-                <a href="home.php">
-                    <img src="img/logo.png" alt="CynTour Logo">
+                <a href="dashboard.php" style="text-decoration: none;">
+                    <div class="login-logo-text">Cyn<span>Tour</span></div>
                 </a>
             </div>
             
