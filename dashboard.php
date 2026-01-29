@@ -111,370 +111,562 @@ if ($companyId) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $companyId ? htmlspecialchars($companyName) : 'Makbuz Paneli' ?></title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title><?= $companyId ? htmlspecialchars($companyName) : 'Receipt Dashboard' ?> - CynTour</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="css/cyntour-style.css" rel="stylesheet">
     <style>
-        :root {
-            --primary-gold: #c5a47e; /* Rafine, daha az parlak bir altın rengi */
-            --gradient-start: #e6c9a7;
-            --gradient-end: #c5a47e;
-            --success-color: #28a745;
-            --light-gray: #fdfcf9; /* Daha sıcak bir kırık beyaz */
-            --border-color: #e9ecef;
-            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
-            --card-hover-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-            --border-radius: .5rem;
-            --font-family-header: 'Playfair Display', serif;
-            --font-family-sans-serif: 'Inter', sans-serif;
-        }
-
-        /* --- Genel & Düzen --- */
+        /* Dashboard Specific Styles */
         body {
-            background-color: var(--light-gray);
-            font-family: var(--font-family-sans-serif);
-            color: #333;
-        }
-        h1, .h1, h2, .h2, .page-header .h2, .stat-card-value, .navbar-brand, .company-card .card-title {
-            font-family: var(--font-family-header);
-        }
-        .text-gold {
-            color: var(--primary-gold) !important;
-        }
-        .main-container {
-             animation: fadeInUp .5s ease-out forwards;
-        }
-        .page-header {
-            animation: fadeInUp .5s ease-out .1s forwards;
-            opacity: 0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
         }
 
-        /* --- Gezinme Çubuğu --- */
-        .navbar {
-            background-color: #fff;
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: none;
+        /* Enhanced Navbar */
+        .dashboard-navbar {
+            background: var(--white);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        /* --- Düğmeler --- */
-        .btn-gradient {
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            border: none;
-            color: #fff !important;
-            box-shadow: 0 4px 10px rgba(0,0,0,.1);
-            transition: opacity .2s;
-        }
-        .btn-gradient:hover {
-            opacity: 0.9;
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .btn-outline-gold {
-            color: var(--primary-gold);
-            border-color: var(--primary-gold);
-        }
-
-        .btn-outline-gold:hover {
-            color: #fff;
-            background-color: var(--primary-gold);
-            border-color: var(--primary-gold);
-        }
-
-        /* --- Kartlar --- */
-        .card {
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            box-shadow: var(--card-shadow);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            opacity: 0;
-            animation: fadeInUp .5s ease-out forwards;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--card-hover-shadow);
-        }
-        .card-header {
-            background-color: #fff;
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
             font-weight: 600;
-            border-bottom: 1px solid var(--border-color);
+            color: var(--secondary);
+            text-decoration: none;
         }
 
-        /* --- Şirket Kartları (Panel) --- */
+        .navbar-brand i {
+            color: var(--primary);
+            font-size: 1.75rem;
+        }
+
+        .navbar-brand span {
+            color: var(--primary);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.5s ease-out 0.1s forwards;
+            opacity: 0;
+        }
+
+        .page-header h1 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: var(--gray-600);
+            margin: 0;
+        }
+
+        /* Company Cards */
+        .company-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .company-card {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            border: 1px solid var(--gray-100);
+            opacity: 0;
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .company-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        }
+
         .company-card a {
             text-decoration: none;
             color: inherit;
-        }
-        .company-card .card-body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-        .company-card .card-title {
-            font-size: 1.25rem; /* Playfair için daha büyük */
-            font-weight: 700;
-            margin-top: 1rem;
-            color: var(--primary-gold);
-        }
-        .company-card-stats {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-        }
-        .company-card-stats strong {
             display: block;
-            font-size: 1.1rem;
-            font-weight: 600;
+        }
+
+        .company-card-body {
+            padding: 1.75rem;
+            text-align: center;
         }
 
         .avatar-initials {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            color: #fff;
+            width: 70px;
+            height: 70px;
+            border-radius: var(--radius-full);
+            background: var(--primary-gradient);
+            color: var(--white);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
-            font-weight: 600;
-            font-family: var(--font-family-header);
-        }
-        
-        /* --- İstatistik Kartları (Detay Görünümü) --- */
-        .stat-card {
-            animation-delay: .2s;
-        }
-        .stat-card .card-body {
-            display: flex;
-            align-items: center;
-        }
-        .stat-card-icon {
-            font-size: 1.75rem;
-            padding: 1rem;
-            border-radius: var(--border-radius);
-            margin-right: 1rem;
-            background-color: #fef6ec; /* Açık altın arkaplan */
-        }
-        .stat-card-icon.icon-receipts { color: var(--primary-gold); }
-        .stat-card-icon.icon-subtotal { color: #fd7e14; }
-        .stat-card-icon.icon-total { color: var(--success-color); }
-        .stat-card-title {
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-bottom: 0.25rem;
-        }
-        .stat-card-value {
-            font-size: 1.75rem; /* Playfair için daha büyük */
             font-weight: 700;
-        }
-        
-        /* --- Tablo --- */
-        .table-container-card {
-             animation-delay: .3s;
-        }
-        .table thead th {
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-top: none;
-            background-color: #f8f9fa;
-        }
-        .table td {
-            vertical-align: middle;
+            font-family: var(--font-heading);
+            margin: 0 auto 1rem;
+            box-shadow: var(--shadow-gold);
         }
 
-        /* --- Boş Durum --- */
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            opacity: 0.7;
-        }
-        .empty-state i {
-            font-size: 3rem;
+        .company-card-title {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--secondary);
             margin-bottom: 1rem;
         }
 
-        /* --- Alt Bilgi --- */
-        footer {
-            border-top: 1px solid var(--border-color);
-            padding: 1.5rem 0;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-top: 3rem;
-            background: #fff;
+        .company-card-stats {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid var(--gray-100);
+            padding-top: 1rem;
+            margin-top: 0.5rem;
         }
-        
-        /* --- Animasyonlar --- */
+
+        .company-stat {
+            text-align: center;
+        }
+
+        .company-stat-label {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .company-stat-value {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .company-stat-value.highlight {
+            color: var(--primary);
+        }
+
+        /* Stats Cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-100);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.receipts {
+            background: linear-gradient(135deg, rgba(202,140,5,0.15) 0%, rgba(160,96,0,0.15) 100%);
+            color: var(--primary);
+        }
+
+        .stat-icon.total {
+            background: linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(5,150,105,0.15) 100%);
+            color: var(--success);
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            line-height: 1;
+        }
+
+        /* Receipt Table */
+        .table-container {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            border: 1px solid var(--gray-100);
+        }
+
+        .table-header {
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            border-bottom: 1px solid var(--gray-100);
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .table-header i {
+            color: var(--primary);
+        }
+
+        .receipt-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .receipt-table thead {
+            background: var(--gray-50);
+        }
+
+        .receipt-table th {
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .receipt-table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
+            vertical-align: middle;
+            color: var(--gray-700);
+        }
+
+        .receipt-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .receipt-table tbody tr:hover {
+            background: var(--gray-50);
+        }
+
+        .receipt-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .payment-amount {
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        /* Action Buttons */
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-view {
+            background: linear-gradient(135deg, rgba(202,140,5,0.1) 0%, rgba(160,96,0,0.1) 100%);
+            color: var(--primary);
+        }
+
+        .btn-view:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, rgba(239,68,68,0.1) 0%, rgba(220,38,38,0.1) 100%);
+            color: var(--danger);
+        }
+
+        .btn-delete:hover {
+            background: var(--danger);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--gray-500);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--gray-300);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h4 {
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        .dashboard-footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-500);
+            font-size: 0.9rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--gray-200);
+            background: var(--white);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar-container {
+                padding: 0 1rem;
+            }
+            
+            .main-container {
+                padding: 1rem;
+            }
+
+            .company-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+
+            .receipt-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        /* Animations */
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
         }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white mb-4">
-    <div class="container">
+<nav class="dashboard-navbar">
+    <div class="navbar-container">
         <a class="navbar-brand" href="dashboard.php">
-            <i class="fas fa-file-invoice-dollar text-gold"></i>
-            Makbuzlar
+            <i class="fas fa-file-invoice-dollar"></i>
+            Cyn<span>Tour</span>
         </a>
-        <a href="receipt-create.php" class="btn btn-gradient ml-auto">
-            <i class="fas fa-plus-circle mr-1"></i> Yeni Makbuz
+        <a href="receipt-create.php" class="cyn-btn cyn-btn-primary">
+            <i class="fas fa-plus-circle"></i> New Receipt
         </a>
     </div>
 </nav>
 
-<div class="container main-container">
+<div class="main-container">
     <?php if ($companyId): ?>
         <!-- ======================= -->
-        <!-- Tek Şirket Görünümü     -->
+        <!-- Single Company View     -->
         <!-- ======================= -->
-        <div class="page-header d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h2 mb-0"><?= htmlspecialchars($companyName) ?></h1>
-            <a href="dashboard.php" class="btn btn-sm btn-outline-secondary">
-                <i class="fas fa-arrow-left mr-1"></i> Panele Geri Dön
+        <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1><?= htmlspecialchars($companyName) ?></h1>
+                <p>Receipt history and payment summary</p>
+            </div>
+            <a href="dashboard.php" class="cyn-btn cyn-btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
         </div>
 
-        <!-- İstatistik Kartları -->
-        <div class="row mb-4">
-            <div class="col-md-6 mb-3 mb-md-0">
-                <div class="card stat-card h-100">
-                    <div class="card-body">
-                        <div class="stat-card-icon icon-receipts"><i class="fas fa-file-alt"></i></div>
-                        <div>
-                            <div class="stat-card-title">Toplam Makbuz</div>
-                            <div class="stat-card-value"><?= $receiptCount ?></div>
-                        </div>
-                    </div>
+        <!-- Stats Cards -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon receipts">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">Total Receipts</div>
+                    <div class="stat-value"><?= $receiptCount ?></div>
                 </div>
             </div>
 
             <?php foreach ($currency_totals as $currency => $total): ?>
-                <div class="col-md-6">
-                    <div class="card stat-card">
-                        <div class="card-body">
-                            <div class="stat-card-icon icon-total"><i class="fas fa-wallet"></i></div>
-                            <div>
-                                <div class="stat-card-title">Toplam (<?= htmlspecialchars($currency) ?>)</div>
-                                <div class="stat-card-value"><?= get_currency_symbol($currency) . number_format($total, 2) ?></div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="stat-card">
+                <div class="stat-icon total">
+                    <i class="fas fa-wallet"></i>
                 </div>
+                <div class="stat-info">
+                    <div class="stat-label">Total (<?= htmlspecialchars($currency) ?>)</div>
+                    <div class="stat-value"><?= get_currency_symbol($currency) . number_format($total, 2) ?></div>
+                </div>
+            </div>
             <?php endforeach; ?>
         </div>
 
-        <!-- Makbuz Tablosu -->
-        <div class="card table-container-card">
-            <div class="card-header">
-                Makbuz Geçmişi
+        <!-- Receipt Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <i class="fas fa-history"></i> Receipt History
             </div>
             <?php if (empty($receipts)): ?>
-                <div class="card-body">
-                    <div class="empty-state">
-                        <i class="fas fa-folder-open"></i>
-                        <h4>Hiç Makbuz Bulunamadı</h4>
-                        <p class="text-muted">Bu şirket için henüz kaydedilmiş bir makbuz bulunmuyor.</p>
-                    </div>
+                <div class="empty-state">
+                    <i class="fas fa-folder-open"></i>
+                    <h4>No Receipts Found</h4>
+                    <p>No receipts have been recorded for this company yet.</p>
                 </div>
             <?php else: ?>
-                <div class="table-responsive">
-                    <table class="table table-hover table-striped mb-0">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Tarih</th>
-                                <th>Teslim Alan</th>
-                                <th>Konu</th>
-                                <th>Ödeyen</th>
-                                <th class="text-right">Ödemeler</th>
-                                <th class="text-center">İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ($receipts as $i => $row): ?>
-                            <tr style="animation: fadeInUp .5s ease-out <?= .05 * $i ?>s forwards; opacity: 0;">
-                                <td><?= htmlspecialchars($row['id']) ?></td>
-                                <td><?= date('d/m/y', strtotime($row['receipt_date'])) ?></td>
-                                <td><?= htmlspecialchars($row['received_by'] ?: 'Yok') ?></td>
-                                <td><?= htmlspecialchars($row['subject']) ?></td>
-                                <td>
-                                    <?php 
-                                    $receipt_payments = $payments_by_receipt[$row['id']] ?? [];
-                                    if (!empty($receipt_payments)) {
-                                        echo htmlspecialchars($receipt_payments[0]['money_provider']);
-                                    } else {
-                                        echo 'Yok';
-                                    }
-                                    ?>
-                                </td>
-                                <td class="text-right font-weight-bold" style="min-width: 150px;">
-                                    <?php if (!empty($receipt_payments)): ?>
-                                        <?php foreach ($receipt_payments as $payment): ?>
-                                            <div><?= get_currency_symbol($payment['currency']) . number_format($payment['amount'], 2) ?></div>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        Yok
-                                    <?php endif; ?>
-                                </td>
-                                <td class="text-center">
-                                    <a class="btn btn-sm btn-outline-gold" href="receipt-view.php?id=<?= $row['id'] ?>" target="_blank" title="Makbuzu Görüntüle">
+                <table class="receipt-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Received By</th>
+                            <th>Subject</th>
+                            <th>Provider</th>
+                            <th style="text-align: right;">Payments</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($receipts as $i => $row): ?>
+                        <tr style="animation: fadeInUp 0.5s ease-out <?= 0.05 * $i ?>s forwards; opacity: 0;">
+                            <td><strong>#<?= htmlspecialchars($row['id']) ?></strong></td>
+                            <td><?= date('d M Y', strtotime($row['receipt_date'])) ?></td>
+                            <td><?= htmlspecialchars($row['received_by'] ?: '-') ?></td>
+                            <td><?= htmlspecialchars($row['subject']) ?></td>
+                            <td>
+                                <?php 
+                                $receipt_payments = $payments_by_receipt[$row['id']] ?? [];
+                                if (!empty($receipt_payments)) {
+                                    echo htmlspecialchars($receipt_payments[0]['money_provider']);
+                                } else {
+                                    echo '-';
+                                }
+                                ?>
+                            </td>
+                            <td style="text-align: right;">
+                                <?php if (!empty($receipt_payments)): ?>
+                                    <?php foreach ($receipt_payments as $payment): ?>
+                                        <div class="payment-amount"><?= get_currency_symbol($payment['currency']) . number_format($payment['amount'], 2) ?></div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </td>
+                            <td style="text-align: center;">
+                                <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                                    <a class="btn-action btn-view" href="receipt-view.php?id=<?= $row['id'] ?>" target="_blank" title="View Receipt">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <form action="dashboard.php?company=<?= $companyId ?>" method="POST" class="d-inline" onsubmit="return confirm('#<?= $row['id'] ?> numaralı makbuzu silmek istediğinizden emin misiniz?');">
+                                    <form action="dashboard.php?company=<?= $companyId ?>" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete receipt #<?= $row['id'] ?>?');">
                                         <input type="hidden" name="delete_receipt_id" value="<?= $row['id'] ?>">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Makbuzu Sil">
+                                        <button type="submit" class="btn-action btn-delete" title="Delete Receipt">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
             <?php endif; ?>
         </div>
 
     <?php else: ?>
         <!-- ======================= -->
-        <!-- Tüm Şirketler Görünümü  -->
+        <!-- All Companies View      -->
         <!-- ======================= -->
-        <div class="page-header mb-4">
-            <h1 class="h2">Şirket Paneli</h1>
-            <p class="text-muted">Detaylı makbuz geçmişini görüntülemek için bir şirket seçin.</p>
+        <div class="page-header">
+            <h1>Company Dashboard</h1>
+            <p>Select a company to view detailed receipt history.</p>
         </div>
-        <div class="row">
+        
+        <div class="company-grid">
             <?php foreach ($companies as $i => $c): ?>
-            <div class="col-md-6 col-lg-4 mb-4 company-card" style="animation-delay: <?= .1 * $i ?>s;">
+            <div class="company-card" style="animation-delay: <?= 0.1 * $i ?>s;">
                 <a href="dashboard.php?company=<?= $c['id'] ?>">
-                    <div class="card h-100">
-                        <div class="card-body p-4">
-                            <?= generate_initials_avatar($c['company']) ?>
-                            <h5 class="card-title"><?= htmlspecialchars($c['company']) ?></h5>
-                            <div class="company-card-stats border-top pt-3">
-                                <div>
-                                    Makbuzlar
-                                    <strong><?= $c['receipt_count'] ?></strong>
-                                </div>
-                                <div class="w-100 border-top mt-2 pt-2">
-                                    Toplam Değer
-                                    <?php if (empty($c['totals'])): ?>
-                                        <strong>Makbuz yok</strong>
-                                    <?php else: ?>
-                                        <?php foreach ($c['totals'] as $currency => $total): ?>
-                                            <strong class="d-block"><?= get_currency_symbol($currency) . number_format($total, 2) ?></strong>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </div>
+                    <div class="company-card-body">
+                        <?= generate_initials_avatar($c['company']) ?>
+                        <h5 class="company-card-title"><?= htmlspecialchars($c['company']) ?></h5>
+                        <div class="company-card-stats">
+                            <div class="company-stat">
+                                <div class="company-stat-label">Receipts</div>
+                                <div class="company-stat-value highlight"><?= $c['receipt_count'] ?></div>
+                            </div>
+                            <div class="company-stat">
+                                <div class="company-stat-label">Total Value</div>
+                                <?php if (empty($c['totals'])): ?>
+                                    <div class="company-stat-value">-</div>
+                                <?php else: ?>
+                                    <?php foreach ($c['totals'] as $currency => $total): ?>
+                                        <div class="company-stat-value"><?= get_currency_symbol($currency) . number_format($total, 2) ?></div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -485,8 +677,8 @@ if ($companyId) {
     <?php endif; ?>
 </div>
 
-<footer class="mt-5">
-    © <?= date('Y') ?> Cyntour. Tüm hakları saklıdır.
+<footer class="dashboard-footer">
+    © <?= date('Y') ?> CynTour. All rights reserved.
 </footer>
 
 </body>

@@ -25,10 +25,16 @@ spl_autoload_register(function ($class) {
     // Get the relative class name
     $relativeClass = substr($class, $len);
     
-    // Replace the namespace prefix with the base directory
-    // Replace namespace separators with directory separators
-    // Append with .php
-    $file = $baseDir . str_replace('\\', '/', strtolower($relativeClass)) . '.php';
+    // Map namespace parts to directory path
+    // CynTour\Core\Application -> core/Application.php
+    $parts = explode('\\', $relativeClass);
+    
+    // Convert first part (like 'Core') to lowercase for directory
+    if (count($parts) > 0) {
+        $parts[0] = strtolower($parts[0]);
+    }
+    
+    $file = $baseDir . implode('/', $parts) . '.php';
     
     // If the file exists, require it
     if (file_exists($file)) {
@@ -36,8 +42,8 @@ spl_autoload_register(function ($class) {
         return;
     }
     
-    // Try with original case for backward compatibility
-    $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
+    // Try fully lowercase for backward compatibility
+    $file = $baseDir . strtolower(str_replace('\\', '/', $relativeClass)) . '.php';
     if (file_exists($file)) {
         require $file;
     }
