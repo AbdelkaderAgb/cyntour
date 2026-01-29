@@ -31,3 +31,25 @@ uploads/
 # OS files
 .DS_Store
 Thumbs.db
+
+# ===========================================
+# Image files - Host on CDN for better performance
+# ===========================================
+# To remove existing images from git tracking (but keep local files):
+# git rm --cached *.jpg *.jpeg *.png *.gif *.webp *.svg
+# git rm --cached img/*.jpg img/*.jpeg img/*.png img/*.gif img/*.webp img/*.svg
+#
+# Uncomment the lines below when ready to use CDN hosting:
+# *.jpg
+# *.jpeg
+# *.png
+# *.gif
+# *.webp
+# *.ico
+# img/
+# 
+# Keep essential images that are part of the application:
+# !logo.png
+# !logo-mini.png
+# !stamp.png
+# !singateur.png
