@@ -19,17 +19,20 @@ IG.html
 # Logs
 *.log
 logs/
-storage/logs/
+storage/logs/*
+!storage/logs/.gitkeep
 
 # Cache and temp files
 cache/
 tmp/
 *.cache
-storage/cache/
+storage/cache/*
+!storage/cache/.gitkeep
 
 # Upload directories (may contain sensitive data)
 uploads/
-storage/uploads/
+storage/uploads/*
+!storage/uploads/.gitkeep
 
 # OS files
 .DS_Store
@@ -54,7 +57,12 @@ Thumbs.db
 *.wav
 img/
 pdf/
-assets/images/
+assets/images/*
+!assets/images/.gitkeep
+
+# JavaScript - ignore compiled/vendor
+assets/js/*.min.js
+!assets/js/.gitkeep
 
 # Excel files
 *.xlsx
