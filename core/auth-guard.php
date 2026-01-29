@@ -1,20 +1,23 @@
 <?php
 /**
- * CynTour - Authentication Guard
+ * CynTour - Authentication Guard Middleware
  * 
  * Include this file at the top of any page that requires authentication.
  * Redirects to login page if user is not authenticated.
  * 
- * @deprecated Use core/auth-guard.php for new code
+ * @package CynTour
+ * @version 2.0
  */
 
-// Load the new core if not already loaded
-if (!class_exists('\CynTour\Core\Application')) {
-    require_once __DIR__ . '/core/autoload.php';
+// Load bootstrap if not already loaded
+if (!defined('CYNTOUR_BASE_PATH')) {
+    require_once dirname(__FILE__) . '/bootstrap.php';
 }
 
-$app = \CynTour\Core\Application::getInstance();
-$app->startSession();
+use CynTour\Core\Application;
+use CynTour\Core\Helper;
+
+$app = Application::getInstance();
 
 // Check if user is authenticated
 if (!$app->isAuthenticated()) {
@@ -25,8 +28,7 @@ if (!$app->isAuthenticated()) {
         $_SESSION['redirect_after_login'] = $request_uri;
     }
     
-    header('Location: login.php');
-    exit();
+    Helper::redirect('login.php');
 }
 
 // Optional: Check session timeout (30 minutes of inactivity)
@@ -45,10 +47,8 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
         $_SESSION['redirect_after_login'] = $redirect_url;
     }
     
-    header('Location: login.php?expired=1');
-    exit();
+    Helper::redirect('login.php?expired=1');
 }
 
 // Update last activity time
 $_SESSION['last_activity'] = time();
-?>
