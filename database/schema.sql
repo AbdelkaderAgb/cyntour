@@ -2,14 +2,15 @@
 -- Cyntour Tourism Management System Database Schema
 -- Version: 1.0
 -- Description: Complete database schema with sample data
+-- Note: Tables are automatically created on first connection
 -- =====================================================
 
--- Create database if not exists
-CREATE DATABASE IF NOT EXISTS cyntour_db 
-    CHARACTER SET utf8mb4 
-    COLLATE utf8mb4_unicode_ci;
+-- Create database if not exists (run manually if needed)
+-- CREATE DATABASE IF NOT EXISTS barqvkxs_cyn 
+--     CHARACTER SET utf8mb4 
+--     COLLATE utf8mb4_unicode_ci;
 
-USE cyntour_db;
+-- USE barqvkxs_cyn;
 
 -- =====================================================
 -- USERS AND AUTHENTICATION

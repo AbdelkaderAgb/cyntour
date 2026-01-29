@@ -10,13 +10,13 @@ A comprehensive tourism management system for CYN Turizm, featuring hotel bookin
 - **Voucher System**: Generate vouchers for hotels, tours, and transfers
 - **User Management**: Admin dashboard with role-based access control
 - **Receipt & Invoice Generation**: Create and manage financial documents
+- **Automatic Database Setup**: Tables are created automatically on first connection
 
 ## Project Structure
 
 ```
 cyntour/
-├── config.php              # Database configuration (create from example)
-├── config.example.php      # Database config template
+├── config.php              # Database configuration with auto-table creation
 ├── database/
 │   └── schema.sql          # Complete database schema with sample data
 ├── includes/
@@ -32,54 +32,55 @@ cyntour/
 
 ## Setup
 
-### 1. Database Configuration
+### Quick Start (Automatic Setup)
 
-1. Copy `config.example.php` to `config.php`:
-   ```bash
-   cp config.example.php config.php
-   ```
+1. Database credentials are already configured in `config.php`:
+   - **Database**: `barqvkxs_cyn`
+   - **Username**: `barqvkxs_cyn`
+   - **Password**: Configured in config file
 
-2. Edit `config.php` and update the database credentials:
-   ```php
-   $db_config = [
-       'host'     => 'localhost',
-       'database' => 'cyntour_db',
-       'username' => 'your_username',
-       'password' => 'your_password',
-       'charset'  => 'utf8mb4'
-   ];
-   ```
+2. **Tables are created automatically!** On first connection, the system will:
+   - Check if the `users` table exists
+   - If not, automatically execute the schema from `database/schema.sql`
+   - Create all tables with sample data
 
-   Or set environment variables:
-   - `DB_HOST` - Database host
-   - `DB_NAME` - Database name
-   - `DB_USER` - Database username
-   - `DB_PASS` - Database password
+3. Access the application in your browser and login with:
+   - **Email**: admin@cyntour.com
+   - **Password**: Admin123!
 
-### 2. Database Setup
+### Manual Database Setup (Optional)
 
-Import the database schema:
+If you prefer to set up the database manually:
+
 ```bash
-mysql -u username -p < database/schema.sql
+mysql -u barqvkxs_cyn -p barqvkxs_cyn < database/schema.sql
 ```
 
-This will create:
-- All necessary tables
-- Sample data for testing
-- Reporting views
+### Custom Configuration
 
-### 3. Default Login
+Edit `config.php` to change database credentials:
+```php
+$db_config = [
+    'host'     => 'localhost',
+    'database' => 'your_database',
+    'username' => 'your_username',
+    'password' => 'your_password',
+    'charset'  => 'utf8mb4'
+];
+```
 
-After importing the schema, you can login with:
-- **Email**: admin@cyntour.com
-- **Password**: Admin123!
+Or set environment variables:
+- `DB_HOST` - Database host
+- `DB_NAME` - Database name
+- `DB_USER` - Database username
+- `DB_PASS` - Database password
 
 ## Main Pages
 
 | Page | Description |
 |------|-------------|
 | `index.php` | Home page with hotel listings |
-| `admin.php` | Admin dashboard |
+| `admin.php` | Admin dashboard (requires login) |
 | `tours.php` | Tour listings |
 | `transfer.php` | Transfer services |
 | `login.php` | User login |

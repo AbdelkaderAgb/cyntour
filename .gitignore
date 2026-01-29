@@ -1,7 +1,6 @@
 # Environment and configuration files
 .env
 *.token
-config.php
 
 # HTML files
 IG.html
