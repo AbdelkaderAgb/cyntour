@@ -20,8 +20,13 @@ function isLoggedIn() {
 
 // Function to check if user is admin
 function isAdmin() {
-    return isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin' ||
-           isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
+    if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin') {
+        return true;
+    }
+    if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+        return true;
+    }
+    return false;
 }
 
 // Function to get active class
