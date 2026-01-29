@@ -1,17 +1,9 @@
 <?php
 include 'auth.php'; // Include auth.php to restrict access
+require_once 'config.php';
 
 // Database connection
-$host = 'localhost'; // Adjust if necessary
-$username = "cyntzsrb_cyn";
-$password = "Qj!d$}Zh,-~m";
-$database = 'cyntzsrb_cyn';
-
-$conn = new mysqli($host, $username, $password, $database);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$conn = getMysqliConnection();
 
 // Fetch total number of unique hotels
 $hotelsQuery = "SELECT COUNT(DISTINCT hotel_name) AS total_hotels FROM pricing_data";

@@ -1,17 +1,8 @@
 <?php
-// Veritabanı ayarları
-$host = 'localhost';
-$username = "cyntzsrb_cyn";
-$password = "Qj!d$}Zh,-~m";
-$database = 'cyntzsrb_cyn';
+require_once 'config.php';
 
-// Veritabanı bağlantısı oluştur
-$conn = new mysqli($host, $username, $password, $database);
-
-// Bağlantıyı kontrol et
-if ($conn->connect_error) {
-    die("Veritabanı bağlantısı başarısız: " . $conn->connect_error);
-}
+// Database connection
+$conn = getMysqliConnection();
 
 $results = [];
 $searched = false;

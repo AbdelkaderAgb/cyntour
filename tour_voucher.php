@@ -2,9 +2,8 @@
 /* ────────────────────────────────────────────────
    1. DB connection + sanitised voucher_id
    ──────────────────────────────────────────────── */
-$host='localhost';  $user='cyntzsrb_cyn';  $pass='Qj!d$}Zh,-~m';  $db='cyntzsrb_cyn';
-$conn = new mysqli($host,$user,$pass,$db);
-if($conn->connect_error){ die('DB error: '.$conn->connect_error); }
+require_once 'config.php';
+$conn = getMysqliConnection();
 
 $voucher_id = isset($_GET['voucher_id']) ? intval($_GET['voucher_id']) : 0;
 if(!$voucher_id){ die('No voucher_id supplied.'); }

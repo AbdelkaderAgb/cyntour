@@ -3,15 +3,11 @@ header('Content-Type: application/json');
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-// Database connection settings
-$servername = "cyntzsrb_cyn";
-$username = "cyntzsrb_cyn";
-$password = "Qj!d$}Zh,-~m";
-$dbname = "tour_voucher";
+// Database connection settings - using config
+require_once 'config.php';
 
 try {
-    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn = getDbConnection();
 
     // Insert voucher data
     $stmt = $conn->prepare("INSERT INTO tour_voucher (voucher_no, company_name, adult_count, child_count, infant_count, tours, customers) VALUES (:voucher_no, :company_name, :adult_count, :child_count, :infant_count, :tours, :customers)");

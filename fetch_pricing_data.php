@@ -1,21 +1,12 @@
 <?php
-// Database connection details
-$servername = "localhost";
-$username = "cyntzsrb_cyn";
-$password = "Qj!d$}Zh,-~m";
-$dbname = "cyntzsrb_cyn";
+require_once 'config.php';
 
 // Enable error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+// Database connection
+$conn = getMysqliConnection();
 
 // Get the hotel name from the query parameter
 $hotel = isset($_GET['hotel']) ? $_GET['hotel'] : '';

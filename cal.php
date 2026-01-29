@@ -1,17 +1,8 @@
 <?php
-// Database configuration
-$host = 'localhost';
-$username = "cyntzsrb_cyn";  // Replace with actual username
-$password = "Qj!d$}Zh,-~m";  // Replace with actual password
-$database = 'cyntzsrb_cyn';  // Replace with actual database name
+require_once 'config.php';
 
-// Create connection
-$conn = new mysqli($host, $username, $password, $database);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection error: " . $conn->connect_error);
-}
+// Database connection
+$conn = getMysqliConnection();
 
 $success_message = '';
 

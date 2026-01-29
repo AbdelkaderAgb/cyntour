@@ -1,7 +1,7 @@
 <?php
 include 'auth.php'; // Include auth.php to restrict access
-
 require 'vendor/autoload.php';
+require_once 'config.php';
 
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 ?><!DOCTYPE html>
@@ -89,18 +89,8 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
     <?php
     if(isset($_POST['submit'])){
-        $servername = "localhost";
-        $username = "cyntzsrb_cyn";
-        $password = "Qj!d$}Zh,-~m";
-        $dbname = "cyntzsrb_cyn";
-
-        // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
-
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
+        // Database connection
+        $conn = getMysqliConnection();
 
         $allowedFileType = [
             'application/vnd.ms-excel',

@@ -8,19 +8,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
 
-    // Database connection details
-    $servername = "localhost";
-    $username = "cyntzsrb_cyn";
-    $password = "Qj!d$}Zh,-~m";
-    $dbname = "cyntzsrb_cyn";
+    require_once 'config.php';
 
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    // Check connection
-    if ($conn->connect_error) {
-        // Exit and send a JSON error response
-        die(json_encode(["success" => false, "message" => "Connection failed: " . $conn->connect_error]));
+    // Database connection
+    try {
+        $conn = getMysqliConnection();
+    } catch (Exception $e) {
+        die(json_encode(["success" => false, "message" => "Connection failed: " . $e->getMessage()]));
     }
 
     // Get POST data from the request body

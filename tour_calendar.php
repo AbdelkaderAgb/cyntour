@@ -3,16 +3,9 @@
 error_reporting(E_ALL); 
 ini_set('display_errors', 1); // Hataları görmek için açıyoruz
 
-$host='localhost'; 
-$user='cyntzsrb_cyn'; 
-$pass='Qj!d$}Zh,-~m'; 
-$db='cyntzsrb_cyn';
+require_once 'config.php';
 
-$conn = new mysqli($host, $user, $pass, $db);
-
-if($conn->connect_error){ 
-    die('DB Bağlantı hatası: '.$conn->connect_error); 
-}
+$conn = getMysqliConnection();
 
 /* ÖNEMLİ DÜZELTME: Türkçe karakter sorunu ve JSON hatasını önlemek için */
 $conn->set_charset("utf8mb4");

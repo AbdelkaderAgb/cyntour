@@ -5,20 +5,11 @@ $success_message = "";
 
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Database connection parameters
-    $host = 'localhost';
-    $username = "cyntzsrb_cyn";
-    $password = "Qj!d$}Zh,-~m";
-    $database = 'cyntzsrb_cyn';
+    require_once 'config.php';
     
     try {
-        // Create connection
-        $conn = new mysqli($host, $username, $password, $database);
-        
-        // Check connection
-        if ($conn->connect_error) {
-            throw new Exception("Database connection failed: " . $conn->connect_error);
-        }
+        // Database connection
+        $conn = getMysqliConnection();
         
         // Get form data
         $voucher_no = $_POST['voucher_no'];

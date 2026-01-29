@@ -1,14 +1,8 @@
 <?php
-$host = 'localhost';
-$dbName = 'cyntzsrb_cyn';
-$username = 'cyntzsrb_cyn';
-$password = 'Qj!d$}Zh,-~m';
+require_once 'config.php';
 
-$conn = new mysqli($host, $username, $password, $dbName);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+// Database connection
+$conn = getMysqliConnection();
 
 $sql = "SELECT DISTINCT city FROM hotels"; // Select distinct city names from hotels table
 $result = $conn->query($sql);

@@ -1,8 +1,7 @@
 <?php
 /* ───── 1.  DB connection ───────────────────────────────────── */
-$host='localhost'; $user='cyntzsrb_cyn'; $pass='Qj!d$}Zh,-~m'; $db='cyntzsrb_cyn';
-$conn = new mysqli($host,$user,$pass,$db);
-if($conn->connect_error){ die('DB error: '.$conn->connect_error); }
+require_once 'config.php';
+$conn = getMysqliConnection();
 
 /* ───── 2.  Handle POST save then redirect ─────────────────── */
 if($_SERVER['REQUEST_METHOD']==='POST'){

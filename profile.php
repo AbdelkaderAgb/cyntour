@@ -1,18 +1,9 @@
 <?php
 session_start();
+require_once 'config.php';
 
-// Establishing a connection to the database
-$servername = "localhost";
-$username = "cyntzsrb_cyn";
-$password = "Qj!d$}Zh,-~m";
-$database = "cyntzsrb_cyn";
-
-$conn = mysqli_connect($servername, $username, $password, $database);
-
-// Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
+// Database connection
+$conn = getMysqliConnection();
 
 // Fetch profile information for the admin user from the database
 $sql = "SELECT * FROM users WHERE role = 'admin' LIMIT 1"; // Assuming there is only one admin user
