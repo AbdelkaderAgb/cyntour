@@ -5,12 +5,16 @@
  * Handles new user registration with custom design (no Bootstrap)
  */
 
+// Start output buffering to ensure headers can be sent
+ob_start();
+
 // Start session at the top to avoid "headers already sent" issues
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 require_once 'config.php';
+require_once 'helpers.php';
 
 $errors = array();
 $formData = [];
@@ -85,8 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($stmt->execute()) {
             $_SESSION['registration_success'] = true;
-            header("Location: login.php");
-            exit();
+            safe_redirect('login.php');
         } else {
             array_push($errors, "Registration failed: " . $stmt->error);
         }
