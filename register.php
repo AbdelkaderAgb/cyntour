@@ -1,14 +1,12 @@
 <?php
 /**
- * CynTour - Unified Registration System
+ * CynTour - Registration Page
  * 
- * Handles new user registration with custom design (no Bootstrap)
+ * Clean, secure user registration system
  */
 
-// Start output buffering to ensure headers can be sent
 ob_start();
 
-// Start session at the top to avoid "headers already sent" issues
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -16,87 +14,116 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once 'config.php';
 require_once 'helpers.php';
 
-$errors = array();
-$formData = [];
+// Redirect if already logged in
+if (isset($_SESSION['auth']) && $_SESSION['auth'] === true) {
+    safe_redirect('index.php');
+}
 
-// Check if form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+$errors = [];
+$formData = [
+    'company_name' => '',
+    'first_name' => '',
+    'last_name' => '',
+    'email' => '',
+    'phone_number' => ''
+];
+
+// Handle registration form submission
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $conn = getMysqliConnection();
-
-    // Validate and sanitize input fields
+    
+    // Sanitize and validate inputs (prepared statements handle SQL injection)
     $formData = [
-        'company_name' => trim(mysqli_real_escape_string($conn, $_POST['company_name'])),
-        'first_name' => trim(mysqli_real_escape_string($conn, $_POST['first_name'])),
-        'last_name' => trim(mysqli_real_escape_string($conn, $_POST['last_name'])),
-        'email' => trim(mysqli_real_escape_string($conn, $_POST['email'])),
-        'phone_number' => trim(mysqli_real_escape_string($conn, $_POST['phone_number']))
+        'company_name' => trim($_POST['company_name'] ?? ''),
+        'first_name' => trim($_POST['first_name'] ?? ''),
+        'last_name' => trim($_POST['last_name'] ?? ''),
+        'email' => trim($_POST['email'] ?? ''),
+        'phone_number' => trim($_POST['phone_number'] ?? '')
     ];
     
-    $userPassword = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
-
+    $password = $_POST['password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
+    
     // Validation
-    if (empty($formData['company_name'])) { 
-        array_push($errors, "Company name is required"); 
-    }
-    if (empty($formData['first_name'])) { 
-        array_push($errors, "First name is required"); 
-    }
-    if (empty($formData['last_name'])) { 
-        array_push($errors, "Last name is required"); 
-    }
-    if (empty($formData['email'])) { 
-        array_push($errors, "Email is required"); 
-    } elseif (!filter_var($formData['email'], FILTER_VALIDATE_EMAIL)) { 
-        array_push($errors, "Invalid email format"); 
-    }
-    if (empty($formData['phone_number'])) { 
-        array_push($errors, "Phone number is required"); 
-    }
-    if (empty($userPassword)) { 
-        array_push($errors, "Password is required"); 
-    } elseif (strlen($userPassword) < 8) { 
-        array_push($errors, "Password must be at least 8 characters"); 
-    }
-    if ($userPassword !== $confirm_password) { 
-        array_push($errors, "Passwords do not match"); 
-    }
-
-    // Check if email or company name already exist
-    $check_stmt = $conn->prepare("SELECT email, company_name FROM users WHERE email = ? OR company_name = ?");
-    $check_stmt->bind_param("ss", $formData['email'], $formData['company_name']);
-    $check_stmt->execute();
-    $check_result = $check_stmt->get_result();
-    
-    if ($check_result->num_rows > 0) {
-        $user = $check_result->fetch_assoc();
-        if ($user['email'] === $formData['email']) { 
-            array_push($errors, "Email already exists"); 
-        }
-        if ($user['company_name'] === $formData['company_name']) { 
-            array_push($errors, "Company name already exists"); 
-        }
+    if (empty($formData['company_name'])) {
+        $errors[] = "Company name is required";
+    } elseif (strlen($formData['company_name']) > 255) {
+        $errors[] = "Company name is too long";
     }
     
-    $check_stmt->close();
-
-    // If no errors, insert into database
-    if (count($errors) == 0) {
-        $password_hash = password_hash($userPassword, PASSWORD_DEFAULT);
+    if (empty($formData['first_name'])) {
+        $errors[] = "First name is required";
+    } elseif (strlen($formData['first_name']) > 100) {
+        $errors[] = "First name is too long";
+    }
+    
+    if (empty($formData['last_name'])) {
+        $errors[] = "Last name is required";
+    } elseif (strlen($formData['last_name']) > 100) {
+        $errors[] = "Last name is too long";
+    }
+    
+    if (empty($formData['email'])) {
+        $errors[] = "Email is required";
+    } elseif (!filter_var($formData['email'], FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Invalid email format";
+    }
+    
+    if (empty($formData['phone_number'])) {
+        $errors[] = "Phone number is required";
+    }
+    
+    if (empty($password)) {
+        $errors[] = "Password is required";
+    } elseif (strlen($password) < 8) {
+        $errors[] = "Password must be at least 8 characters";
+    }
+    
+    if ($password !== $confirm_password) {
+        $errors[] = "Passwords do not match";
+    }
+    
+    // Insert new user if no validation errors
+    // The database has UNIQUE constraints on email and company_name
+    // so we handle duplicates via the error response from INSERT
+    if (empty($errors)) {
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
         
-        $stmt = $conn->prepare("INSERT INTO users (company_name, first_name, last_name, email, phone_number, password) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssss", $formData['company_name'], $formData['first_name'], $formData['last_name'], $formData['email'], $formData['phone_number'], $password_hash);
-
+        $stmt = $conn->prepare("INSERT INTO users (company_name, first_name, last_name, email, phone_number, password, role, status) VALUES (?, ?, ?, ?, ?, ?, 'user', 'active')");
+        $stmt->bind_param("ssssss", 
+            $formData['company_name'], 
+            $formData['first_name'], 
+            $formData['last_name'], 
+            $formData['email'], 
+            $formData['phone_number'], 
+            $password_hash
+        );
+        
         if ($stmt->execute()) {
             $_SESSION['registration_success'] = true;
+            $stmt->close();
+            $conn->close();
             safe_redirect('login.php');
         } else {
-            array_push($errors, "Registration failed: " . $stmt->error);
+            // Check for duplicate entry errors
+            if ($conn->errno === 1062) { // Duplicate entry error code
+                $error_msg = $conn->error;
+                if (stripos($error_msg, 'email') !== false) {
+                    $errors[] = "Email already exists";
+                } elseif (stripos($error_msg, 'company_name') !== false) {
+                    $errors[] = "Company name already exists";
+                } else {
+                    $errors[] = "This email or company name is already registered";
+                }
+            } else {
+                error_log('Registration error: ' . $conn->error);
+                $errors[] = "Registration failed. Please try again.";
+            }
         }
-
+        
         $stmt->close();
     }
-
+    
     $conn->close();
 }
 ?>
@@ -108,15 +135,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="description" content="CynTour - Create your account">
     <title>CynTour - Register</title>
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Custom Styles -->
     <link href="css/cyntour-style.css" rel="stylesheet">
     
     <style>
@@ -324,7 +346,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
     <div class="register-container">
-        <!-- Image Side -->
         <div class="register-image">
             <div class="register-image-content">
                 <h2>Join <span>CynTour</span></h2>
@@ -355,7 +376,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
         
-        <!-- Form Side -->
         <div class="register-form-container">
             <div class="register-logo">
                 <a href="home.php">
@@ -368,7 +388,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <p>Join our platform and start your Turkish adventure</p>
             </div>
             
-            <?php if (count($errors) > 0): ?>
+            <?php if (!empty($errors)): ?>
             <div class="cyn-alert cyn-alert-danger animate-fadeIn">
                 <i class="fas fa-exclamation-circle"></i>
                 <div>
@@ -379,7 +399,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <?php endif; ?>
             
-            <form class="register-form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+            <form class="register-form" action="" method="post" novalidate>
                 <div class="cyn-form-group">
                     <label class="cyn-form-label" for="company_name">
                         <i class="fas fa-building"></i> Company Name
@@ -389,8 +409,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                            name="company_name" 
                            class="cyn-form-control" 
                            placeholder="Your company name" 
-                           value="<?php echo isset($formData['company_name']) ? htmlspecialchars($formData['company_name']) : ''; ?>"
-                           required>
+                           value="<?php echo htmlspecialchars($formData['company_name']); ?>"
+                           required
+                           maxlength="255">
                 </div>
                 
                 <div class="form-row">
@@ -403,8 +424,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                name="first_name" 
                                class="cyn-form-control" 
                                placeholder="First name" 
-                               value="<?php echo isset($formData['first_name']) ? htmlspecialchars($formData['first_name']) : ''; ?>"
-                               required>
+                               value="<?php echo htmlspecialchars($formData['first_name']); ?>"
+                               required
+                               maxlength="100">
                     </div>
                     
                     <div class="cyn-form-group">
@@ -416,8 +438,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                name="last_name" 
                                class="cyn-form-control" 
                                placeholder="Last name" 
-                               value="<?php echo isset($formData['last_name']) ? htmlspecialchars($formData['last_name']) : ''; ?>"
-                               required>
+                               value="<?php echo htmlspecialchars($formData['last_name']); ?>"
+                               required
+                               maxlength="100">
                     </div>
                 </div>
                 
@@ -430,7 +453,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                            name="email" 
                            class="cyn-form-control" 
                            placeholder="your@email.com" 
-                           value="<?php echo isset($formData['email']) ? htmlspecialchars($formData['email']) : ''; ?>"
+                           value="<?php echo htmlspecialchars($formData['email']); ?>"
                            required>
                 </div>
                 
@@ -443,7 +466,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                            name="phone_number" 
                            class="cyn-form-control" 
                            placeholder="+90 XXX XXX XX XX" 
-                           value="<?php echo isset($formData['phone_number']) ? htmlspecialchars($formData['phone_number']) : ''; ?>"
+                           value="<?php echo htmlspecialchars($formData['phone_number']); ?>"
                            required>
                 </div>
                 
@@ -567,42 +590,80 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         strengthText.style.color = color;
     });
     
-    // Form submission
+    // Form validation
     document.querySelector('.register-form').addEventListener('submit', function(e) {
         const password = document.getElementById('password').value;
         const confirm = document.getElementById('confirm_password').value;
+        const email = document.getElementById('email').value.trim();
+        const companyName = document.getElementById('company_name').value.trim();
+        const firstName = document.getElementById('first_name').value.trim();
+        const lastName = document.getElementById('last_name').value.trim();
+        const phone = document.getElementById('phone_number').value.trim();
         
         // Clear previous errors
-        document.querySelectorAll('.cyn-form-error').forEach(el => el.remove());
+        document.querySelectorAll('.field-error').forEach(el => el.remove());
         
         let hasError = false;
         
-        if (password !== confirm) {
-            e.preventDefault();
-            const confirmInput = document.getElementById('confirm_password');
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'cyn-form-error';
-            errorDiv.textContent = 'Passwords do not match';
-            confirmInput.parentElement.parentElement.appendChild(errorDiv);
+        if (!companyName) {
+            showFieldError('company_name', 'Company name is required');
+            hasError = true;
+        }
+        
+        if (!firstName) {
+            showFieldError('first_name', 'First name is required');
+            hasError = true;
+        }
+        
+        if (!lastName) {
+            showFieldError('last_name', 'Last name is required');
+            hasError = true;
+        }
+        
+        if (!email) {
+            showFieldError('email', 'Email is required');
+            hasError = true;
+        } else if (!isValidEmail(email)) {
+            showFieldError('email', 'Please enter a valid email');
+            hasError = true;
+        }
+        
+        if (!phone) {
+            showFieldError('phone_number', 'Phone number is required');
             hasError = true;
         }
         
         if (password.length < 8) {
-            e.preventDefault();
-            const passwordInput = document.getElementById('password');
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'cyn-form-error';
-            errorDiv.textContent = 'Password must be at least 8 characters';
-            passwordInput.closest('.cyn-form-group').appendChild(errorDiv);
+            showFieldError('password', 'Password must be at least 8 characters');
             hasError = true;
         }
         
-        if (!hasError) {
-            const btn = this.querySelector('button[type="submit"]');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
-            btn.disabled = true;
+        if (password !== confirm) {
+            showFieldError('confirm_password', 'Passwords do not match');
+            hasError = true;
         }
+        
+        if (hasError) {
+            e.preventDefault();
+            return;
+        }
+        
+        const btn = this.querySelector('button[type="submit"]');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+        btn.disabled = true;
     });
+    
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    
+    function showFieldError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'field-error cyn-form-error';
+        errorDiv.textContent = message;
+        field.closest('.cyn-form-group').appendChild(errorDiv);
+    }
     </script>
 </body>
 </html>
