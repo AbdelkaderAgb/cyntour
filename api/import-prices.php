@@ -1,7 +1,7 @@
 <?php
 include 'auth.php'; // Include auth.php to restrict access
 require 'vendor/autoload.php';
-require_once 'config.php';
+require_once '../config.php';
 
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 ?><!DOCTYPE html>

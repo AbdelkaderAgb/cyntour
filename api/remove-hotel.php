@@ -1,6 +1,6 @@
 <?php
 include 'auth.php'; // Include auth.php to restrict access
-require_once 'config.php';
+require_once '../config.php';
 
 // Database connection
 $conn = getMysqliConnection();

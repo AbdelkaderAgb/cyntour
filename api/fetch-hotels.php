@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../database-legacy.php';
 
 $city = $_GET['city'];
 

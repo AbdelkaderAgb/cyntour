@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../database-legacy.php';
 
 $stmt = $conn->prepare("SELECT DISTINCT city FROM hotels ORDER BY city ASC");
 $stmt->execute();

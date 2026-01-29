@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 $data = json_decode(file_get_contents('php://input'), true);
 
 // Database connection settings - using config
-require_once 'config.php';
+require_once '../config.php';
 
 try {
     $conn = getDbConnection();

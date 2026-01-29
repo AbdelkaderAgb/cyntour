@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../database-legacy.php';
 
 $hotelId = $_GET['hotelId'];
 

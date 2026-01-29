@@ -1,12 +1,12 @@
 <?php
-require_once 'config.php';
+require_once '../config.php';
 
 // Database connection
 $conn = getMysqliConnection();
 
 $hotel_id = isset($_GET['hotel_id']) ? intval($_GET['hotel_id']) : 0;
 
-$sql = "SELECT room_type, adult_price, child_price, description FROM hotel_prices WHERE hotel_id = ?";
+$sql = "SELECT room_type, adult_price, child_price, currency, description, start_date, end_date FROM hotel_prices WHERE hotel_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $hotel_id);
 $stmt->execute();
