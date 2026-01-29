@@ -1,711 +1,792 @@
 <?php
-// Include authentication (auth.php starts the session and verifies authentication)
+/**
+ * CynTour - Unified Dashboard & Hotels Page
+ * 
+ * This page combines the hotel listings with the management dashboard.
+ * It displays hotel listings and provides quick access to all management tools.
+ */
+
+// Include authentication and configuration
 include 'auth.php';
 require_once 'config.php';
+require_once 'includes/components.php';
 
 // Redirect to login page if user is not authenticated
 if (!isset($_SESSION['auth']) || $_SESSION['auth'] !== true) {
     // Try auto-login with cookie first
     if (isset($_COOKIE['remember_me'])) {
-        // Retrieve the token from the cookie
         $token = $_COOKIE['remember_me'];
-        
-        // Database connection
         $conn = getMysqliConnection();
         
-        // Use a prepared statement to safely query the user with this token
-        $stmt = $conn->prepare("SELECT id, username, role FROM users WHERE remember_token = ?");
+        $stmt = $conn->prepare("SELECT id, username, role, first_name, email FROM users WHERE remember_token = ?");
         $stmt->bind_param("s", $token);
         $stmt->execute();
         $resultToken = $stmt->get_result();
         
         if ($resultToken->num_rows > 0) {
             $user = $resultToken->fetch_assoc();
-            // Set session variables for the authenticated user
             $_SESSION['auth'] = true;
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
+            $_SESSION['username'] = $user['username'] ?? $user['first_name'];
             $_SESSION['user_role'] = $user['role'];
+            $_SESSION['user'] = $user;
         } else {
-            // If auto-login failed, redirect to login page
             header("Location: login.php");
             exit();
         }
         $stmt->close();
     } else {
-        // No cookie found, redirect to login page
         header("Location: login.php");
         exit();
     }
 }
 
+// Get user info
+$user = $_SESSION['user'] ?? [];
+$isAdmin = cyn_is_admin();
+
 // Database connection
 $conn = getMysqliConnection();
 
 // Get current page number from query string (default is 1)
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$hotelsPerPage = 10;
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$hotelsPerPage = 12;
 $offset = ($page - 1) * $hotelsPerPage;
 
-// Query to fetch hotel names with pagination
-$sql = "SELECT DISTINCT hotel_name FROM pricing_data LIMIT $offset, $hotelsPerPage";
-$result = $conn->query($sql);
+// Query to fetch hotel names with pagination using prepared statement
+$sql = "SELECT DISTINCT hotel_name FROM pricing_data LIMIT ?, ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ii", $offset, $hotelsPerPage);
+$stmt->execute();
+$result = $stmt->get_result();
 
 // Query to get total number of hotels for pagination
 $totalHotelsResult = $conn->query("SELECT COUNT(DISTINCT hotel_name) as total FROM pricing_data");
-$totalHotelsRow = $totalHotelsResult->fetch_assoc();
-$totalHotels = $totalHotelsRow['total'];
-$totalPages = ceil($totalHotels / $hotelsPerPage);
+$totalHotels = 0;
+$totalPages = 1;
+if ($totalHotelsResult) {
+    $totalHotelsRow = $totalHotelsResult->fetch_assoc();
+    $totalHotels = $totalHotelsRow['total'];
+    $totalPages = ceil($totalHotels / $hotelsPerPage);
+    // Clamp page to valid range
+    $page = min($page, max(1, $totalPages));
+}
+
+// Define dashboard cards
+$dashboardCards = [
+    ['icon' => 'fa-calendar-alt', 'title' => 'Transfer Calendar', 'desc' => 'Plan and manage transfer operations', 'link' => 'Calendar.php', 'color' => '#6366f1'],
+    ['icon' => 'fa-calendar-alt', 'title' => 'Tour Calendar', 'desc' => 'View and manage city tours', 'link' => 'tour_calendar.php', 'color' => '#8b5cf6'],
+    ['icon' => 'fa-building', 'title' => 'Hotel Calendar', 'desc' => 'Track hotel reservations', 'link' => 'cal.php', 'color' => '#ec4899'],
+    ['icon' => 'fa-file-invoice-dollar', 'title' => 'Hotel Invoice', 'desc' => 'Create and manage hotel invoices', 'link' => 'invoice_form.php', 'color' => '#f59e0b'],
+    ['icon' => 'fa-ticket-alt', 'title' => 'Hotel Voucher', 'desc' => 'Prepare hotel vouchers', 'link' => 'form.php', 'color' => '#10b981'],
+    ['icon' => 'fa-exchange-alt', 'title' => 'Transfer Voucher', 'desc' => 'Manage transfer vouchers', 'link' => 'transfer-voucher-form.php', 'color' => '#3b82f6'],
+    ['icon' => 'fa-file-invoice', 'title' => 'Transfer Invoice', 'desc' => 'Create transfer invoices', 'link' => 'transfer-invoice-form.php', 'color' => '#ef4444'],
+    ['icon' => 'fa-receipt', 'title' => 'Receipt', 'desc' => 'Create and manage receipts', 'link' => 'receipt-form.php', 'color' => '#14b8a6'],
+    ['icon' => 'fa-route', 'title' => 'Tour Voucher', 'desc' => 'Manage tour vouchers', 'link' => 'tour_voucher_form.php', 'color' => '#f97316'],
+];
+
+// Admin-only cards
+if ($isAdmin) {
+    $dashboardCards[] = ['icon' => 'fa-file-alt', 'title' => 'Letterhead', 'desc' => 'Create corporate documents', 'link' => 'letterhead.php', 'color' => '#6366f1'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Cyntourism - Your premier tourism partner in Turkey">
-    <meta name="author" content="Cyntourism">
-    <title>Cyntourism - Hotel Listings</title>
-    <!-- Custom fonts and styles -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <?php cyn_render_head('CynTour - Dashboard & Hotels'); ?>
     <style>
+        /* Dashboard Page Styles */
         :root {
-            --primary: #CA8C05;
-            --primary-light: #FFD700;
-            --primary-dark: #A06000;
-            --secondary: #2A4D69;
-            --light: #F8F9FA;
-            --dark: #212529;
-            --gray: #6c757d;
-            --border-radius: 12px;
-            --box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            --transition: all 0.3s ease;
+            --dash-primary: #6366f1;
+            --dash-secondary: #4f46e5;
+            --dash-accent: #818cf8;
         }
         
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f9f9f9;
-            color: #333;
-            line-height: 1.7;
+        .page-hero {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+            padding: var(--spacing-2xl) var(--spacing-lg);
+            color: var(--white);
         }
         
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Playfair Display', serif;
+        .page-hero-content {
+            max-width: var(--container-xl);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-lg);
+        }
+        
+        .welcome-text h1 {
+            color: var(--white);
+            font-size: 2rem;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .welcome-text h1 span {
+            color: var(--primary-light);
+        }
+        
+        .welcome-text p {
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            background: rgba(255,255,255,0.1);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--radius-full);
+            backdrop-filter: blur(10px);
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
             font-weight: 600;
         }
         
-        /* Navbar Styling */
-        .navbar {
-            background-color: #fff !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            padding: 15px 20px;
+        .user-details {
+            color: var(--white);
+        }
+        
+        .user-details .name {
+            font-weight: 600;
+        }
+        
+        .user-details .role {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            background: var(--white);
+            box-shadow: var(--shadow-sm);
             position: sticky;
-            top: 0;
-            z-index: 1000;
+            top: 70px;
+            z-index: 100;
         }
         
-        .navbar-brand img {
-            height: 80px;
-            width: auto;
-            transition: var(--transition);
+        .tab-nav-container {
+            max-width: var(--container-xl);
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            display: flex;
+            gap: var(--spacing-xs);
         }
         
-        .navbar-brand img:hover {
-            transform: scale(1.05);
-        }
-        
-        .nav-link {
+        .tab-btn {
+            padding: var(--spacing-md) var(--spacing-xl);
+            border: none;
+            background: none;
+            font-family: var(--font-primary);
+            font-size: 0.95rem;
             font-weight: 500;
-            padding: 10px 15px !important;
-            color: var(--dark) !important;
-            border-bottom: 2px solid transparent;
-            transition: var(--transition);
-        }
-        
-        .nav-link:hover, .nav-link.active {
-            color: var(--primary) !important;
-            border-bottom: 2px solid var(--primary);
-        }
-        
-        /* Hotel List Container */
-        .section-container {
-            padding: 40px 20px;
-            background-color: #fff;
-            box-shadow: var(--box-shadow);
-            border-radius: var(--border-radius);
-            margin: 30px auto;
-        }
-        
-        .section-title {
-            font-size: 2.5rem;
-            color: var(--primary);
-            text-align: center;
-            margin-bottom: 30px;
+            color: var(--gray-600);
+            cursor: pointer;
             position: relative;
-            padding-bottom: 15px;
+            transition: var(--transition-fast);
         }
         
-        .section-title::after {
+        .tab-btn::after {
             content: '';
             position: absolute;
             bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
+            left: 0;
+            right: 0;
             height: 3px;
-            background-color: var(--primary);
+            background: var(--primary);
+            transform: scaleX(0);
+            transition: transform var(--transition-fast);
         }
         
-        /* Search Bar */
-        .search-container {
-            max-width: 700px;
-            margin: 0 auto 30px;
-            position: relative;
-        }
-        
-        .search-input {
-            border-radius: 50px;
-            padding: 15px 25px;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-            font-size: 16px;
-            transition: var(--transition);
-        }
-        
-        .search-input:focus {
-            box-shadow: 0 5px 15px rgba(202, 140, 5, 0.2);
-            border-color: var(--primary-light);
-        }
-        
-        .search-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-        }
-        
-        /* Hotel List */
-        .hotel-list {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .hotel-item {
-            margin: 12px 0;
-            padding: 16px 20px;
-            background-color: var(--light);
-            border-radius: var(--border-radius);
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-left: 4px solid var(--primary);
-        }
-        
-        .hotel-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-            background-color: #fff;
-        }
-        
-        .hotel-name {
-            color: var(--secondary);
-            font-weight: 600;
-            font-size: 18px;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-        
-        .hotel-name:hover {
+        .tab-btn:hover {
             color: var(--primary);
         }
         
-        .view-details {
-            padding: 6px 15px;
-            background: linear-gradient(to right, var(--primary), var(--primary-dark));
-            color: white;
-            border-radius: 30px;
-            font-size: 14px;
-            transition: var(--transition);
-            text-decoration: none;
-            display: inline-block;
+        .tab-btn.active {
+            color: var(--primary);
         }
         
-        .view-details:hover {
-            background: linear-gradient(to right, var(--primary-dark), var(--primary));
-            transform: scale(1.05);
-            color: white;
+        .tab-btn.active::after {
+            transform: scaleX(1);
+        }
+        
+        .tab-btn i {
+            margin-right: var(--spacing-sm);
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Dashboard Cards Section */
+        .dashboard-section {
+            padding: var(--spacing-2xl) 0;
+            background: var(--light);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+            max-width: var(--container-xl);
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+        
+        .dash-card {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-normal);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dash-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-color, var(--primary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform var(--transition-normal);
+        }
+        
+        .dash-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+        
+        .dash-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .dash-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--spacing-lg);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(129, 140, 248, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .dash-icon i {
+            font-size: 1.5rem;
+            color: var(--card-color, var(--dash-primary));
+        }
+        
+        .dash-card h3 {
+            font-size: 1.2rem;
+            color: var(--gray-900);
+            margin-bottom: var(--spacing-sm);
+            font-family: var(--font-primary);
+            font-weight: 600;
+        }
+        
+        .dash-card p {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .dash-link {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: var(--card-color, var(--dash-primary));
+            color: var(--white);
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: var(--transition-fast);
+        }
+        
+        .dash-link:hover {
+            filter: brightness(1.1);
+            transform: translateX(4px);
+            color: var(--white);
+        }
+        
+        /* Hotels Section */
+        .hotels-section {
+            padding: var(--spacing-2xl) 0;
+            background: var(--light);
+        }
+        
+        .hotels-header {
+            max-width: var(--container-xl);
+            margin: 0 auto var(--spacing-xl);
+            padding: 0 var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+        
+        .hotels-header h2 {
+            font-size: 1.75rem;
+            color: var(--secondary);
+        }
+        
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .search-box input {
+            padding-right: 50px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            right: var(--spacing-lg);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+        }
+        
+        .hotels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: var(--spacing-lg);
+            max-width: var(--container-xl);
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+        
+        .hotel-card {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-normal);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-lg);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .hotel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .hotel-icon {
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(202, 140, 5, 0.1);
+            border-radius: var(--radius-lg);
+            margin-right: var(--spacing-md);
+            flex-shrink: 0;
+        }
+        
+        .hotel-icon i {
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+        
+        .hotel-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .hotel-name {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            color: var(--secondary);
+            margin-bottom: var(--spacing-xs);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .hotel-name a {
+            color: inherit;
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+        
+        .hotel-name a:hover {
+            color: var(--primary);
+        }
+        
+        .hotel-meta {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+        
+        .hotel-action {
+            flex-shrink: 0;
+            margin-left: var(--spacing-sm);
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            max-width: var(--container-xl);
+            margin: 0 auto var(--spacing-lg);
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+        
+        .stats-info {
+            color: var(--gray-600);
+        }
+        
+        .stats-info strong {
+            color: var(--primary);
         }
         
         /* Pagination */
         .pagination-container {
             display: flex;
             justify-content: center;
-            margin-top: 40px;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-2xl);
+            padding: 0 var(--spacing-lg);
+            flex-wrap: wrap;
         }
         
-        .pagination .page-link {
-            margin: 0 5px;
-            border-radius: 50%;
+        .pagination-link {
             width: 40px;
             height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--dark);
-            border: none;
-            transition: var(--transition);
-        }
-        
-        .pagination .page-link:hover {
-            background-color: var(--primary-light);
-            color: white;
-        }
-        
-        .pagination .page-item.active .page-link {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        /* Featured Section */
-        .feature-heading {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 40px;
-            text-align: center;
-            color: var(--dark);
-        }
-        
-        .feature-card {
-            border: none;
-            box-shadow: var(--box-shadow);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            transition: var(--transition);
-            height: 100%;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-        }
-        
-        .card-img-top {
-            height: 280px;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-        
-        .feature-card:hover .card-img-top {
-            transform: scale(1.05);
-        }
-        
-        .card-body {
-            padding: 25px;
-        }
-        
-        .card-title {
-            color: var(--primary);
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-        }
-        
-        .card-text {
-            color: var(--gray);
-            font-size: 15px;
-            line-height: 1.6;
-        }
-        
-        /* Info Cards */
-        .info-card {
-            background-color: white;
-            border-radius: var(--border-radius);
-            padding: 30px;
-            box-shadow: var(--box-shadow);
-            height: 100%;
-            transition: var(--transition);
-        }
-        
-        .info-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .certification-img {
-            max-width: 200px;
-            margin-bottom: 20px;
-            transition: var(--transition);
-        }
-        
-        .info-card:hover .certification-img {
-            transform: scale(1.05);
-        }
-        
-        .contact-info p {
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .contact-info i {
-            color: var(--primary);
-            margin-right: 10px;
-            font-size: 18px;
-            width: 25px;
-            text-align: center;
-        }
-        
-        .contact-info a {
-            color: var(--secondary);
+            border-radius: var(--radius-full);
+            background: var(--white);
+            color: var(--gray-700);
             text-decoration: none;
-            transition: var(--transition);
-        }
-        
-        .contact-info a:hover {
-            color: var(--primary);
-        }
-        
-        .btn-check-certificate {
-            background: linear-gradient(to right, var(--primary), var(--primary-dark));
-            border: none;
-            border-radius: 30px;
-            padding: 10px 25px;
-            color: white;
             font-weight: 500;
-            transition: var(--transition);
+            transition: var(--transition-fast);
+            box-shadow: var(--shadow-sm);
         }
         
-        .btn-check-certificate:hover {
-            background: linear-gradient(to right, var(--primary-dark), var(--primary));
-            transform: scale(1.05);
-            color: white;
+        .pagination-link:hover {
+            background: var(--primary-light);
+            color: var(--white);
         }
         
-        /* Footer */
-        .footer {
-            background-color: var(--primary);
-            color: white;
-            padding: 20px 0;
+        .pagination-link.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .empty-state {
             text-align: center;
-            font-weight: 500;
-            margin-top: 60px;
+            padding: var(--spacing-3xl);
+            color: var(--gray-500);
+            grid-column: 1 / -1;
         }
         
-        /* Back to top button */
-        .back-to-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 45px;
-            height: 45px;
-            background-color: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            transition: var(--transition);
-            z-index: 99;
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-lg);
+            color: var(--gray-300);
         }
         
-        .back-to-top:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-5px);
-        }
-        
-        /* Responsive Adjustments */
-        @media (max-width: 991px) {
-            .navbar-collapse {
-                background-color: white;
-                border-radius: var(--border-radius);
-                padding: 20px;
-                box-shadow: var(--box-shadow);
-                margin-top: 15px;
-            }
-            
-            .section-title {
-                font-size: 2rem;
-            }
-            
-            .feature-heading {
-                font-size: 1.8rem;
-            }
-            
-            .nav-link {
-                padding: 10px !important;
-            }
-            
-            .navbar-nav {
-                align-items: center;
-            }
-        }
-        
+        /* Responsive */
         @media (max-width: 767px) {
-            .section-container {
-                padding: 30px 15px;
-            }
-            
-            .hotel-item {
+            .page-hero-content {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
+                text-align: center;
             }
             
-            .view-details {
-                align-self: flex-end;
+            .hotels-grid, .dashboard-grid {
+                grid-template-columns: 1fr;
             }
             
-            .card-img-top {
-                height: 220px;
+            .hotel-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hotel-icon {
+                margin-right: 0;
+                margin-bottom: var(--spacing-md);
+            }
+            
+            .hotel-action {
+                margin-left: 0;
+                margin-top: var(--spacing-md);
+            }
+            
+            .tab-nav-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .tab-btn {
+                white-space: nowrap;
+                padding: var(--spacing-md);
             }
         }
     </style>
 </head>
 <body>
-    <!-- Back to Top Button -->
-    <a href="#" class="back-to-top">
-        <i class="fas fa-arrow-up"></i>
-    </a>
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <img src="img/logo.png" alt="Cyntourism Logo">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="index.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="admin.php">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="tours.php">Tours</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="transfer.php">Transfer</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="contact.php">Contact Us</a>
-                    </li>
-                    <?php
-                    // Check if user is logged in using the session variable
-                    if (isset($_SESSION['auth']) && $_SESSION['auth'] === true) {
-                        // If the user is an admin, show the Dashboard link
-                        if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
-                            echo '<li class="nav-item">
-                                    <a class="nav-link" href="admin.php">Dashboard</a>
-                                  </li>';
-                        }
-                        // Display Logout link for any logged-in user
-                        echo '<li class="nav-item">
-                                <a class="nav-link" href="logout.php">Logout</a>
-                              </li>';
-                    } else {
-                        // For non-logged in users, display the Login link
-                        echo '<li class="nav-item">
-                                <a class="nav-link" href="login.php">Login</a>
-                              </li>';
-                    }
-                    ?>
-                </ul>
+    <?php cyn_render_navbar(); ?>
+    
+    <!-- Page Hero -->
+    <section class="page-hero">
+        <div class="page-hero-content">
+            <div class="welcome-text">
+                <h1>Welcome back, <span><?php echo cyn_get_display_name(); ?></span></h1>
+                <p>Manage your hotels, vouchers, and documents from one place.</p>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <?php echo strtoupper(substr(cyn_get_display_name(), 0, 1)); ?>
+                </div>
+                <div class="user-details">
+                    <div class="name"><?php echo !empty($user['email']) ? htmlspecialchars($user['email']) : cyn_get_display_name(); ?></div>
+                    <div class="role"><?php echo $isAdmin ? 'Administrator' : 'User'; ?></div>
+                </div>
             </div>
         </div>
-    </nav>
-        
-    <!-- Hotel Listings Section -->
-    <div class="container section-container">
-        <h2 class="section-title">Premium Hotel Collection</h2>
-        
-        <!-- Search Bar -->
-        <div class="search-container">
-            <input type="text" id="hotelSearch" class="form-control search-input" placeholder="Find your perfect stay...">
-            <i class="fas fa-search search-icon"></i>
+    </section>
+    
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+        <div class="tab-nav-container">
+            <button class="tab-btn active" data-tab="dashboard">
+                <i class="fas fa-th-large"></i> Dashboard
+            </button>
+            <button class="tab-btn" data-tab="hotels">
+                <i class="fas fa-hotel"></i> Hotels
+            </button>
         </div>
-        
-        <!-- Hotel List -->
-        <div class="hotel-list">
-            <ul id="hotelList" class="list-unstyled">
-                <?php
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        echo '<li class="hotel-item">
-                                <a href="hotel.php?name=' . urlencode($row['hotel_name']) . '" class="hotel-name">' . htmlspecialchars($row['hotel_name']) . '</a>
-                                <a href="hotel.php?name=' . urlencode($row['hotel_name']) . '" class="view-details">View Details</a>
-                              </li>';
-                    }
-                } else {
-                    echo '<li class="hotel-item">No hotels found.</li>';
-                }
-                ?>
-            </ul>
+    </div>
+    
+    <!-- Dashboard Tab -->
+    <div class="tab-content active" id="dashboard">
+        <section class="dashboard-section">
+            <div class="dashboard-grid">
+                <?php foreach ($dashboardCards as $card): ?>
+                <div class="dash-card" style="--card-color: <?php echo $card['color']; ?>;">
+                    <div class="dash-icon">
+                        <i class="fas <?php echo $card['icon']; ?>"></i>
+                    </div>
+                    <h3><?php echo htmlspecialchars($card['title']); ?></h3>
+                    <p><?php echo htmlspecialchars($card['desc']); ?></p>
+                    <a href="<?php echo htmlspecialchars($card['link']); ?>" class="dash-link">
+                        Open <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Hotels Tab -->
+    <div class="tab-content" id="hotels">
+        <section class="hotels-section">
+            <!-- Search & Actions -->
+            <div class="hotels-header">
+                <h2><i class="fas fa-hotel" style="color: var(--primary); margin-right: var(--spacing-sm);"></i> Hotel Collection</h2>
+                <div class="search-box">
+                    <input type="text" 
+                           id="hotelSearch" 
+                           class="cyn-form-control cyn-form-control-rounded" 
+                           placeholder="Search hotels...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            
+            <!-- Stats Bar -->
+            <div class="stats-bar" style="margin-left: var(--spacing-lg); margin-right: var(--spacing-lg);">
+                <div class="stats-info">
+                    Showing <strong><?php echo min($offset + 1, $totalHotels); ?>-<?php echo min($offset + $hotelsPerPage, $totalHotels); ?></strong> of <strong><?php echo $totalHotels; ?></strong> hotels
+                </div>
+                <?php if ($isAdmin): ?>
+                <a href="upload.php" class="cyn-btn cyn-btn-primary cyn-btn-sm">
+                    <i class="fas fa-plus"></i> Add Hotel
+                </a>
+                <?php endif; ?>
+            </div>
+            
+            <!-- Hotels Grid -->
+            <div class="hotels-grid" id="hotelsList">
+                <?php if ($result && $result->num_rows > 0): ?>
+                    <?php while ($row = $result->fetch_assoc()): ?>
+                    <div class="hotel-card">
+                        <div class="hotel-icon">
+                            <i class="fas fa-hotel"></i>
+                        </div>
+                        <div class="hotel-info">
+                            <div class="hotel-name">
+                                <a href="hotel.php?name=<?php echo urlencode($row['hotel_name']); ?>">
+                                    <?php echo htmlspecialchars($row['hotel_name']); ?>
+                                </a>
+                            </div>
+                            <div class="hotel-meta">
+                                <i class="fas fa-star" style="color: var(--primary);"></i> Premium Partner
+                            </div>
+                        </div>
+                        <div class="hotel-action">
+                            <a href="hotel.php?name=<?php echo urlencode($row['hotel_name']); ?>" class="cyn-btn cyn-btn-primary cyn-btn-sm">
+                                View <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <i class="fas fa-hotel"></i>
+                        <h3>No Hotels Found</h3>
+                        <p>There are no hotels in the database yet.</p>
+                        <?php if ($isAdmin): ?>
+                        <a href="upload.php" class="cyn-btn cyn-btn-primary" style="margin-top: var(--spacing-md);">
+                            <i class="fas fa-plus"></i> Add First Hotel
+                        </a>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
             
             <!-- Pagination -->
+            <?php if ($totalPages > 1): ?>
             <div class="pagination-container">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination">
-                        <?php if ($page > 1): ?>
-                            <li class="page-item">
-                                <a class="page-link" href="?page=<?php echo $page - 1; ?>" aria-label="Previous">
-                                    <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
-                                </a>
-                            </li>
-                        <?php endif; ?>
-                        
-                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
-                                <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                            </li>
-                        <?php endfor; ?>
-                        
-                        <?php if ($page < $totalPages): ?>
-                            <li class="page-item">
-                                <a class="page-link" href="?page=<?php echo $page + 1; ?>" aria-label="Next">
-                                    <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
-                                </a>
-                            </li>
-                        <?php endif; ?>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </div>
-
-    <!-- Featured Destinations -->
-    <div class="container my-5">
-        <h2 class="feature-heading">Premium Turkish Experiences</h2>
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card">
-                    <a href="transfer.php">
-                        <img src="tra.webp" class="card-img-top" alt="Luxury Transfer Services">
-                    </a>
-                    <div class="card-body">
-                        <h4 class="card-title">Luxury Transfer Services</h4>
-                        <p class="card-text">Experience premium transportation from all major airports in Turkey. Our fleet of luxury vehicles ensures comfortable and reliable travel to your destination.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card">
-                    <a href="tours.php">
-                        <img src="tour.webp" class="card-img-top" alt="Exclusive Turkish Tours">
-                    </a>
-                    <div class="card-body">
-                        <h4 class="card-title">Exclusive Tours</h4>
-                        <p class="card-text">Discover Turkey's hidden gems with our carefully curated tours. From Istanbul's historic wonders to Cappadocia's magical landscapes, create unforgettable memories.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mx-auto">
-                <div class="feature-card">
-                    <a href="index.php">
-                        <img src="img/images (25)_LE_auto_x2_colored_light_ai.jpg" class="card-img-top" alt="Luxury Hotels & Resorts">
-                    </a>
-                    <div class="card-body">
-                        <h4 class="card-title">Luxury Accommodations</h4>
-                        <p class="card-text">Indulge in Turkey's finest hotels and resorts. From beachfront villas to historic boutique hotels, we offer a curated selection of premium accommodations.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Company Info Section -->
-    <div class="container my-5">
-        <div class="row g-4">
-            <!-- Certification Block -->
-            <div class="col-lg-6">
-                <div class="info-card text-center">
-                    <img class="certification-img" src="img/tursab-seeklogo-removebg.png" alt="Tursab Certification">
-                    <h4 class="mb-3">Official Certification</h4>
-                    <p class="mb-4"><strong>CYN TURIZM</strong> is proud to be certified by TURSAB (Association of Turkish Travel Agencies) under license no: 11738</p>
-                    <a class="btn btn-check-certificate" href="https://www.tursab.org.tr/acenta-arama" target="_blank">
-                        Verify Certificate <i class="fas fa-external-link-alt ms-1"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Contact Information -->
-            <div class="col-lg-6">
-                <div class="info-card">
-                    <h4 class="mb-4 text-center">Get In Touch</h4>
-                    <div class="contact-info">
-                        <p><i class="fas fa-phone-alt"></i> +90531 817 67 70</p>
-                        <p><i class="fas fa-envelope"></i> <a href="mailto:info@cyntour.com">info@cyntour.com</a></p>
-                        <p><i class="fas fa-envelope"></i> <a href="mailto:sales@cyntourim.com">sales@cyntourim.com</a></p>
-                        <p><i class="fas fa-map-marker-alt"></i> Molla Gürani, Karakoyunlu Sokağı No:2 D:4, 34093 Fatih/İstanbul</p>
-                        <p><i class="fab fa-instagram"></i> <a href="https://www.instagram.com/cyn__turizm/" target="_blank">@cyn__turizm</a></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <span>© 2006-2024 CYN TURIZM | All Rights Reserved</span>
-        </div>
-    </footer>
-    
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Hotel search functionality
-            $("#hotelSearch").on("keyup", function() {
-                var value = $(this).val().toLowerCase();
-                $("#hotelList li").filter(function() {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-                });
-            });
-            
-            // Back to top button functionality
-            $(window).scroll(function() {
-                if ($(this).scrollTop() > 200) {
-                    $('.back-to-top').fadeIn();
-                } else {
-                    $('.back-to-top').fadeOut();
-                }
-            });
-            
-            $('.back-to-top').click(function(e) {
-                e.preventDefault();
-                $('html, body').animate({scrollTop: 0}, 800);
-                return false;
-            });
-            
-            // Add animation when scrolling
-            function revealOnScroll() {
-                var reveals = document.querySelectorAll('.feature-card, .info-card');
+                <?php if ($page > 1): ?>
+                <a href="?page=<?php echo $page - 1; ?>#hotels" class="pagination-link">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                <?php endif; ?>
                 
-                for (var i = 0; i < reveals.length; i++) {
-                    var windowHeight = window.innerHeight;
-                    var elementTop = reveals[i].getBoundingClientRect().top;
-                    var elementVisible = 150;
-                    
-                    if (elementTop < windowHeight - elementVisible) {
-                        reveals[i].classList.add('show');
-                    }
+                <?php 
+                $start = max(1, $page - 2);
+                $end = min($totalPages, $page + 2);
+                
+                if ($start > 1): ?>
+                <a href="?page=1#hotels" class="pagination-link">1</a>
+                <?php if ($start > 2): ?>
+                <span class="pagination-link" style="pointer-events: none;" aria-hidden="true">...</span>
+                <?php endif; ?>
+                <?php endif; ?>
+                
+                <?php for ($i = $start; $i <= $end; $i++): ?>
+                <a href="?page=<?php echo $i; ?>#hotels" class="pagination-link <?php echo $i == $page ? 'active' : ''; ?>">
+                    <?php echo $i; ?>
+                </a>
+                <?php endfor; ?>
+                
+                <?php if ($end < $totalPages): ?>
+                <?php if ($end < $totalPages - 1): ?>
+                <span class="pagination-link" style="pointer-events: none;" aria-hidden="true">...</span>
+                <?php endif; ?>
+                <a href="?page=<?php echo $totalPages; ?>#hotels" class="pagination-link"><?php echo $totalPages; ?></a>
+                <?php endif; ?>
+                
+                <?php if ($page < $totalPages): ?>
+                <a href="?page=<?php echo $page + 1; ?>#hotels" class="pagination-link">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+        </section>
+    </div>
+    
+    <?php cyn_render_footer(); ?>
+    <?php cyn_render_scripts(); ?>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching functionality
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetTab = this.dataset.tab;
+                
+                // Update active states
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+                
+                // Update URL hash
+                history.pushState(null, '', '#' + targetTab);
+            });
+        });
+        
+        // Check URL hash on load
+        if (window.location.hash) {
+            const hash = window.location.hash.substring(1);
+            // Sanitize hash to only allow valid tab identifiers (alphanumeric and hyphens)
+            if (/^[a-zA-Z0-9-]+$/.test(hash)) {
+                const targetBtn = document.querySelector(`.tab-btn[data-tab="${hash}"]`);
+                if (targetBtn) {
+                    targetBtn.click();
                 }
             }
-            
-            window.addEventListener('scroll', revealOnScroll);
-            revealOnScroll();
-        });
+        }
+        
+        // Hotel search functionality
+        const searchInput = document.getElementById('hotelSearch');
+        const hotelCards = document.querySelectorAll('.hotel-card');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                hotelCards.forEach(card => {
+                    const hotelName = card.querySelector('.hotel-name').textContent.toLowerCase();
+                    if (hotelName.includes(searchTerm)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
     </script>
 </body>
 </html>
