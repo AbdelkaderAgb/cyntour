@@ -23,7 +23,7 @@ if (isset($_SESSION['registration_success'])) {
 
 // Redirect if already logged in
 if (isset($_SESSION['auth']) && $_SESSION['auth'] === true) {
-    safe_redirect('home.php');
+    safe_redirect('index.php');
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
@@ -41,6 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($userPassword, $user['password'])) {
+            // Harden session handling
+            session_regenerate_id(true);
             $_SESSION['user'] = $user;
             $_SESSION['auth'] = true;
             $_SESSION['user_id'] = $user['id'];
@@ -64,7 +66,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             }
             
             // Redirect based on role using safe_redirect helper
-            $redirectUrl = ($user['role'] === 'admin') ? 'admin.php' : 'home.php';
+            $redirectUrl = ($user['role'] === 'admin') ? 'admin.php' : 'index.php';
+            session_write_close();
             safe_redirect($redirectUrl);
         } else {
             $errors[] = "Invalid email or password.";
