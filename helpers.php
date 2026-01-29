@@ -37,9 +37,14 @@ function safe_redirect($url) {
     // Sanitize the URL for HTML output
     $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
     
-    // Flush output buffer if active
-    if (ob_get_level()) {
-        ob_end_clean();
+    // Clear ALL output buffer levels to ensure headers can be sent
+    // Use a safety counter to prevent infinite loops if ob_end_clean() fails
+    $maxIterations = 100;
+    $iterations = 0;
+    while (ob_get_level() && $iterations++ < $maxIterations) {
+        if (!ob_end_clean()) {
+            break;
+        }
     }
     
     // Try PHP header redirect first
