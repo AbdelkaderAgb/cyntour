@@ -2,14 +2,17 @@
 /**
  * Configuration file for Cyntour application
  * 
- * This file contains database credentials and connection helpers.
- * Tables are automatically created if they don't exist.
+ * This file now loads the new core system while providing backward compatibility.
  * 
  * Database: barqvkxs_cyn
  * Username: barqvkxs_cyn
  */
 
-// Database configuration
+// Load the new autoloader which handles everything
+require_once __DIR__ . '/core/autoload.php';
+
+// Database configuration - these variables are kept for backward compatibility
+// but the actual config is managed by the Application class
 $db_config = [
     'host'     => getenv('DB_HOST') ?: 'localhost',
     'database' => getenv('DB_NAME') ?: 'barqvkxs_cyn',
@@ -18,7 +21,7 @@ $db_config = [
     'charset'  => 'utf8mb4'
 ];
 
-// DSN for PDO connection
+// DSN for PDO connection (backward compatibility)
 $db_dsn = "mysql:host={$db_config['host']};dbname={$db_config['database']};charset={$db_config['charset']}";
 
 // PDO options for better error handling and security
@@ -29,150 +32,37 @@ $db_options = [
 ];
 
 /**
- * Check if tables exist and initialize database if needed
- * Uses file-based locking to prevent race conditions
+ * Legacy function - Check if tables exist and initialize database if needed
+ * @deprecated Use Application::getInstance()->getMysqli() instead
  * @param mysqli $conn
  * @return bool True if tables exist or were created successfully
  */
 function initializeDatabaseTables($conn) {
-    // Check if the users table exists (if it does, database is already initialized)
-    $result = $conn->query("SHOW TABLES LIKE 'users'");
-    if ($result && $result->num_rows > 0) {
-        return true; // Tables already exist
-    }
-    
-    // Use file-based locking to prevent concurrent initialization
-    $lockFile = sys_get_temp_dir() . '/cyntour_db_init.lock';
-    $fp = fopen($lockFile, 'c');
-    
-    if (!flock($fp, LOCK_EX | LOCK_NB)) {
-        // Another process is initializing, wait for it
-        flock($fp, LOCK_EX);
-        fclose($fp);
-        // Recheck if tables were created by another process
-        $result = $conn->query("SHOW TABLES LIKE 'users'");
-        return ($result && $result->num_rows > 0);
-    }
-    
-    try {
-        // Double-check after acquiring lock
-        $result = $conn->query("SHOW TABLES LIKE 'users'");
-        if ($result && $result->num_rows > 0) {
-            flock($fp, LOCK_UN);
-            fclose($fp);
-            return true;
-        }
-        
-        // Get the schema file path
-        $schemaFile = __DIR__ . '/database/schema.sql';
-        
-        if (!file_exists($schemaFile)) {
-            error_log('Database schema file not found: ' . $schemaFile);
-            flock($fp, LOCK_UN);
-            fclose($fp);
-            return false;
-        }
-        
-        // Read schema
-        $schema = file_get_contents($schemaFile);
-        
-        // Remove the CREATE DATABASE and USE statements since we're already connected
-        $schema = preg_replace('/^--.*$/m', '', $schema); // Remove single-line comments
-        $schema = preg_replace('/CREATE\s+DATABASE.*?;/is', '', $schema);
-        $schema = preg_replace('/USE\s+[\w_]+\s*;/is', '', $schema);
-        
-        // Use mysqli_multi_query for better handling of multiple statements
-        if ($conn->multi_query($schema)) {
-            // Process all result sets
-            do {
-                if ($result = $conn->store_result()) {
-                    $result->free();
-                }
-            } while ($conn->more_results() && $conn->next_result());
-            
-            // Check for errors in multi_query execution
-            if ($conn->errno) {
-                throw new Exception('SQL execution error: ' . $conn->error);
-            }
-            
-            error_log('Database tables created successfully');
-            flock($fp, LOCK_UN);
-            fclose($fp);
-            return true;
-        } else {
-            throw new Exception('Failed to execute schema: ' . $conn->error);
-        }
-        
-    } catch (Exception $e) {
-        error_log('Error creating database tables: ' . $e->getMessage());
-        flock($fp, LOCK_UN);
-        fclose($fp);
-        return false;
-    }
+    // This is now handled by the Application class
+    return true;
 }
 
 /**
  * Get PDO database connection
- * Tables are automatically created if they don't exist.
+ * @deprecated Use Application::getInstance()->getPdo() instead
  * @return PDO
  * @throws PDOException
  */
-function getDbConnection() {
-    global $db_dsn, $db_config, $db_options;
-    
-    static $pdo = null;
-    
-    if ($pdo === null) {
-        try {
-            $pdo = new PDO($db_dsn, $db_config['username'], $db_config['password'], $db_options);
-        } catch (PDOException $e) {
-            error_log('Database connection failed: ' . $e->getMessage());
-            throw new PDOException('Database connection failed. Please check your configuration.');
-        }
-        
-        // Initialize database tables if needed by calling mysqli connection
-        // which handles table initialization. This ensures tables exist
-        // regardless of which connection type is used first.
-        getMysqliConnection();
+if (!function_exists('getDbConnection')) {
+    function getDbConnection() {
+        return \CynTour\Core\Application::getInstance()->getPdo();
     }
-    
-    return $pdo;
 }
 
 /**
  * Get MySQLi database connection
- * Tables are automatically created if they don't exist.
+ * @deprecated Use Application::getInstance()->getMysqli() instead
  * @return mysqli
  * @throws Exception
  */
-function getMysqliConnection() {
-    global $db_config;
-    
-    static $conn = null;
-    static $initialized = false;
-    
-    if ($conn === null) {
-        $conn = new mysqli(
-            $db_config['host'],
-            $db_config['username'],
-            $db_config['password'],
-            $db_config['database']
-        );
-        
-        if ($conn->connect_error) {
-            error_log('Database connection failed: ' . $conn->connect_error);
-            throw new Exception('Database connection failed. Please check your configuration.');
-        }
-        
-        $conn->set_charset($db_config['charset']);
-        
-        // Initialize database tables if needed (only once per process)
-        if (!$initialized) {
-            initializeDatabaseTables($conn);
-            $initialized = true;
-        }
+if (!function_exists('getMysqliConnection')) {
+    function getMysqliConnection() {
+        return \CynTour\Core\Application::getInstance()->getMysqli();
     }
-    
-    return $conn;
 }
 ?>

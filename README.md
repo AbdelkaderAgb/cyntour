@@ -1,6 +1,6 @@
-# Cyntour - Tourism Management System
+# CynTour - Tourism Management System v2.0
 
-A comprehensive tourism management system for CYN Turizm, featuring hotel booking, tour management, and transfer services.
+A comprehensive tourism management system for CYN Turizm, featuring hotel booking, tour management, and transfer services. Rebuilt with a modern, organized architecture.
 
 ## Features
 
@@ -16,79 +16,150 @@ A comprehensive tourism management system for CYN Turizm, featuring hotel bookin
 
 ```
 cyntour/
-├── config.php              # Database configuration with auto-table creation
+├── bootstrap.php           # Application bootstrap (include in all pages)
+├── core/                   # Core application classes
+│   ├── Application.php     # Main application class (singleton)
+│   ├── Helper.php          # Utility helper functions
+│   ├── View.php            # View rendering component
+│   ├── autoload.php        # PSR-4 autoloader with backward compatibility
+│   └── auth-guard.php      # Authentication middleware
+├── app/                    # Application logic
+│   ├── Controllers/        # Request handlers
+│   ├── Models/             # Database models
+│   └── Views/              # View templates
+│       ├── admin/          # Admin dashboard views
+│       ├── auth/           # Authentication views
+│       ├── dashboard/      # Dashboard views
+│       ├── public/         # Public-facing views
+│       ├── vouchers/       # Voucher-related views
+│       ├── invoices/       # Invoice views
+│       ├── receipts/       # Receipt views
+│       └── partials/       # Reusable view components
+├── assets/                 # Static assets
+│   ├── css/                # Stylesheets
+│   │   └── cyntour-style.css
+│   ├── js/                 # JavaScript files
+│   └── images/             # Images and icons
 ├── database/
-│   └── schema.sql          # Complete database schema with sample data
-├── includes/
-│   ├── navigation.php      # Shared navigation component
-│   └── footer.php          # Shared footer component
-├── img/                    # Images and assets
-├── css/                    # Stylesheets
-├── js/                     # JavaScript files
-├── pdf/                    # Tour program PDFs
-├── uploads/                # User uploads
-└── vendor/                 # PHP dependencies
+│   └── schema.sql          # Database schema with sample data
+├── storage/                # Application storage
+│   ├── logs/               # Application logs
+│   ├── cache/              # Cache files
+│   └── uploads/            # User uploads
+├── includes/               # Legacy includes (for backward compatibility)
+├── css/                    # Legacy CSS (for backward compatibility)
+└── uploads/                # Legacy uploads directory
 ```
 
-## Setup
-
-### Quick Start (Automatic Setup)
-
-1. Database credentials are already configured in `config.php`:
-   - **Database**: `barqvkxs_cyn`
-   - **Username**: `barqvkxs_cyn`
-   - **Password**: Configured in config file
-
-2. **Tables are created automatically!** On first connection, the system will:
-   - Check if the `users` table exists
-   - If not, automatically execute the schema from `database/schema.sql`
-   - Create all tables with sample data
-
-3. Access the application in your browser and login with:
-   - **Email**: admin@cyntour.com
-   - **Password**: Admin123!
-
-### Manual Database Setup (Optional)
-
-If you prefer to set up the database manually:
-
-```bash
-mysql -u barqvkxs_cyn -p barqvkxs_cyn < database/schema.sql
-```
-
-### Custom Configuration
-
-Edit `config.php` to change database credentials:
-```php
-$db_config = [
-    'host'     => 'localhost',
-    'database' => 'your_database',
-    'username' => 'your_username',
-    'password' => 'your_password',
-    'charset'  => 'utf8mb4'
-];
-```
-
-Or set environment variables:
-- `DB_HOST` - Database host
-- `DB_NAME` - Database name
-- `DB_USER` - Database username
-- `DB_PASS` - Database password
-
-## Main Pages
+## Main Entry Points
 
 | Page | Description |
 |------|-------------|
-| `index.php` | Home page with hotel listings |
-| `admin.php` | Admin dashboard (requires login) |
-| `tours.php` | Tour listings |
-| `transfer.php` | Transfer services |
-| `login.php` | User login |
+| `home.php` | Public home/landing page |
+| `hotels.php` | Hotel listings with search |
+| `tours.php` | Tour packages listing |
+| `transfers.php` | Transfer services page |
+| `contact.php` | Contact information |
+| `login.php` | User authentication |
 | `register.php` | User registration |
+| `dashboard.php` | Main dashboard (requires auth) |
+
+## Quick Start
+
+### 1. Include Bootstrap
+
+Add this to the top of every PHP file:
+
+```php
+<?php
+require_once 'bootstrap.php';
+```
+
+### 2. Require Authentication (Optional)
+
+For pages that need authentication:
+
+```php
+<?php
+require_once 'core/auth-guard.php';
+```
+
+### 3. Use Application Classes
+
+```php
+<?php
+use CynTour\Core\Application;
+use CynTour\Core\Helper;
+use CynTour\Core\View;
+
+$app = Application::getInstance();
+
+// Check authentication
+if ($app->isAuthenticated()) {
+    echo $app->getDisplayName();
+}
+
+// Get database connection
+$conn = $app->getMysqli();
+$pdo = $app->getPdo();
+
+// Use helper functions
+Helper::redirect('dashboard.php');
+$symbol = Helper::getCurrencySymbol('EUR');
+
+// Render views
+View::renderHead('Page Title');
+View::renderNavbar();
+View::renderFooter();
+View::renderScripts();
+```
+
+### 4. Backward Compatibility
+
+Legacy function names still work:
+
+```php
+// These functions are available for backward compatibility
+getMysqliConnection();  // Returns mysqli
+getDbConnection();      // Returns PDO
+safe_redirect($url);    // Redirects with fallback
+cyn_render_head($title);
+cyn_render_navbar();
+cyn_render_footer();
+cyn_is_logged_in();
+cyn_is_admin();
+```
+
+## Database Configuration
+
+### Environment Variables (Recommended)
+
+```bash
+export DB_HOST=localhost
+export DB_NAME=your_database
+export DB_USER=your_username
+export DB_PASS=your_password
+export APP_DEBUG=false
+```
+
+### Default Credentials
+
+- **Database**: `barqvkxs_cyn`
+- **Username**: `barqvkxs_cyn`
+- **Password**: Configured in Application class
+
+### Auto-initialization
+
+Tables are created automatically on first database connection using `database/schema.sql`.
+
+## Default Login
+
+- **Email**: admin@cyntour.com
+- **Password**: Admin123!
 
 ## Voucher System
 
-The system supports three types of vouchers:
+Three types of vouchers are supported:
 
 1. **Hotel Vouchers** (`h_vouchers`)
    - Accommodation bookings with check-in/check-out dates
@@ -102,20 +173,28 @@ The system supports three types of vouchers:
    - Airport transfers and point-to-point services
    - Vehicle type and passenger count
 
-## Security Notes
-
-- Never commit `config.php` with real credentials to version control
-- The `config.php` file is excluded from git via `.gitignore`
-- Use environment variables in production environments
-- All user passwords are hashed using `password_hash()`
-
-## Technologies Used
+## Technologies
 
 - PHP 7.4+
 - MySQL 5.7+ / MariaDB 10+
 - Bootstrap 5
 - Font Awesome 6
 - jQuery 3.6
+
+## Security Notes
+
+- Never commit `.env` or configuration files with real credentials
+- Use environment variables in production
+- All passwords are hashed using `password_hash()`
+- CSRF protection should be implemented for forms
+- All user input is sanitized using prepared statements
+
+## File Naming Convention
+
+- Use lowercase with hyphens for URL-friendly files: `hotel-vouchers.php`
+- Use PascalCase for class files: `Application.php`
+- Use camelCase for function names: `getCurrencySymbol()`
+- Avoid special characters and spaces in file names
 
 ## License
 

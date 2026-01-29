@@ -19,14 +19,17 @@ IG.html
 # Logs
 *.log
 logs/
+storage/logs/
 
 # Cache and temp files
 cache/
 tmp/
 *.cache
+storage/cache/
 
 # Upload directories (may contain sensitive data)
 uploads/
+storage/uploads/
 
 # OS files
 .DS_Store
@@ -51,3 +54,8 @@ Thumbs.db
 *.wav
 img/
 pdf/
+assets/images/
+
+# Excel files
+*.xlsx
+*.xls
