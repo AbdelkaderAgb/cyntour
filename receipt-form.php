@@ -110,7 +110,7 @@ include 'auth.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="amount"><i class="fas fa-money-bill mr-1 text-muted"></i>Amount:</label>
-                                <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>
+                                <input type="number" class="form-control" id="amount" name="amount" min="0" step="0.01" required>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -150,7 +150,7 @@ include 'auth.php';
                     </div>
                     <div class="form-group">
                         <label for="remaining_amount"><i class="fas fa-balance-scale mr-1 text-muted"></i>Remaining Amount (optional):</label>
-                        <input type="number" class="form-control" id="remaining_amount" name="remaining_amount" step="0.01">
+                        <input type="number" class="form-control" id="remaining_amount" name="remaining_amount" min="0" step="0.01">
                     </div>
                     <div class="d-flex justify-content-between mt-4">
                         <a href="admin.php" class="btn btn-outline-secondary"><i class="fas fa-times mr-1"></i>Cancel</a>

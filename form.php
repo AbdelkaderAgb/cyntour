@@ -1,19 +1,27 @@
 <?php
-// Include authentication for non-POST requests
+// Include authentication for all requests
+session_start();
+require_once 'config.php';
+
+// Check if user is logged in for non-POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     include 'auth.php';
 }
 
 // This block will only run when a POST request is made to this page.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify user is authenticated for POST requests too
+    if (!isset($_SESSION['auth']) || $_SESSION['auth'] !== true) {
+        header('Content-Type: application/json');
+        die(json_encode(["success" => false, "message" => "Unauthorized. Please login first."]));
+    }
+    
     // Set the content type to application/json for the response
     header('Content-Type: application/json');
 
     // Enable error reporting
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
-
-    require_once 'config.php';
 
     // Database connection
     try {

@@ -743,12 +743,19 @@ $conn->close();
                                                     <td>
                                                         <?php 
                                                         $type = $voucher['type'] ?? 'Unknown';
-                                                        $badgeClass = match($type) {
-                                                            'Hotel' => 'badge-primary',
-                                                            'Transfer' => 'badge-success',
-                                                            'Tour' => 'badge-info',
-                                                            default => 'badge-secondary'
-                                                        };
+                                                        switch($type) {
+                                                            case 'Hotel':
+                                                                $badgeClass = 'badge-primary';
+                                                                break;
+                                                            case 'Transfer':
+                                                                $badgeClass = 'badge-success';
+                                                                break;
+                                                            case 'Tour':
+                                                                $badgeClass = 'badge-info';
+                                                                break;
+                                                            default:
+                                                                $badgeClass = 'badge-secondary';
+                                                        }
                                                         ?>
                                                         <span class="badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars($type); ?></span>
                                                     </td>
