@@ -41,6 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($userPassword, $user['password'])) {
+            // Harden session handling
+            session_regenerate_id(true);
             $_SESSION['user'] = $user;
             $_SESSION['auth'] = true;
             $_SESSION['user_id'] = $user['id'];
@@ -65,6 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             
             // Redirect based on role using safe_redirect helper
             $redirectUrl = ($user['role'] === 'admin') ? 'admin.php' : 'index.php';
+            session_write_close();
             safe_redirect($redirectUrl);
         } else {
             $errors[] = "Invalid email or password.";
