@@ -1,4 +1,7 @@
 <?php
+/* ───── 0.  Include authentication ────────────────────────── */
+include 'auth.php';
+
 /* ───── 1.  DB connection ───────────────────────────────────── */
 require_once 'config.php';
 $conn = getMysqliConnection();
@@ -68,16 +71,95 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CYN City Tour Voucher Form</title>
+<title>Tour Voucher Form - CYN Tourism</title>
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 <style>
-body{font-family:Arial,Helvetica,sans-serif;max-width:840px;margin:auto;padding:20px}
-.customer-info,.tour-info{border:1px solid #ddd;padding:10px;margin-bottom:10px}
+:root {
+    --primary: #36b9cc;
+    --primary-dark: #258391;
+    --light: #f8f9fc;
+}
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: var(--light);
+    padding: 0;
+    margin: 0;
+}
+.page-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 20px 0;
+    margin-bottom: 30px;
+}
+.page-header h1 {
+    margin: 0;
+    font-size: 1.75rem;
+}
+.form-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+}
+.card {
+    border: none;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+    border-radius: 0.5rem;
+}
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid #e3e6f0;
+    padding: 1rem 1.25rem;
+}
+.card-header h5 {
+    margin: 0;
+    color: var(--primary);
+    font-weight: 600;
+}
+.customer-info, .tour-info {
+    border: 1px solid #e3e6f0;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 0.5rem;
+    background-color: #fafbfc;
+}
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border: none;
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+}
+.back-link {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+}
+.back-link:hover {
+    color: white;
+    text-decoration: none;
+}
 </style>
 </head>
 <body>
-<h1 class="text-center mb-4">CYN City Tour Voucher Form</h1>
+<div class="page-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <a href="admin.php" class="back-link"><i class="fas fa-arrow-left mr-2"></i>Back to Dashboard</a>
+                <h1 class="mt-2"><i class="fas fa-map-marked-alt mr-2"></i>Tour Voucher Form</h1>
+            </div>
+            <img src="logo.png" alt="CYN Tourism" style="height: 50px; filter: brightness(0) invert(1);">
+        </div>
+    </div>
+</div>
+
+<div class="form-container">
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-file-alt mr-2"></i>Create New Tour Voucher</h5>
+        </div>
+        <div class="card-body">
 
 <!-- ───── 3.  Voucher form (POSTs back to same file) ────────── -->
 <form method="POST" id="tourVoucherForm">
@@ -85,11 +167,11 @@ body{font-family:Arial,Helvetica,sans-serif;max-width:840px;margin:auto;padding:
   <!-- Header -->
   <div class="form-row">
     <div class="form-group col-md-6">
-      <label>Voucher No</label>
+      <label><i class="fas fa-hashtag mr-1 text-muted"></i>Voucher No</label>
       <input type="text" class="form-control" name="voucher_no" required>
     </div>
     <div class="form-group col-md-6">
-      <label>Company Name</label>
+      <label><i class="fas fa-building mr-1 text-muted"></i>Company Name</label>
       <input type="text" class="form-control" name="company_name" required>
     </div>
   </div>
@@ -154,8 +236,15 @@ body{font-family:Arial,Helvetica,sans-serif;max-width:840px;margin:auto;padding:
   </div>
   <button type="button" class="btn btn-secondary mb-3" onclick="addCustomer()">Add Customer</button>
 
-  <button type="submit" class="btn btn-primary">Save &amp; Generate PDF</button>
+  <div class="d-flex justify-content-between mt-4">
+    <a href="admin.php" class="btn btn-outline-secondary"><i class="fas fa-times mr-1"></i>Cancel</a>
+    <button type="submit" class="btn btn-primary"><i class="fas fa-file-alt mr-1"></i>Save &amp; Generate PDF</button>
+  </div>
 </form>
+
+        </div>
+    </div>
+</div>
 
 <!-- ───── 4.  JS helpers to clone blocks ───────────────────── -->
 <script>
