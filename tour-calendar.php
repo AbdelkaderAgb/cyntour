@@ -10,8 +10,11 @@ $conn = getMysqliConnection();
 /* ───────── 1-A. VOUCHER SİLME İSTEĞİ ─────────────────────── */
 if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['delete_voucher'])){
     $vid = intval($_POST['delete_voucher']);
-    // SQL Injection önlemek için prepare kullanmak daha iyidir ama mevcut yapıyı koruyoruz
-    $conn->query("DELETE FROM city_tour_vouchers WHERE id=$vid");
+    // Use prepared statement to prevent SQL injection
+    $stmt = $conn->prepare("DELETE FROM city_tour_vouchers WHERE id = ?");
+    $stmt->bind_param("i", $vid);
+    $stmt->execute();
+    $stmt->close();
     echo 'ok';
     exit;
 }

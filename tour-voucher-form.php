@@ -62,7 +62,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     }
 
     /* 2-d: all done – jump to the PDF page */
-    header("Location: tour_voucher.php?voucher_id=$voucher_id");
+    header("Location: tour-vouchers.php?voucher_id=$voucher_id");
     exit;
 }
 ?>

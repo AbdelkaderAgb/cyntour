@@ -21,37 +21,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $total_pax = htmlspecialchars($_POST['total_pax']);
     $passengers = htmlspecialchars($_POST['passengers']);
 
-    // Check if voucher_no already exists
-    $check_sql = "SELECT id FROM vouchers WHERE voucher_no = '$voucher_no'";
-    $check_result = $conn->query($check_sql);
+    // Check if voucher_no already exists using prepared statement
+    $check_stmt = $conn->prepare("SELECT id FROM vouchers WHERE voucher_no = ?");
+    $check_stmt->bind_param("s", $voucher_no);
+    $check_stmt->execute();
+    $check_result = $check_stmt->get_result();
 
     if ($check_result->num_rows > 0) {
         $error_message = "Voucher No already exists. Please use a different Voucher No.";
     } else {
-        $sql = "INSERT INTO vouchers (voucher_no, company_name, hotel_name, flight_number, pickup_location, dropoff_location, pickup_date, pickup_time, transfer_type, return_date, return_time, total_pax, passengers)
-                VALUES ('$voucher_no', '$company_name', '$hotel_name', '$flight_number', '$pickup_location', '$dropoff_location', '$pickup_date', '$pickup_time', '$transfer_type', '$return_date', '$return_time', '$total_pax', '$passengers')";
+        // Use prepared statement to prevent SQL injection
+        $stmt = $conn->prepare("INSERT INTO vouchers (voucher_no, company_name, hotel_name, flight_number, pickup_location, dropoff_location, pickup_date, pickup_time, transfer_type, return_date, return_time, total_pax, passengers)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssssssssss", $voucher_no, $company_name, $hotel_name, $flight_number, $pickup_location, $dropoff_location, $pickup_date, $pickup_time, $transfer_type, $return_date, $return_time, $total_pax, $passengers);
 
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute()) {
             $last_id = $conn->insert_id;
             header("Location: transfer-voucher.php?id=$last_id");
             exit();
         } else {
-            $error_message = "Error: " . $sql . "<br>" . $conn->error;
+            $error_message = "Error: " . $stmt->error;
         }
+        $stmt->close();
     }
+    $check_stmt->close();
 
     $conn->close();
 }
 
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
-    $sql = "SELECT * FROM vouchers WHERE id='$id'";
-    $result = $conn->query($sql);
+    // Use prepared statement for SELECT
+    $stmt = $conn->prepare("SELECT * FROM vouchers WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
     } else {
-        echo "No voucher found with ID: " . $id;
+        echo "No voucher found with ID: " . htmlspecialchars($id);
         exit();
     }
 }

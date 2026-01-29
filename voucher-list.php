@@ -4,7 +4,7 @@ require_once 'config.php';
 // Database connection
 $conn = getMysqliConnection();
 
-$sql = "SELECT id, name, city ,district FROM hotels";
+$sql = "SELECT id, name, city, district FROM hotels";
 $result = $conn->query($sql);
 
 $hotels = [];
