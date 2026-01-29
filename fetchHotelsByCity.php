@@ -3,7 +3,6 @@ require_once 'config.php';
 
 // Database connection
 $conn = getMysqliConnection();
-$conn->set_charset("utf8");
 
 $hotel_id = isset($_GET['hotel_id']) ? intval($_GET['hotel_id']) : 0;
 

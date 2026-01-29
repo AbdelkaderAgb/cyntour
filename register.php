@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // If no errors, insert into database
     if (count($errors) == 0) {
         // Hash the password
-        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        $password_hash = password_hash($userPassword, PASSWORD_DEFAULT);
         
         // Prepare and bind the SQL statement
         $stmt = $conn->prepare("INSERT INTO users (company_name, first_name, last_name, email, phone_number, password) VALUES (?, ?, ?, ?, ?, ?)");

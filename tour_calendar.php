@@ -7,9 +7,6 @@ require_once 'config.php';
 
 $conn = getMysqliConnection();
 
-/* ÖNEMLİ DÜZELTME: Türkçe karakter sorunu ve JSON hatasını önlemek için */
-$conn->set_charset("utf8mb4");
-
 /* ───────── 1-A. VOUCHER SİLME İSTEĞİ ─────────────────────── */
 if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['delete_voucher'])){
     $vid = intval($_POST['delete_voucher']);
