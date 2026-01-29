@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_receipt_id']))
     }
     
     $receipt_id_to_delete = intval($_POST['delete_receipt_id']);
-    $company_id_redirect = isset($_GET['company']) ? intval($_GET['company']) : 0;
+    $company_redirect = isset($_GET['company']) ? urlencode($_GET['company']) : '';
 
     if ($receipt_id_to_delete > 0) {
         $sql = "DELETE FROM receipts WHERE id = ?";
@@ -35,49 +35,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_receipt_id']))
     }
 
     // Redirect to prevent form resubmission
-    header("Location: dashboard.php?company=" . $company_id_redirect);
+    header("Location: dashboard.php" . ($company_redirect ? "?company=" . $company_redirect : ""));
     exit;
 }
 
-// Get company ID
-$companyId = isset($_GET['company']) ? intval($_GET['company']) : 0;
+// Get company name from URL (using customer_company field)
+$companyFilter = isset($_GET['company']) ? trim($_GET['company']) : '';
 
-if ($companyId) {
-    // Tek bir şirketin makbuzlarını görüntüleme mantığı
-    $sql_receipts = "SELECT r.id, r.receipt_date, r.subject, r.received_by, p.company_name 
+if ($companyFilter) {
+    // Single company view - show receipts for this company
+    $sql_receipts = "SELECT r.id, r.receipt_no, r.created_at, r.customer_name, 
+                            r.customer_company, r.total_amount, r.currency, 
+                            r.payment_status, r.notes
                      FROM receipts r 
-                     JOIN partners p ON r.partner_id = p.id 
-                     WHERE r.partner_id = ? 
-                     ORDER BY r.receipt_date DESC, r.id DESC";
+                     WHERE r.customer_company = ? 
+                     ORDER BY r.created_at DESC, r.id DESC";
     $stmt_receipts = $pdo->prepare($sql_receipts);
-    $stmt_receipts->execute([$companyId]);
+    $stmt_receipts->execute([$companyFilter]);
     $receipts = $stmt_receipts->fetchAll(PDO::FETCH_ASSOC);
 
-    // Tabloda göstermek için bu makbuzlara ait tüm ödemeleri çek
-    $sql_payments = "SELECT rp.receipt_id, rp.amount, rp.currency, rp.money_provider
+    // Fetch all payments for these receipts
+    $sql_payments = "SELECT rp.receipt_id, rp.amount, rp.payment_method, rp.payment_date
                      FROM receipt_payments rp
                      JOIN receipts r ON rp.receipt_id = r.id
-                     WHERE r.partner_id = ?";
+                     WHERE r.customer_company = ?";
     $stmt_payments = $pdo->prepare($sql_payments);
-    $stmt_payments->execute([$companyId]);
+    $stmt_payments->execute([$companyFilter]);
     $all_payments = $stmt_payments->fetchAll(PDO::FETCH_ASSOC);
 
-    // Kolay erişim için ödemeleri makbuz kimliğine göre grupla
+    // Group payments by receipt ID for easy access
     $payments_by_receipt = [];
     foreach ($all_payments as $payment) {
         $payments_by_receipt[$payment['receipt_id']][] = $payment;
     }
 
-    $companyName = $receipts ? $receipts[0]['company_name'] : 'Şirket Bulunamadı';
+    $companyName = $companyFilter;
 
-    // Bu şirket için receipt_payments tablosundan toplamları hesapla
-    $sql_totals = "SELECT rp.currency, SUM(rp.amount) as total_sum
-                   FROM receipt_payments rp
-                   JOIN receipts r ON rp.receipt_id = r.id
-                   WHERE r.partner_id = ?
-                   GROUP BY rp.currency";
+    // Calculate totals for this company by currency
+    $sql_totals = "SELECT r.currency, SUM(r.total_amount) as total_sum
+                   FROM receipts r
+                   WHERE r.customer_company = ?
+                   GROUP BY r.currency";
     $stmt_totals = $pdo->prepare($sql_totals);
-    $stmt_totals->execute([$companyId]);
+    $stmt_totals->execute([$companyFilter]);
     $totals_data = $stmt_totals->fetchAll(PDO::FETCH_ASSOC);
 
     $currency_totals = [];
@@ -87,37 +87,45 @@ if ($companyId) {
     $receiptCount = count($receipts);
 
 } else {
-    // Ana panel görünümü mantığı (tüm şirketler)
-    // Adım 1: Tüm şirketleri ve toplam makbuz sayılarını al.
-    $sql_companies = "SELECT p.id, p.company_name, 
-                          (SELECT COUNT(*) FROM receipts r WHERE r.partner_id = p.id) AS receipt_count
-                      FROM partners p
-                      ORDER BY p.company_name";
-    $all_companies = $pdo->query($sql_companies)->fetchAll(PDO::FETCH_ASSOC);
+    // Main dashboard view - show all companies
+    // Get all unique companies with their receipt counts
+    $sql_companies = "SELECT customer_company, 
+                             COUNT(*) AS receipt_count,
+                             currency,
+                             SUM(total_amount) as total_sum
+                      FROM receipts 
+                      WHERE customer_company IS NOT NULL AND customer_company != ''
+                      GROUP BY customer_company, currency
+                      ORDER BY customer_company";
+    $all_company_data = $pdo->query($sql_companies)->fetchAll(PDO::FETCH_ASSOC);
 
-    // Adım 2: Şirket ve para birimine göre gruplandırılmış tüm ödeme toplamlarını al.
-    $sql_totals = "SELECT r.partner_id, rp.currency, SUM(rp.amount) as total_sum
-                   FROM receipt_payments rp
-                   JOIN receipts r ON rp.receipt_id = r.id
-                   GROUP BY r.partner_id, rp.currency";
-    $all_totals = $pdo->query($sql_totals)->fetchAll(PDO::FETCH_ASSOC);
-
-    // Adım 3: Kolay erişim için toplamları şirkete göre düzenle.
-    $totals_by_company = [];
-    foreach ($all_totals as $total_row) {
-        $totals_by_company[$total_row['partner_id']][$total_row['currency']] = $total_row['total_sum'];
+    // Organize data by company
+    $companies = [];
+    foreach ($all_company_data as $row) {
+        $company_name = $row['customer_company'];
+        if (!isset($companies[$company_name])) {
+            $companies[$company_name] = [
+                'company' => $company_name,
+                'receipt_count' => 0,
+                'totals' => []
+            ];
+        }
+        // Add to receipt count (but only count once per company, not per currency)
+        // We need a separate query for accurate count
+        $companies[$company_name]['totals'][$row['currency']] = $row['total_sum'];
     }
 
-    // Adım 4: Verileri görüntüleme için son bir yapıda birleştir.
-    $companies = [];
-    foreach ($all_companies as $company_row) {
-        $id = $company_row['id'];
-        $companies[$id] = [
-            'id' => $id,
-            'company' => $company_row['company_name'],
-            'receipt_count' => $company_row['receipt_count'],
-            'totals' => $totals_by_company[$id] ?? []
-        ];
+    // Get accurate receipt counts per company
+    $sql_counts = "SELECT customer_company, COUNT(*) as receipt_count
+                   FROM receipts 
+                   WHERE customer_company IS NOT NULL AND customer_company != ''
+                   GROUP BY customer_company";
+    $counts_data = $pdo->query($sql_counts)->fetchAll(PDO::FETCH_ASSOC);
+    
+    foreach ($counts_data as $row) {
+        if (isset($companies[$row['customer_company']])) {
+            $companies[$row['customer_company']]['receipt_count'] = $row['receipt_count'];
+        }
     }
 }
 ?>
@@ -126,7 +134,7 @@ if ($companyId) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $companyId ? htmlspecialchars($companyName) : 'Receipt Dashboard' ?> - CynTour</title>
+    <title><?= $companyFilter ? htmlspecialchars($companyName) : 'Receipt Dashboard' ?> - CynTour</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -439,6 +447,36 @@ if ($companyId) {
             color: var(--success);
         }
 
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-paid {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .status-partial {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .status-refunded {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
         /* Action Buttons */
         .action-buttons {
             display: flex;
@@ -567,7 +605,7 @@ if ($companyId) {
 </nav>
 
 <div class="main-container">
-    <?php if ($companyId): ?>
+    <?php if ($companyFilter): ?>
         <!-- ======================= -->
         <!-- Single Company View     -->
         <!-- ======================= -->
@@ -621,50 +659,50 @@ if ($companyId) {
                 <table class="receipt-table">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>Receipt #</th>
                             <th>Date</th>
-                            <th>Received By</th>
-                            <th>Subject</th>
-                            <th>Provider</th>
-                            <th style="text-align: right;">Payments</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Payment Method</th>
+                            <th style="text-align: right;">Amount</th>
                             <th style="text-align: center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                     <?php foreach ($receipts as $i => $row): ?>
                         <tr class="receipt-row" style="--delay: <?= 0.05 * $i ?>s;">
-                            <td><strong>#<?= htmlspecialchars($row['id']) ?></strong></td>
-                            <td><?= date('d M Y', strtotime($row['receipt_date'])) ?></td>
-                            <td><?= htmlspecialchars($row['received_by'] ?: '-') ?></td>
-                            <td><?= htmlspecialchars($row['subject']) ?></td>
+                            <td><strong><?= htmlspecialchars($row['receipt_no']) ?></strong></td>
+                            <td><?= date('d M Y', strtotime($row['created_at'])) ?></td>
+                            <td><?= htmlspecialchars($row['customer_name']) ?></td>
+                            <td>
+                                <?php 
+                                $status_class = 'status-' . $row['payment_status'];
+                                ?>
+                                <span class="status-badge <?= $status_class ?>"><?= ucfirst($row['payment_status']) ?></span>
+                            </td>
                             <td>
                                 <?php 
                                 $receipt_payments = $payments_by_receipt[$row['id']] ?? [];
                                 if (!empty($receipt_payments)) {
-                                    echo htmlspecialchars($receipt_payments[0]['money_provider']);
+                                    $methods = array_unique(array_column($receipt_payments, 'payment_method'));
+                                    echo htmlspecialchars(ucfirst(str_replace('_', ' ', implode(', ', $methods))));
                                 } else {
                                     echo '-';
                                 }
                                 ?>
                             </td>
                             <td class="text-right">
-                                <?php if (!empty($receipt_payments)): ?>
-                                    <?php foreach ($receipt_payments as $payment): ?>
-                                        <div class="payment-amount"><?= get_currency_symbol($payment['currency']) . number_format($payment['amount'], 2) ?></div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    -
-                                <?php endif; ?>
+                                <div class="payment-amount"><?= get_currency_symbol($row['currency']) . number_format($row['total_amount'], 2) ?></div>
                             </td>
                             <td class="text-center">
                                 <div class="action-buttons">
-                                    <a class="btn-action btn-view" href="receipt-view.php?id=<?= $row['id'] ?>" target="_blank" aria-label="View receipt #<?= $row['id'] ?>">
+                                    <a class="btn-action btn-view" href="receipt-view.php?id=<?= $row['id'] ?>" target="_blank" aria-label="View receipt <?= htmlspecialchars($row['receipt_no']) ?>">
                                         <i class="fas fa-eye" aria-hidden="true"></i>
                                     </a>
-                                    <form action="dashboard.php?company=<?= $companyId ?>" method="POST" class="delete-form" onsubmit="return confirm('Are you sure you want to delete receipt #<?= $row['id'] ?>?');">
+                                    <form action="dashboard.php?company=<?= urlencode($companyFilter) ?>" method="POST" class="delete-form" onsubmit="return confirm('Are you sure you want to delete receipt <?= htmlspecialchars($row['receipt_no']) ?>?');">
                                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
                                         <input type="hidden" name="delete_receipt_id" value="<?= $row['id'] ?>">
-                                        <button type="submit" class="btn-action btn-delete" aria-label="Delete receipt #<?= $row['id'] ?>">
+                                        <button type="submit" class="btn-action btn-delete" aria-label="Delete receipt <?= htmlspecialchars($row['receipt_no']) ?>">
                                             <i class="fas fa-trash-alt" aria-hidden="true"></i>
                                         </button>
                                     </form>
@@ -686,34 +724,44 @@ if ($companyId) {
             <p>Select a company to view detailed receipt history.</p>
         </div>
         
-        <div class="company-grid">
-            <?php foreach ($companies as $i => $c): ?>
-            <div class="company-card" style="animation-delay: <?= 0.1 * $i ?>s;">
-                <a href="dashboard.php?company=<?= $c['id'] ?>">
-                    <div class="company-card-body">
-                        <?= generate_initials_avatar($c['company']) ?>
-                        <h5 class="company-card-title"><?= htmlspecialchars($c['company']) ?></h5>
-                        <div class="company-card-stats">
-                            <div class="company-stat">
-                                <div class="company-stat-label">Receipts</div>
-                                <div class="company-stat-value highlight"><?= $c['receipt_count'] ?></div>
-                            </div>
-                            <div class="company-stat">
-                                <div class="company-stat-label">Total Value</div>
-                                <?php if (empty($c['totals'])): ?>
-                                    <div class="company-stat-value">-</div>
-                                <?php else: ?>
-                                    <?php foreach ($c['totals'] as $currency => $total): ?>
-                                        <div class="company-stat-value"><?= get_currency_symbol($currency) . number_format($total, 2) ?></div>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
+        <?php if (empty($companies)): ?>
+            <div class="table-container">
+                <div class="empty-state">
+                    <i class="fas fa-building"></i>
+                    <h4>No Companies Found</h4>
+                    <p>No receipts with company information have been recorded yet.</p>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="company-grid">
+                <?php $i = 0; foreach ($companies as $company_name => $c): ?>
+                <div class="company-card" style="animation-delay: <?= 0.1 * $i ?>s;">
+                    <a href="dashboard.php?company=<?= urlencode($c['company']) ?>">
+                        <div class="company-card-body">
+                            <?= generate_initials_avatar($c['company']) ?>
+                            <h5 class="company-card-title"><?= htmlspecialchars($c['company']) ?></h5>
+                            <div class="company-card-stats">
+                                <div class="company-stat">
+                                    <div class="company-stat-label">Receipts</div>
+                                    <div class="company-stat-value highlight"><?= $c['receipt_count'] ?></div>
+                                </div>
+                                <div class="company-stat">
+                                    <div class="company-stat-label">Total Value</div>
+                                    <?php if (empty($c['totals'])): ?>
+                                        <div class="company-stat-value">-</div>
+                                    <?php else: ?>
+                                        <?php foreach ($c['totals'] as $currency => $total): ?>
+                                            <div class="company-stat-value"><?= get_currency_symbol($currency) . number_format($total, 2) ?></div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </a>
+                    </a>
+                </div>
+                <?php $i++; endforeach; ?>
             </div>
-            <?php endforeach; ?>
-        </div>
+        <?php endif; ?>
     <?php endif; ?>
 </div>
 
