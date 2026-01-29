@@ -1,14 +1,8 @@
 <?php
-$host = 'localhost';
-$dbName = 'cyntzsrb_cyn';
-$username = 'cyntzsrb_cyn';
-$password = 'Qj!d$}Zh,-~m';
+require_once 'config.php';
 
-$conn = new mysqli($host, $username, $password, $dbName);
-$conn -> set_charset("utf8");
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+// Database connection
+$conn = getMysqliConnection();
 
 $hotel_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 

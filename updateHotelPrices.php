@@ -1,14 +1,8 @@
 <?php
-$host = 'localhost';
-$dbName = 'cyntzsrb_cyn';
-$username = 'cyntzsrb_cyn';
-$password = 'Qj!d$}Zh,-~m';
-$conn = new mysqli($host, $username, $password, $dbName);
+require_once 'config.php';
 
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+// Database connection
+$conn = getMysqliConnection();
 
 // Get POST data
 $hotelIds = isset($_POST['hotelIds']) ? explode(',', $_POST['hotelIds']) : [];

@@ -1,39 +1,82 @@
 <?php
 include 'auth.php'; // Include auth.php to restrict access
+require_once 'config.php';
 
 // Database connection
-$host = 'localhost'; // Adjust if necessary
-$username = "cyntzsrb_cyn";
-$password = "Qj!d$}Zh,-~m";
-$database = 'cyntzsrb_cyn';
-
-$conn = new mysqli($host, $username, $password, $database);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$conn = getMysqliConnection();
 
 // Fetch total number of unique hotels
 $hotelsQuery = "SELECT COUNT(DISTINCT hotel_name) AS total_hotels FROM pricing_data";
 $hotelsResult = $conn->query($hotelsQuery);
 $hotelsRow = $hotelsResult->fetch_assoc();
-$totalHotels = $hotelsRow['total_hotels'] ?? 'N/A';
+$totalHotels = $hotelsRow['total_hotels'] ?? 0;
 
 // Fetch total number of users
-$usersQuery = "SELECT COUNT(*) AS total_users FROM users"; // Adjust if necessary for your table structure
+$usersQuery = "SELECT COUNT(*) AS total_users FROM users";
 $usersResult = $conn->query($usersQuery);
 $usersRow = $usersResult->fetch_assoc();
-$totalUsers = $usersRow['total_users'] ?? 'N/A';
+$totalUsers = $usersRow['total_users'] ?? 0;
 
 // Fetch total number of cities
-$citiesQuery = "SELECT COUNT(DISTINCT city) AS total_cities FROM hotels"; // Adjust if necessary for your table structure
+$citiesQuery = "SELECT COUNT(DISTINCT city) AS total_cities FROM hotels";
 $citiesResult = $conn->query($citiesQuery);
 $citiesRow = $citiesResult->fetch_assoc();
-$totalCities = $citiesRow['total_cities'] ?? 'N/A';
+$totalCities = $citiesRow['total_cities'] ?? 0;
 
-// Fetch hotel names
-$hotelNamesQuery = "SELECT DISTINCT hotel_name FROM pricing_data";
+// Fetch voucher statistics
+$hotelVouchersQuery = "SELECT COUNT(*) AS total FROM h_vouchers";
+$hotelVouchersResult = $conn->query($hotelVouchersQuery);
+$totalHotelVouchers = $hotelVouchersResult ? ($hotelVouchersResult->fetch_assoc()['total'] ?? 0) : 0;
+
+$transferVouchersQuery = "SELECT COUNT(*) AS total FROM transfer_vouchers";
+$transferVouchersResult = $conn->query($transferVouchersQuery);
+$totalTransferVouchers = $transferVouchersResult ? ($transferVouchersResult->fetch_assoc()['total'] ?? 0) : 0;
+
+$tourVouchersQuery = "SELECT COUNT(*) AS total FROM city_tour_vouchers";
+$tourVouchersResult = $conn->query($tourVouchersQuery);
+$totalTourVouchers = $tourVouchersResult ? ($tourVouchersResult->fetch_assoc()['total'] ?? 0) : 0;
+
+$totalVouchers = $totalHotelVouchers + $totalTransferVouchers + $totalTourVouchers;
+
+// Fetch hotel names for the table
+$hotelNamesQuery = "SELECT DISTINCT hotel_name FROM pricing_data LIMIT 10";
 $hotelNamesResult = $conn->query($hotelNamesQuery);
+
+// Fetch recent vouchers (combine from different tables)
+$recentVouchers = [];
+
+// Recent hotel vouchers
+$recentHotelVouchersQuery = "SELECT voucher_no, company_name, hotel as hotel_name, 'Hotel' as type, check_in_date as created_date FROM h_vouchers ORDER BY check_in_date DESC LIMIT 5";
+$result = $conn->query($recentHotelVouchersQuery);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $recentVouchers[] = $row;
+    }
+}
+
+// Recent transfer vouchers
+$recentTransferVouchersQuery = "SELECT voucher_no, company_name, hotel_name, 'Transfer' as type, created_at as created_date FROM transfer_vouchers ORDER BY created_at DESC LIMIT 5";
+$result = $conn->query($recentTransferVouchersQuery);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $recentVouchers[] = $row;
+    }
+}
+
+// Recent tour vouchers
+$recentTourVouchersQuery = "SELECT voucher_no, company_name, hotel_name, 'Tour' as type, created_at as created_date FROM city_tour_vouchers ORDER BY created_at DESC LIMIT 5";
+$result = $conn->query($recentTourVouchersQuery);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $recentVouchers[] = $row;
+    }
+}
+
+// Sort by date and limit
+usort($recentVouchers, function($a, $b) {
+    return strtotime($b['created_date'] ?? '1970-01-01') - strtotime($a['created_date'] ?? '1970-01-01');
+});
+$recentVouchers = array_slice($recentVouchers, 0, 8);
 
 $conn->close();
 ?>
@@ -323,11 +366,11 @@ $conn->close();
 
             <!-- Nav Item - Hotels Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseHotels" aria-expanded="true" aria-controls="collapseHotels">
                     <i class="fas fa-hotel"></i>
                     <span>Hotels</span>
                 </a>
-                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+                <div id="collapseHotels" class="collapse" aria-labelledby="headingHotels" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Hotel Management:</h6>
                         <a class="collapse-item" href="upload.php">
@@ -335,6 +378,75 @@ $conn->close();
                         </a>
                         <a class="collapse-item" href="increase_prices.php">
                             <i class="fas fa-tag fa-sm fa-fw mr-1"></i>Pricing
+                        </a>
+                        <a class="collapse-item" href="index.php">
+                            <i class="fas fa-list fa-sm fa-fw mr-1"></i>View All Hotels
+                        </a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Vouchers Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseVouchers" aria-expanded="true" aria-controls="collapseVouchers">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Vouchers</span>
+                </a>
+                <div id="collapseVouchers" class="collapse" aria-labelledby="headingVouchers" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Create Vouchers:</h6>
+                        <a class="collapse-item" href="form.php">
+                            <i class="fas fa-bed fa-sm fa-fw mr-1"></i>Hotel Voucher
+                        </a>
+                        <a class="collapse-item" href="transfer-voucher-form.php">
+                            <i class="fas fa-shuttle-van fa-sm fa-fw mr-1"></i>Transfer Voucher
+                        </a>
+                        <a class="collapse-item" href="tour_voucher_form.php">
+                            <i class="fas fa-map-marked-alt fa-sm fa-fw mr-1"></i>Tour Voucher
+                        </a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Documents Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDocuments" aria-expanded="true" aria-controls="collapseDocuments">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Documents</span>
+                </a>
+                <div id="collapseDocuments" class="collapse" aria-labelledby="headingDocuments" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Create Documents:</h6>
+                        <a class="collapse-item" href="invoice_form.php">
+                            <i class="fas fa-file-invoice fa-sm fa-fw mr-1"></i>Invoice
+                        </a>
+                        <a class="collapse-item" href="receipt-form.php">
+                            <i class="fas fa-receipt fa-sm fa-fw mr-1"></i>Receipt
+                        </a>
+                        <a class="collapse-item" href="tour_invoice_form.php">
+                            <i class="fas fa-file-alt fa-sm fa-fw mr-1"></i>Tour Invoice
+                        </a>
+                        <a class="collapse-item" href="transfer-invoice-form.php">
+                            <i class="fas fa-file-contract fa-sm fa-fw mr-1"></i>Transfer Invoice
+                        </a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Tours -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTours" aria-expanded="true" aria-controls="collapseTours">
+                    <i class="fas fa-route"></i>
+                    <span>Tours</span>
+                </a>
+                <div id="collapseTours" class="collapse" aria-labelledby="headingTours" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Tour Management:</h6>
+                        <a class="collapse-item" href="tours.php">
+                            <i class="fas fa-list fa-sm fa-fw mr-1"></i>View Tours
+                        </a>
+                        <a class="collapse-item" href="tour_calendar.php">
+                            <i class="fas fa-calendar-alt fa-sm fa-fw mr-1"></i>Tour Calendar
                         </a>
                     </div>
                 </div>
@@ -345,6 +457,30 @@ $conn->close();
                 <a class="nav-link" href="users.php">
                     <i class="fas fa-users"></i>
                     <span>Users</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Quick Links
+            </div>
+
+            <!-- Nav Item - Transfer -->
+            <li class="nav-item">
+                <a class="nav-link" href="transfer.php">
+                    <i class="fas fa-car"></i>
+                    <span>Transfer Services</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Home -->
+            <li class="nav-item">
+                <a class="nav-link" href="index.php">
+                    <i class="fas fa-home"></i>
+                    <span>View Website</span>
                 </a>
             </li>
 
@@ -396,7 +532,7 @@ $conn->close();
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                                <?php if ($_SESSION['user']['role'] === 'admin') : ?>
+                                <?php if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin') : ?>
                                 <a class="dropdown-item" href="profile.php">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
@@ -424,31 +560,30 @@ $conn->close();
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Dashboard Overview</h1>
                         <div>
+                            <a href="form.php" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm mr-2">
+                                <i class="fas fa-file-alt fa-sm text-white-50"></i> New Voucher
+                            </a>
                             <a href="upload.php" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
                                 <i class="fas fa-plus fa-sm text-white-50"></i> New Hotel
                             </a>
                         </div>
                     </div>
 
-                    <!-- Content Row -->
-                    <div class="row stats-row">
+                    <!-- Statistics Row -->
+                    <div class="row">
                         
                         <!-- Hotels Card -->
-                        <div class="col-xl-6 col-md-6 mb-4 animate-card">
-                            <div class="card border-left-primary shadow h-100 py-3 stats-card">
+                        <div class="col-xl-3 col-md-6 mb-4 animate-card">
+                            <div class="card border-left-primary shadow h-100 py-2 stats-card">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                                 Total Hotels</div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $totalHotels; ?></div>
-                                            <div class="mt-2 text-xs text-gray-500">
-                                                <i class="fas fa-arrow-up text-success mr-1"></i>
-                                                <span>12% increase this month</span>
-                                            </div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-hotel fa-3x text-gray-300 stat-icon"></i>
+                                            <i class="fas fa-hotel fa-2x text-gray-300 stat-icon"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -456,35 +591,248 @@ $conn->close();
                         </div>
                         
                         <!-- Users Card -->
-                        <div class="col-xl-6 col-md-6 mb-4 animate-card">
-                            <div class="card border-left-success shadow h-100 py-3 stats-card">
+                        <div class="col-xl-3 col-md-6 mb-4 animate-card">
+                            <div class="card border-left-success shadow h-100 py-2 stats-card">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                                 Registered Users</div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $totalUsers; ?></div>
-                                            <div class="mt-2 text-xs text-gray-500">
-                                                <i class="fas fa-arrow-up text-success mr-1"></i>
-                                                <span>8% increase this month</span>
-                                            </div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-users fa-3x text-gray-300 stat-icon"></i>
+                                            <i class="fas fa-users fa-2x text-gray-300 stat-icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Total Vouchers Card -->
+                        <div class="col-xl-3 col-md-6 mb-4 animate-card">
+                            <div class="card border-left-info shadow h-100 py-2 stats-card">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                Total Vouchers</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $totalVouchers; ?></div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-file-alt fa-2x text-gray-300 stat-icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Cities Card -->
+                        <div class="col-xl-3 col-md-6 mb-4 animate-card">
+                            <div class="card border-left-warning shadow h-100 py-2 stats-card">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Cities Covered</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $totalCities; ?></div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-map-marker-alt fa-2x text-gray-300 stat-icon"></i>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- End Content Row -->
+
+                    <!-- Quick Actions Row -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card shadow">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-bolt mr-2"></i>Quick Actions</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <!-- Voucher Actions -->
+                                        <div class="col-lg-4 col-md-6 mb-3">
+                                            <h6 class="text-uppercase text-muted small mb-3">Vouchers</h6>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <a href="form.php" class="btn btn-outline-primary btn-sm mb-2 mr-2">
+                                                    <i class="fas fa-bed mr-1"></i> Hotel Voucher
+                                                </a>
+                                                <a href="transfer-voucher-form.php" class="btn btn-outline-success btn-sm mb-2 mr-2">
+                                                    <i class="fas fa-shuttle-van mr-1"></i> Transfer Voucher
+                                                </a>
+                                                <a href="tour_voucher_form.php" class="btn btn-outline-info btn-sm mb-2 mr-2">
+                                                    <i class="fas fa-map-marked-alt mr-1"></i> Tour Voucher
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!-- Document Actions -->
+                                        <div class="col-lg-4 col-md-6 mb-3">
+                                            <h6 class="text-uppercase text-muted small mb-3">Documents</h6>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <a href="invoice_form.php" class="btn btn-outline-warning btn-sm mb-2 mr-2">
+                                                    <i class="fas fa-file-invoice mr-1"></i> Invoice
+                                                </a>
+                                                <a href="receipt-form.php" class="btn btn-outline-danger btn-sm mb-2 mr-2">
+                                                    <i class="fas fa-receipt mr-1"></i> Receipt
+                                                </a>
+                                                <a href="tour_invoice_form.php" class="btn btn-outline-secondary btn-sm mb-2 mr-2">
+                                                    <i class="fas fa-file-alt mr-1"></i> Tour Invoice
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!-- Management Actions -->
+                                        <div class="col-lg-4 col-md-6 mb-3">
+                                            <h6 class="text-uppercase text-muted small mb-3">Management</h6>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <a href="upload.php" class="btn btn-outline-primary btn-sm mb-2 mr-2">
+                                                    <i class="fas fa-plus-circle mr-1"></i> Add Hotel
+                                                </a>
+                                                <a href="increase_prices.php" class="btn btn-outline-success btn-sm mb-2 mr-2">
+                                                    <i class="fas fa-tag mr-1"></i> Update Prices
+                                                </a>
+                                                <a href="users.php" class="btn btn-outline-info btn-sm mb-2 mr-2">
+                                                    <i class="fas fa-users mr-1"></i> Manage Users
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Row -->
+                    <div class="row">
+                        <!-- Recent Vouchers -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-file-alt mr-2"></i>Recent Vouchers</h6>
+                                    <div class="dropdown no-arrow">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownVouchers" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownVouchers">
+                                            <div class="dropdown-header">Create New:</div>
+                                            <a class="dropdown-item" href="form.php">Hotel Voucher</a>
+                                            <a class="dropdown-item" href="transfer-voucher-form.php">Transfer Voucher</a>
+                                            <a class="dropdown-item" href="tour_voucher_form.php">Tour Voucher</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <?php if (count($recentVouchers) > 0): ?>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Voucher No</th>
+                                                    <th>Company</th>
+                                                    <th>Type</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($recentVouchers as $voucher): ?>
+                                                <tr>
+                                                    <td><span class="text-primary font-weight-bold"><?php echo htmlspecialchars($voucher['voucher_no'] ?? 'N/A'); ?></span></td>
+                                                    <td><?php echo htmlspecialchars($voucher['company_name'] ?? 'N/A'); ?></td>
+                                                    <td>
+                                                        <?php 
+                                                        $type = $voucher['type'] ?? 'Unknown';
+                                                        switch($type) {
+                                                            case 'Hotel':
+                                                                $badgeClass = 'badge-primary';
+                                                                break;
+                                                            case 'Transfer':
+                                                                $badgeClass = 'badge-success';
+                                                                break;
+                                                            case 'Tour':
+                                                                $badgeClass = 'badge-info';
+                                                                break;
+                                                            default:
+                                                                $badgeClass = 'badge-secondary';
+                                                        }
+                                                        ?>
+                                                        <span class="badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars($type); ?></span>
+                                                    </td>
+                                                </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <?php else: ?>
+                                    <p class="text-center text-muted mb-0">No vouchers found. <a href="form.php">Create one now!</a></p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Voucher Statistics -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-chart-pie mr-2"></i>Voucher Statistics</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-4 text-center">
+                                            <div class="border rounded p-3 mb-2" style="background: linear-gradient(135deg, #4e73df22 0%, #4e73df11 100%);">
+                                                <h4 class="text-primary mb-1"><?php echo $totalHotelVouchers; ?></h4>
+                                                <small class="text-muted">Hotel</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <div class="border rounded p-3 mb-2" style="background: linear-gradient(135deg, #1cc88a22 0%, #1cc88a11 100%);">
+                                                <h4 class="text-success mb-1"><?php echo $totalTransferVouchers; ?></h4>
+                                                <small class="text-muted">Transfer</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <div class="border rounded p-3 mb-2" style="background: linear-gradient(135deg, #36b9cc22 0%, #36b9cc11 100%);">
+                                                <h4 class="text-info mb-1"><?php echo $totalTourVouchers; ?></h4>
+                                                <small class="text-muted">Tour</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <h6 class="mb-3">Quick Create</h6>
+                                    <div class="row">
+                                        <div class="col-6 mb-2">
+                                            <a href="form.php" class="btn btn-primary btn-block btn-sm">
+                                                <i class="fas fa-bed mr-1"></i> Hotel Voucher
+                                            </a>
+                                        </div>
+                                        <div class="col-6 mb-2">
+                                            <a href="transfer-voucher-form.php" class="btn btn-success btn-block btn-sm">
+                                                <i class="fas fa-shuttle-van mr-1"></i> Transfer Voucher
+                                            </a>
+                                        </div>
+                                        <div class="col-6 mb-2">
+                                            <a href="tour_voucher_form.php" class="btn btn-info btn-block btn-sm">
+                                                <i class="fas fa-map-marked-alt mr-1"></i> Tour Voucher
+                                            </a>
+                                        </div>
+                                        <div class="col-6 mb-2">
+                                            <a href="receipt-form.php" class="btn btn-warning btn-block btn-sm">
+                                                <i class="fas fa-receipt mr-1"></i> Receipt
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Hotel List Section -->
                     <div class="row">
                         <div class="col-lg-12 mb-4">
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Hotel Management</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-hotel mr-2"></i>Hotel Management</h6>
                                     <div class="dropdown no-arrow">
                                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
@@ -494,7 +842,7 @@ $conn->close();
                                             <a class="dropdown-item" href="upload.php">Add New Hotel</a>
                                             <a class="dropdown-item" href="increase_prices.php">Update Prices</a>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">Export List</a>
+                                            <a class="dropdown-item" href="index.php">View All Hotels</a>
                                         </div>
                                     </div>
                                 </div>
@@ -509,6 +857,7 @@ $conn->close();
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                <?php if ($hotelNamesResult && $hotelNamesResult->num_rows > 0): ?>
                                                 <?php while($hotel = $hotelNamesResult->fetch_assoc()): ?>
                                                 <tr>
                                                     <td class="align-middle">
@@ -530,9 +879,19 @@ $conn->close();
                                                     </td>
                                                 </tr>
                                                 <?php endwhile; ?>
+                                                <?php else: ?>
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted">No hotels found. <a href="upload.php">Add a hotel now!</a></td>
+                                                </tr>
+                                                <?php endif; ?>
                                             </tbody>
                                         </table>
                                     </div>
+                                    <?php if ($totalHotels > 10): ?>
+                                    <div class="text-center mt-3">
+                                        <a href="index.php" class="btn btn-sm btn-outline-primary">View All Hotels <i class="fas fa-arrow-right ml-1"></i></a>
+                                    </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>

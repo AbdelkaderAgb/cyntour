@@ -1,6 +1,7 @@
 <?php
 include 'auth.php';
 require 'vendor/autoload.php';
+require_once 'config.php';
 
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 ?>
@@ -372,18 +373,8 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
                             $hotel_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
                             if (isset($_POST['submit'])) {
-                                $servername = "localhost";
-                                $username = "cyntzsrb_cyn";
-                                $password = "Qj!d$}Zh,-~m";
-                                $dbname = "cyntzsrb_cyn";
-
-                                // Create connection
-                                $conn = new mysqli($servername, $username, $password, $dbname);
-
-                                // Check connection
-                                if ($conn->connect_error) {
-                                    die("<div class='message error animate-card'>Connection failed: " . $conn->connect_error . "</div>");
-                                }
+                                // Database connection
+                                $conn = getMysqliConnection();
 
                                 // Function to check if currency column exists, if not add it
                                 function ensureCurrencyColumnExists($conn) {

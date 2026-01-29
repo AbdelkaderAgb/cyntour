@@ -1,16 +1,8 @@
 <?php
-$host = 'localhost';
-$username = "cyntzsrb_cyn";
-$password = "Qj!d$}Zh,-~m";
-$database = 'cyntzsrb_cyn';
+require_once 'config.php';
 
-// Bağlantı oluştur
-$conn = new mysqli($host, $username, $password, $database);
-
-// Bağlantıyı kontrol et
-if ($conn->connect_error) {
-    die("Bağlantı hatası: " . $conn->connect_error);
-}
+// Database connection
+$conn = getMysqliConnection();
 
 $success_message = '';
 

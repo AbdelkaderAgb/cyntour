@@ -1,24 +1,18 @@
 <?php
+// Include authentication
+include 'auth.php';
+
 // Initialize error message variable
 $error_message = "";
 $success_message = "";
 
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Database connection parameters
-    $host = 'localhost';
-    $username = "cyntzsrb_cyn";
-    $password = "Qj!d$}Zh,-~m";
-    $database = 'cyntzsrb_cyn';
+    require_once 'config.php';
     
     try {
-        // Create connection
-        $conn = new mysqli($host, $username, $password, $database);
-        
-        // Check connection
-        if ($conn->connect_error) {
-            throw new Exception("Database connection failed: " . $conn->connect_error);
-        }
+        // Database connection
+        $conn = getMysqliConnection();
         
         // Get form data
         $voucher_no = $_POST['voucher_no'];
@@ -97,44 +91,89 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transfer Voucher Form</title>
+    <title>Transfer Voucher Form - CYN Tourism</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
+        :root {
+            --primary: #1cc88a;
+            --primary-dark: #169b6b;
+            --light: #f8f9fc;
+        }
         body {
-            font-family: 'Helvetica Neue', sans-serif;
-            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--light);
             padding: 0;
-            box-sizing: border-box;
-            background-color: #f9f9f9;
+            margin: 0;
         }
-
-        .container {
-            width: 100%;
-            padding: 20px;
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        .page-header h1 {
+            margin: 0;
+            font-size: 1.75rem;
+        }
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+            border-radius: 0.5rem;
+        }
+        .card-header {
             background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
+            border-bottom: 1px solid #e3e6f0;
+            padding: 1rem 1.25rem;
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
+        .card-header h5 {
+            margin: 0;
+            color: var(--primary);
+            font-weight: 600;
         }
-
-        .btn-generate {
-            margin-top: 20px;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        }
+        .back-link {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+        }
+        .back-link:hover {
+            color: white;
+            text-decoration: none;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Transfer Voucher Form</h1>
+    <div class="page-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="admin.php" class="back-link"><i class="fas fa-arrow-left mr-2"></i>Back to Dashboard</a>
+                    <h1 class="mt-2"><i class="fas fa-shuttle-van mr-2"></i>Transfer Voucher Form</h1>
+                </div>
+                <img src="logo.png" alt="CYN Tourism" style="height: 50px; filter: brightness(0) invert(1);">
+            </div>
         </div>
+    </div>
+    
+    <div class="form-container">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-file-alt mr-2"></i>Create New Transfer Voucher</h5>
+            </div>
+            <div class="card-body">
         
         <?php if ($success_message): ?>
             <div class="alert alert-success mt-3 mb-3" role="alert">
@@ -204,8 +243,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label for="passengers">Passengers:</label>
                 <textarea class="form-control" id="passengers" name="passengers" rows="5" placeholder="Enter passenger names separated by new lines" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary btn-generate">Generate Voucher</button>
+            <div class="d-flex justify-content-between mt-4">
+                <a href="admin.php" class="btn btn-outline-secondary"><i class="fas fa-times mr-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-file-alt mr-1"></i>Generate Voucher</button>
+            </div>
         </form>
+            </div>
+        </div>
     </div>
     
     <!-- Bootstrap JS and dependencies -->

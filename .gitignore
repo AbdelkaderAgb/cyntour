@@ -1,3 +1,33 @@
-.env 
-*.token 
-IG.html 
+# Environment and configuration files
+.env
+*.token
+
+# HTML files
+IG.html
+
+# Database dumps (contain sensitive data)
+# Exception: schema.sql is allowed for documentation
+/*.sql
+!database/schema.sql
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Cache and temp files
+cache/
+tmp/
+*.cache
+
+# Upload directories (may contain sensitive data)
+uploads/
+
+# OS files
+.DS_Store
+Thumbs.db

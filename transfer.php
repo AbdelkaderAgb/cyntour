@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -392,7 +395,7 @@ h2, h3, h4 {
                     } else {
                         // For non-logged in users, display the Login link
                         echo '<li class="nav-item">
-                                <a class="nav-link" href="login.php">logout</a>
+                                <a class="nav-link" href="login.php">Login</a>
                               </li>';
                     }
                     ?>

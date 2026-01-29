@@ -1,6 +1,7 @@
 <?php
 // Include authentication (auth.php starts the session and verifies authentication)
 include 'auth.php';
+require_once 'config.php';
 
 // Redirect to login page if user is not authenticated
 if (!isset($_SESSION['auth']) || $_SESSION['auth'] !== true) {
@@ -9,19 +10,8 @@ if (!isset($_SESSION['auth']) || $_SESSION['auth'] !== true) {
         // Retrieve the token from the cookie
         $token = $_COOKIE['remember_me'];
         
-        // Database connection details
-        $servername = "localhost";
-        $username = "cyntzsrb_cyn";
-        $password = "Qj!d$}Zh,-~m";
-        $dbname = "cyntzsrb_cyn";
-
-        // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
+        // Database connection
+        $conn = getMysqliConnection();
         
         // Use a prepared statement to safely query the user with this token
         $stmt = $conn->prepare("SELECT id, username, role FROM users WHERE remember_token = ?");
@@ -42,50 +32,15 @@ if (!isset($_SESSION['auth']) || $_SESSION['auth'] !== true) {
             exit();
         }
         $stmt->close();
-        $conn->close();
     } else {
         // No cookie found, redirect to login page
         header("Location: login.php");
         exit();
     }
 }
-// Database connection details
-$servername = "localhost";
-$username = "cyntzsrb_cyn";
-$password = "Qj!d$}Zh,-~m";
-$dbname = "cyntzsrb_cyn";
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Auto-login using the "remember me" cookie if the user is not already authenticated
-if (!isset($_SESSION['auth']) || $_SESSION['auth'] !== true) {
-    if (isset($_COOKIE['remember_me'])) {
-        // Retrieve the token from the cookie
-        $token = $_COOKIE['remember_me'];
-        
-        // Use a prepared statement to safely query the user with this token
-        $stmt = $conn->prepare("SELECT id, username, role FROM users WHERE remember_token = ?");
-        $stmt->bind_param("s", $token);
-        $stmt->execute();
-        $resultToken = $stmt->get_result();
-        
-        if ($resultToken->num_rows > 0) {
-            $user = $resultToken->fetch_assoc();
-            // Set session variables for the authenticated user
-            $_SESSION['auth'] = true;
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['user_role'] = $user['role'];
-        }
-        $stmt->close();
-    }
-}
+// Database connection
+$conn = getMysqliConnection();
 
 // Get current page number from query string (default is 1)
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;

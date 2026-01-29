@@ -1,21 +1,12 @@
 <?php
+require_once 'config.php';
+
 $errors = array(); // Initialize an array to store validation errors
 
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Database connection details
-    $servername = "localhost";
-    $username = "cyntzsrb_cyn";
-    $password = "Qj!d$}Zh,-~m";
-    $dbname = "cyntzsrb_cyn";
-
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+    // Database connection
+    $conn = getMysqliConnection();
 
     // Validate and sanitize input fields
     $company_name = trim(mysqli_real_escape_string($conn, $_POST['company_name']));
@@ -23,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $last_name = trim(mysqli_real_escape_string($conn, $_POST['last_name']));
     $email = trim(mysqli_real_escape_string($conn, $_POST['email']));
     $phone_number = trim(mysqli_real_escape_string($conn, $_POST['phone_number']));
-    $password = $_POST['password'];
+    $userPassword = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
     // Validation
@@ -33,9 +24,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($email)) { array_push($errors, "Email is required"); }
     elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) { array_push($errors, "Invalid email format"); }
     if (empty($phone_number)) { array_push($errors, "Phone number is required"); }
-    if (empty($password)) { array_push($errors, "Password is required"); }
-    elseif (strlen($password) < 8) { array_push($errors, "Password must be at least 8 characters"); }
-    if ($password != $confirm_password) { array_push($errors, "Passwords do not match"); }
+    if (empty($userPassword)) { array_push($errors, "Password is required"); }
+    elseif (strlen($userPassword) < 8) { array_push($errors, "Password must be at least 8 characters"); }
+    if ($userPassword != $confirm_password) { array_push($errors, "Passwords do not match"); }
 
     // Check if email or company name already exist using prepared statement
     $check_stmt = $conn->prepare("SELECT email, company_name FROM users WHERE email = ? OR company_name = ?");
@@ -54,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // If no errors, insert into database
     if (count($errors) == 0) {
         // Hash the password
-        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        $password_hash = password_hash($userPassword, PASSWORD_DEFAULT);
         
         // Prepare and bind the SQL statement
         $stmt = $conn->prepare("INSERT INTO users (company_name, first_name, last_name, email, phone_number, password) VALUES (?, ?, ?, ?, ?, ?)");

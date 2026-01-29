@@ -1,7 +1,8 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['auth']) or $_SESSION['auth'] !== true) {
-  header('location: login.php');
+if (!isset($_SESSION['auth']) || $_SESSION['auth'] !== true) {
+    header('Location: login.php');
+    exit(); // Critical: Must exit after redirect to prevent code execution
 }
 ?>

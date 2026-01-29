@@ -1,23 +1,15 @@
 <?php
-// Veritabanı bağlantı parametreleri
-$host = 'localhost';
-$username = "cyntzsrb_cyn";
-$password = "Qj!d$}Zh,-~m";
-$database = 'cyntzsrb_cyn';
+require_once 'config.php';
 
-// Değişkenleri başlat
+// Initialize variables
 $transfers = [];
 $selectedMonth = isset($_GET['month']) ? intval($_GET['month']) : intval(date('m'));
 $selectedYear = isset($_GET['year']) ? intval($_GET['year']) : intval(date('Y'));
 $error_message = "";
 
-// Veritabanına bağlan
+// Database connection
 try {
-    $conn = new mysqli($host, $username, $password, $database);
-
-    if ($conn->connect_error) {
-        throw new Exception("Veritabanı bağlantısı başarısız: " . $conn->connect_error);
-    }
+    $conn = getMysqliConnection();
 
     // Seçilen ay için tüm transferleri getir
     $sql = "SELECT * FROM transfer_vouchers WHERE

@@ -1,24 +1,16 @@
 <?php
 include 'auth.php'; // Include auth.php to restrict access
-$servername = "localhost"; // Adjust as necessary
-$username = "cyntzsrb_cyn"; // Your DB username
-$password = "Qj!d$}Zh,-~m"; // Your DB password
-$dbname = "cyntzsrb_cyn"; // Your database name
+require_once 'config.php';
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+// Database connection
+$conn = getMysqliConnection();
 
 // Handling the POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['userId'], $_POST['email'], $_POST['password'])) {
     $userId = $conn->real_escape_string($_POST['userId']);
     $email = $conn->real_escape_string($_POST['email']);
-    $password = $conn->real_escape_string($_POST['password']); // Hash the password for security
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    $userPassword = $conn->real_escape_string($_POST['password']); // Hash the password for security
+    $hashedPassword = password_hash($userPassword, PASSWORD_DEFAULT);
     
     $sql = "UPDATE users SET email = ?, password = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
