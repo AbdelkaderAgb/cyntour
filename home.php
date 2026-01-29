@@ -689,7 +689,7 @@ try {
                 <a href="contact.php" class="cyn-btn cyn-btn-light cyn-btn-lg">
                     <i class="fas fa-envelope"></i> Contact Us
                 </a>
-                <a href="https://wa.me/905318176770" target="_blank" class="cyn-btn cyn-btn-lg" style="background: #25D366; color: white;">
+                <a href="https://wa.me/905318176770" target="_blank" class="cyn-btn cyn-btn-lg cyn-btn-whatsapp">
                     <i class="fab fa-whatsapp"></i> WhatsApp
                 </a>
             </div>

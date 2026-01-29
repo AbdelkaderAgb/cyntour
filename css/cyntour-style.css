@@ -49,6 +49,7 @@
     --warning: #FFC107;
     --danger: #DC3545;
     --info: #17A2B8;
+    --whatsapp: #25D366;
     
     /* Typography */
     --font-primary: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -335,6 +336,19 @@ a:hover {
     background: var(--gray-100);
     border-color: var(--gray-400);
     color: var(--gray-800);
+}
+
+.cyn-btn-whatsapp {
+    background: var(--whatsapp);
+    color: var(--white);
+    border-color: var(--whatsapp);
+}
+
+.cyn-btn-whatsapp:hover {
+    background: #128C7E;
+    border-color: #128C7E;
+    transform: translateY(-2px);
+    color: var(--white);
 }
 
 .cyn-btn-lg {

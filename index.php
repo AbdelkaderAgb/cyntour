@@ -375,7 +375,7 @@ $totalPages = ceil($totalHotels / $hotelsPerPage);
                 
                 <?php if ($end < $totalPages): ?>
                 <?php if ($end < $totalPages - 1): ?>
-                <span class="pagination-link" style="pointer-events: none;">...</span>
+                <span class="pagination-link" style="pointer-events: none;" aria-hidden="true">...</span>
                 <?php endif; ?>
                 <a href="?page=<?php echo $totalPages; ?>" class="pagination-link"><?php echo $totalPages; ?></a>
                 <?php endif; ?>

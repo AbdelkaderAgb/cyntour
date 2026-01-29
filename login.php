@@ -55,8 +55,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
                 $updateStmt->execute();
                 $updateStmt->close();
                 
-                // Set cookie for 30 days
-                setcookie('remember_me', $token, time() + (30 * 24 * 60 * 60), '/', '', true, true);
+                // Set cookie for 30 days (secure flag based on HTTPS)
+                $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+                setcookie('remember_me', $token, time() + (30 * 24 * 60 * 60), '/', '', $secure, true);
             }
             
             // Redirect based on role
@@ -380,7 +381,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
                                placeholder="Enter your password" 
                                required 
                                autocomplete="current-password">
-                        <button type="button" class="toggle-btn" onclick="togglePassword()">
+                        <button type="button" class="toggle-btn" onclick="togglePassword()" aria-label="Toggle password visibility">
                             <i class="fas fa-eye" id="toggleIcon"></i>
                         </button>
                     </div>

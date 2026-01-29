@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (strlen($userPassword) < 8) { 
         array_push($errors, "Password must be at least 8 characters"); 
     }
-    if ($userPassword != $confirm_password) { 
+    if ($userPassword !== $confirm_password) { 
         array_push($errors, "Passwords do not match"); 
     }
 
@@ -453,7 +453,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                    placeholder="Min 8 characters" 
                                    required
                                    minlength="8">
-                            <button type="button" class="toggle-btn" onclick="togglePassword('password', 'toggleIcon1')">
+                            <button type="button" class="toggle-btn" onclick="togglePassword('password', 'toggleIcon1')" aria-label="Toggle password visibility">
                                 <i class="fas fa-eye" id="toggleIcon1"></i>
                             </button>
                         </div>
@@ -474,7 +474,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                    class="cyn-form-control" 
                                    placeholder="Repeat password" 
                                    required>
-                            <button type="button" class="toggle-btn" onclick="togglePassword('confirm_password', 'toggleIcon2')">
+                            <button type="button" class="toggle-btn" onclick="togglePassword('confirm_password', 'toggleIcon2')" aria-label="Toggle password visibility">
                                 <i class="fas fa-eye" id="toggleIcon2"></i>
                             </button>
                         </div>
@@ -565,21 +565,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         const password = document.getElementById('password').value;
         const confirm = document.getElementById('confirm_password').value;
         
+        // Clear previous errors
+        document.querySelectorAll('.cyn-form-error').forEach(el => el.remove());
+        
+        let hasError = false;
+        
         if (password !== confirm) {
             e.preventDefault();
-            alert('Passwords do not match!');
-            return;
+            const confirmInput = document.getElementById('confirm_password');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'cyn-form-error';
+            errorDiv.textContent = 'Passwords do not match';
+            confirmInput.parentElement.parentElement.appendChild(errorDiv);
+            hasError = true;
         }
         
         if (password.length < 8) {
             e.preventDefault();
-            alert('Password must be at least 8 characters!');
-            return;
+            const passwordInput = document.getElementById('password');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'cyn-form-error';
+            errorDiv.textContent = 'Password must be at least 8 characters';
+            passwordInput.closest('.cyn-form-group').appendChild(errorDiv);
+            hasError = true;
         }
         
-        const btn = this.querySelector('button[type="submit"]');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
-        btn.disabled = true;
+        if (!hasError) {
+            const btn = this.querySelector('button[type="submit"]');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            btn.disabled = true;
+        }
     });
     </script>
 </body>
