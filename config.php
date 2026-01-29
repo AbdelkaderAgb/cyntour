@@ -112,7 +112,101 @@ function initializeDatabaseTables($conn) {
 }
 
 /**
+ * Check if tables exist and initialize database if needed (PDO version)
+ * Uses file-based locking to prevent race conditions
+ * @param PDO $pdo
+ * @return bool True if tables exist or were created successfully
+ */
+function initializeDatabaseTablesPdo($pdo) {
+    // Check if the users table exists (if it does, database is already initialized)
+    try {
+        $result = $pdo->query("SHOW TABLES LIKE 'users'");
+        if ($result && $result->rowCount() > 0) {
+            return true; // Tables already exist
+        }
+    } catch (PDOException $e) {
+        error_log('Error checking for users table: ' . $e->getMessage());
+        return false;
+    }
+    
+    // Use file-based locking to prevent concurrent initialization
+    $lockFile = sys_get_temp_dir() . '/cyntour_db_init.lock';
+    $fp = fopen($lockFile, 'c');
+    
+    if ($fp === false) {
+        error_log('Failed to open lock file: ' . $lockFile);
+        return false;
+    }
+    
+    try {
+        if (!flock($fp, LOCK_EX | LOCK_NB)) {
+            // Another process is initializing, wait for it
+            flock($fp, LOCK_EX);
+            fclose($fp);
+            // Recheck if tables were created by another process
+            $result = $pdo->query("SHOW TABLES LIKE 'users'");
+            return ($result && $result->rowCount() > 0);
+        }
+        
+        // Double-check after acquiring lock
+        $result = $pdo->query("SHOW TABLES LIKE 'users'");
+        if ($result && $result->rowCount() > 0) {
+            flock($fp, LOCK_UN);
+            fclose($fp);
+            return true;
+        }
+        
+        // Get the schema file path
+        $schemaFile = __DIR__ . '/database/schema.sql';
+        
+        if (!file_exists($schemaFile)) {
+            error_log('Database schema file not found: ' . $schemaFile);
+            flock($fp, LOCK_UN);
+            fclose($fp);
+            return false;
+        }
+        
+        // Read schema
+        $schema = file_get_contents($schemaFile);
+        
+        // Remove the CREATE DATABASE and USE statements since we're already connected
+        $schema = preg_replace('/^--.*$/m', '', $schema); // Remove single-line comments
+        $schema = preg_replace('/CREATE\s+DATABASE.*?;/is', '', $schema);
+        $schema = preg_replace('/USE\s+[\w_]+\s*;/is', '', $schema);
+        
+        // Split schema into individual statements and execute each
+        // This handles multiple statements better with PDO
+        $statements = array_filter(array_map('trim', explode(';', $schema)));
+        
+        foreach ($statements as $statement) {
+            if (!empty($statement)) {
+                try {
+                    $pdo->exec($statement);
+                } catch (PDOException $e) {
+                    // Log but continue - some statements may fail if objects already exist
+                    error_log('SQL statement warning: ' . $e->getMessage());
+                }
+            }
+        }
+        
+        error_log('Database tables created successfully via PDO');
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        return true;
+        
+    } catch (Exception $e) {
+        error_log('Error creating database tables: ' . $e->getMessage());
+        if (is_resource($fp)) {
+            flock($fp, LOCK_UN);
+            fclose($fp);
+        }
+        return false;
+    }
+}
+
+/**
  * Get PDO database connection
+ * Tables are automatically created if they don't exist.
  * @return PDO
  * @throws PDOException
  */
@@ -120,10 +214,17 @@ function getDbConnection() {
     global $db_dsn, $db_config, $db_options;
     
     static $pdo = null;
+    static $initialized = false;
     
     if ($pdo === null) {
         try {
             $pdo = new PDO($db_dsn, $db_config['username'], $db_config['password'], $db_options);
+            
+            // Initialize database tables if needed (only once per process)
+            if (!$initialized) {
+                initializeDatabaseTablesPdo($pdo);
+                $initialized = true;
+            }
         } catch (PDOException $e) {
             error_log('Database connection failed: ' . $e->getMessage());
             throw new PDOException('Database connection failed. Please check your configuration.');
