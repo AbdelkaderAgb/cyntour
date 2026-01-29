@@ -27,11 +27,15 @@ if (!$id) {
     die('ERROR: Invalid or missing receipt ID.');
 }
 
-// --- Step 2: Fetch the Main Receipt and Partner Data ---
-$sql_receipt = "SELECT r.*, p.company_name AS partner_company, p.address AS partner_address
-                FROM receipts r
-                LEFT JOIN partners p ON p.id = r.partner_id
-                WHERE r.id = ? 
+// --- Step 2: Fetch the Main Receipt Data ---
+// Explicitly select only required columns instead of SELECT * for better performance
+// Note: The receipts table doesn't have a partner_id column, so we fetch receipt data directly
+$sql_receipt = "SELECT id, receipt_no, customer_name, customer_company, 
+                       customer_email, customer_phone, subtotal, tax_amount,
+                       discount_amount, total_amount, currency, payment_status,
+                       notes, created_by, created_at, updated_at
+                FROM receipts
+                WHERE id = ? 
                 LIMIT 1";
 
 $stmt_receipt = $pdo->prepare($sql_receipt);

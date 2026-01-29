@@ -44,7 +44,10 @@ $companyFilter = isset($_GET['company']) ? trim($_GET['company']) : '';
 
 if ($companyFilter) {
     // Single company view - show receipts for this company
-    $sql_receipts = "SELECT r.id, r.receipt_no, r.created_at, r.customer_name, 
+    // Use DATE_FORMAT in SQL to avoid expensive strtotime() calls in PHP
+    $sql_receipts = "SELECT r.id, r.receipt_no, 
+                            DATE_FORMAT(r.created_at, '%d %b %Y') as formatted_date,
+                            r.created_at, r.customer_name, 
                             r.customer_company, r.total_amount, r.currency, 
                             r.payment_status, r.notes
                      FROM receipts r 
@@ -88,44 +91,36 @@ if ($companyFilter) {
 
 } else {
     // Main dashboard view - show all companies
-    // Get all unique companies with their receipt counts
-    $sql_companies = "SELECT customer_company, 
-                             COUNT(*) AS receipt_count,
-                             currency,
-                             SUM(total_amount) as total_sum
-                      FROM receipts 
-                      WHERE customer_company IS NOT NULL AND customer_company != ''
-                      GROUP BY customer_company, currency
-                      ORDER BY customer_company";
+    // Optimized: Single query using subquery for accurate receipt counts
+    // Uses subquery join instead of CTE for MySQL 5.7 compatibility
+    $sql_companies = "SELECT r.customer_company, 
+                             r.currency,
+                             SUM(r.total_amount) as total_sum,
+                             cc.receipt_count
+                      FROM receipts r
+                      JOIN (
+                          SELECT customer_company, COUNT(*) as receipt_count
+                          FROM receipts 
+                          WHERE customer_company IS NOT NULL AND customer_company != ''
+                          GROUP BY customer_company
+                      ) cc ON r.customer_company = cc.customer_company
+                      WHERE r.customer_company IS NOT NULL AND r.customer_company != ''
+                      GROUP BY r.customer_company, r.currency, cc.receipt_count
+                      ORDER BY r.customer_company";
     $all_company_data = $pdo->query($sql_companies)->fetchAll(PDO::FETCH_ASSOC);
 
-    // Organize data by company
+    // Organize data by company - receipt_count is now included in each row
     $companies = [];
     foreach ($all_company_data as $row) {
         $company_name = $row['customer_company'];
         if (!isset($companies[$company_name])) {
             $companies[$company_name] = [
                 'company' => $company_name,
-                'receipt_count' => 0,
+                'receipt_count' => $row['receipt_count'],
                 'totals' => []
             ];
         }
-        // Add to receipt count (but only count once per company, not per currency)
-        // We need a separate query for accurate count
         $companies[$company_name]['totals'][$row['currency']] = $row['total_sum'];
-    }
-
-    // Get accurate receipt counts per company
-    $sql_counts = "SELECT customer_company, COUNT(*) as receipt_count
-                   FROM receipts 
-                   WHERE customer_company IS NOT NULL AND customer_company != ''
-                   GROUP BY customer_company";
-    $counts_data = $pdo->query($sql_counts)->fetchAll(PDO::FETCH_ASSOC);
-    
-    foreach ($counts_data as $row) {
-        if (isset($companies[$row['customer_company']])) {
-            $companies[$row['customer_company']]['receipt_count'] = $row['receipt_count'];
-        }
     }
 }
 ?>
@@ -672,7 +667,7 @@ if ($companyFilter) {
                     <?php foreach ($receipts as $i => $row): ?>
                         <tr class="receipt-row" style="--delay: <?= 0.05 * $i ?>s;">
                             <td><strong><?= htmlspecialchars($row['receipt_no']) ?></strong></td>
-                            <td><?= date('d M Y', strtotime($row['created_at'])) ?></td>
+                            <td><?= htmlspecialchars($row['formatted_date']) ?></td>
                             <td><?= htmlspecialchars($row['customer_name']) ?></td>
                             <td>
                                 <?php 
