@@ -31,3 +31,23 @@ uploads/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Media files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.svg
+*.ico
+*.bmp
+*.tiff
+*.tif
+*.pdf
+*.mp4
+*.avi
+*.mov
+*.mp3
+*.wav
+img/
+pdf/
