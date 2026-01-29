@@ -515,7 +515,7 @@ $totalPages = ceil($totalHotels / $hotelsPerPage);
                     } else {
                         // For non-logged in users, display the Login link
                         echo '<li class="nav-item">
-                                <a class="nav-link" href="login.php">logout</a>
+                                <a class="nav-link" href="login.php">Login</a>
                               </li>';
                     }
                     ?>

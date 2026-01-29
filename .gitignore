@@ -7,7 +7,9 @@ config.php
 IG.html
 
 # Database dumps (contain sensitive data)
-*.sql
+# Exception: schema.sql is allowed for documentation
+/*.sql
+!database/schema.sql
 
 # IDE files
 .idea/
