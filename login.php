@@ -1,16 +1,20 @@
 <?php
 /**
- * CynTour - Unified Login System
+ * CynTour - Login Page
  * 
- * Handles user authentication with custom design (no Bootstrap)
+ * Clean, secure user authentication system
  */
 
-// Start output buffering to ensure headers can be sent
 ob_start();
-
 session_start();
+
 require_once "config.php";
 require_once "helpers.php";
+
+// Redirect if already logged in
+if (isset($_SESSION['auth']) && $_SESSION['auth'] === true) {
+    safe_redirect('index.php');
+}
 
 $errors = [];
 $success = '';
@@ -21,60 +25,72 @@ if (isset($_SESSION['registration_success'])) {
     unset($_SESSION['registration_success']);
 }
 
-// Redirect if already logged in
-if (isset($_SESSION['auth']) && $_SESSION['auth'] === true) {
-    safe_redirect('index.php');
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
-    try {
-        $email = trim($_POST['email']);
-        $userPassword = $_POST['password'];
-        $rememberMe = isset($_POST['remember_me']);
-        
-        // Get database connection
-        $conn = getDbConnection();
-        
-        // Attempt to find the user in the 'users' table
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
-        $stmt->execute(['email' => $email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($user && password_verify($userPassword, $user['password'])) {
-            // Harden session handling
-            session_regenerate_id(true);
-            $_SESSION['user'] = $user;
-            $_SESSION['auth'] = true;
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['first_name'] ?? $user['email'];
-            $_SESSION['user_role'] = $user['role'] ?? 'user';
+// Handle login form submission
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
+    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+    $password = $_POST['password'] ?? '';
+    $rememberMe = isset($_POST['remember_me']);
+    
+    // Validate inputs
+    if (empty($email)) {
+        $errors[] = "Email is required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Please enter a valid email address.";
+    }
+    
+    if (empty($password)) {
+        $errors[] = "Password is required.";
+    }
+    
+    // Attempt login if no validation errors
+    if (empty($errors)) {
+        try {
+            $conn = getDbConnection();
             
-            // Handle remember me functionality
-            if ($rememberMe) {
-                $token = bin2hex(random_bytes(32));
-                
-                // Store token in database
-                $mysqli = getMysqliConnection();
-                $updateStmt = $mysqli->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
-                $updateStmt->bind_param("si", $token, $user['id']);
-                $updateStmt->execute();
-                $updateStmt->close();
-                
-                // Set cookie for 30 days (secure flag based on HTTPS)
-                $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-                setcookie('remember_me', $token, time() + (30 * 24 * 60 * 60), '/', '', $secure, true);
+            $stmt = $conn->prepare("SELECT id, company_name, first_name, last_name, email, password, role, status FROM users WHERE email = :email LIMIT 1");
+            $stmt->execute(['email' => $email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($user && password_verify($password, $user['password'])) {
+                // Check if account is active
+                if ($user['status'] !== 'active') {
+                    $errors[] = "Your account is not active. Please contact support.";
+                } else {
+                    // Regenerate session ID to prevent fixation
+                    session_regenerate_id(true);
+                    
+                    // Set session variables
+                    $_SESSION['auth'] = true;
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['user'] = $user;
+                    $_SESSION['username'] = $user['first_name'] ?? $user['email'];
+                    $_SESSION['user_role'] = $user['role'] ?? 'user';
+                    
+                    // Handle remember me
+                    if ($rememberMe) {
+                        $token = bin2hex(random_bytes(32));
+                        $mysqli = getMysqliConnection();
+                        $updateStmt = $mysqli->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
+                        $updateStmt->bind_param("si", $token, $user['id']);
+                        $updateStmt->execute();
+                        $updateStmt->close();
+                        
+                        $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+                        setcookie('remember_me', $token, time() + (30 * 24 * 60 * 60), '/', '', $secure, true);
+                    }
+                    
+                    // Redirect based on role
+                    $redirectUrl = ($user['role'] === 'admin') ? 'admin.php' : 'index.php';
+                    session_write_close();
+                    safe_redirect($redirectUrl);
+                }
+            } else {
+                $errors[] = "Invalid email or password.";
             }
-            
-            // Redirect based on role using safe_redirect helper
-            $redirectUrl = ($user['role'] === 'admin') ? 'admin.php' : 'index.php';
-            session_write_close();
-            safe_redirect($redirectUrl);
-        } else {
-            $errors[] = "Invalid email or password.";
+        } catch (PDOException $e) {
+            error_log('Login error: ' . $e->getMessage());
+            $errors[] = "An error occurred. Please try again later.";
         }
-    } catch(PDOException $e) {
-        error_log('Login error: ' . $e->getMessage());
-        $errors[] = "An error occurred. Please try again.";
     }
 }
 ?>
@@ -86,15 +102,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     <meta name="description" content="CynTour - Login to your account">
     <title>CynTour - Login</title>
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Custom Styles -->
     <link href="css/cyntour-style.css" rel="stylesheet">
     
     <style>
@@ -289,6 +300,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             color: var(--primary);
         }
         
+        .feature-list {
+            margin-top: var(--spacing-xl);
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .feature-item i {
+            color: var(--primary-light);
+        }
+        
         @media (min-width: 768px) {
             .login-image {
                 display: block;
@@ -304,29 +330,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
 </head>
 <body>
     <div class="login-container">
-        <!-- Image Side -->
         <div class="login-image">
             <div class="login-image-content">
                 <h2>Welcome to <span>CynTour</span></h2>
                 <p>Your gateway to unforgettable Turkish experiences. Sign in to access exclusive deals, manage your bookings, and explore our premium travel services.</p>
-                <div style="margin-top: var(--spacing-xl);">
-                    <div style="display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
-                        <i class="fas fa-check-circle" style="color: var(--primary-light);"></i>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
                         <span>Exclusive hotel rates</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
-                        <i class="fas fa-check-circle" style="color: var(--primary-light);"></i>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
                         <span>Priority booking for tours</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
-                        <i class="fas fa-check-circle" style="color: var(--primary-light);"></i>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
                         <span>24/7 customer support</span>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Form Side -->
         <div class="login-form-container">
             <div class="login-logo">
                 <a href="home.php">
@@ -357,7 +381,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             </div>
             <?php endif; ?>
             
-            <form class="login-form" action="" method="post">
+            <form class="login-form" action="" method="post" novalidate>
                 <div class="cyn-form-group">
                     <label class="cyn-form-label" for="email">
                         <i class="fas fa-envelope"></i> Email Address
@@ -368,7 +392,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
                            class="cyn-form-control cyn-form-control-rounded" 
                            placeholder="Enter your email" 
                            required 
-                           autocomplete="email">
+                           autocomplete="email"
+                           value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
                 </div>
                 
                 <div class="cyn-form-group">
@@ -394,7 +419,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
                         <input type="checkbox" id="remember_me" name="remember_me">
                         <label for="remember_me">Remember me</label>
                     </div>
-                    <a href="forgot-password.html" class="forgot-link">
+                    <a href="forgot-password.php" class="forgot-link">
                         <i class="fas fa-key"></i> Forgot Password?
                     </a>
                 </div>
@@ -437,12 +462,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
         }
     }
     
-    // Form submission loading state
-    document.querySelector('.login-form').addEventListener('submit', function() {
+    document.querySelector('.login-form').addEventListener('submit', function(e) {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        let hasError = false;
+        
+        // Clear previous errors
+        document.querySelectorAll('.field-error').forEach(el => el.remove());
+        
+        if (!email) {
+            showFieldError('email', 'Email is required');
+            hasError = true;
+        } else if (!isValidEmail(email)) {
+            showFieldError('email', 'Please enter a valid email');
+            hasError = true;
+        }
+        
+        if (!password) {
+            showFieldError('password', 'Password is required');
+            hasError = true;
+        }
+        
+        if (hasError) {
+            e.preventDefault();
+            return;
+        }
+        
         const btn = this.querySelector('button[type="submit"]');
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
         btn.disabled = true;
     });
+    
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    
+    function showFieldError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'field-error cyn-form-error';
+        errorDiv.textContent = message;
+        field.closest('.cyn-form-group').appendChild(errorDiv);
+    }
     </script>
 </body>
 </html>
