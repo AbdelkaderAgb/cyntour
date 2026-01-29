@@ -3,7 +3,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once 'database.php'; // or 'db.php', ensure this filename is correct
+require_once 'database-config.php';
 require_once 'helpers.php';
 
 // If we are rendering a saved receipt, populate variables from the passed data

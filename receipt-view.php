@@ -17,7 +17,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Make sure the filename matches your database connection file (e.g., db.php, database.php)
-require_once 'database.php';
+require_once 'database-config.php';
 
 // --- Step 1: Get and Validate the Receipt ID ---
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -63,6 +63,6 @@ $receipt_data['payments'] = $payments;
 // --- Step 5: Render the Template ---
 // Now that `$receipt_data` is fully populated with all the information,
 // we simply include the template file. It will handle the entire display.
-include 'create_receipt.php';
+include 'receipt-create.php';
 
 ?>
