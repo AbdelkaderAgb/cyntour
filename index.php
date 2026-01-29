@@ -49,19 +49,28 @@ $isAdmin = cyn_is_admin();
 $conn = getMysqliConnection();
 
 // Get current page number from query string (default is 1)
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $hotelsPerPage = 12;
 $offset = ($page - 1) * $hotelsPerPage;
 
-// Query to fetch hotel names with pagination
-$sql = "SELECT DISTINCT hotel_name FROM pricing_data LIMIT $offset, $hotelsPerPage";
-$result = $conn->query($sql);
+// Query to fetch hotel names with pagination using prepared statement
+$sql = "SELECT DISTINCT hotel_name FROM pricing_data LIMIT ?, ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ii", $offset, $hotelsPerPage);
+$stmt->execute();
+$result = $stmt->get_result();
 
 // Query to get total number of hotels for pagination
 $totalHotelsResult = $conn->query("SELECT COUNT(DISTINCT hotel_name) as total FROM pricing_data");
-$totalHotelsRow = $totalHotelsResult->fetch_assoc();
-$totalHotels = $totalHotelsRow['total'];
-$totalPages = ceil($totalHotels / $hotelsPerPage);
+$totalHotels = 0;
+$totalPages = 1;
+if ($totalHotelsResult) {
+    $totalHotelsRow = $totalHotelsResult->fetch_assoc();
+    $totalHotels = $totalHotelsRow['total'];
+    $totalPages = ceil($totalHotels / $hotelsPerPage);
+    // Clamp page to valid range
+    $page = min($page, max(1, $totalPages));
+}
 
 // Define dashboard cards
 $dashboardCards = [
@@ -574,7 +583,7 @@ if ($isAdmin) {
                     <?php echo strtoupper(substr(cyn_get_display_name(), 0, 1)); ?>
                 </div>
                 <div class="user-details">
-                    <div class="name"><?php echo htmlspecialchars($user['email'] ?? cyn_get_display_name()); ?></div>
+                    <div class="name"><?php echo !empty($user['email']) ? htmlspecialchars($user['email']) : cyn_get_display_name(); ?></div>
                     <div class="role"><?php echo $isAdmin ? 'Administrator' : 'User'; ?></div>
                 </div>
             </div>
@@ -597,7 +606,7 @@ if ($isAdmin) {
     <div class="tab-content active" id="dashboard">
         <section class="dashboard-section">
             <div class="dashboard-grid">
-                <?php foreach ($dashboardCards as $index => $card): ?>
+                <?php foreach ($dashboardCards as $card): ?>
                 <div class="dash-card" style="--card-color: <?php echo $card['color']; ?>;">
                     <div class="dash-icon">
                         <i class="fas <?php echo $card['icon']; ?>"></i>
@@ -750,9 +759,12 @@ if ($isAdmin) {
         // Check URL hash on load
         if (window.location.hash) {
             const hash = window.location.hash.substring(1);
-            const targetBtn = document.querySelector(`.tab-btn[data-tab="${hash}"]`);
-            if (targetBtn) {
-                targetBtn.click();
+            // Sanitize hash to only allow valid tab identifiers (alphanumeric and hyphens)
+            if (/^[a-zA-Z0-9-]+$/.test(hash)) {
+                const targetBtn = document.querySelector(`.tab-btn[data-tab="${hash}"]`);
+                if (targetBtn) {
+                    targetBtn.click();
+                }
             }
         }
         
