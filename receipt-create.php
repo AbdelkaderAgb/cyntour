@@ -55,7 +55,7 @@ if (isset($receipt_data)) {
 }
 
 // Fetch all partners for the dropdown (needed for the 'create' form)
-$partners_stmt = $pdo->query("SELECT id, company FROM partners ORDER BY company");
+$partners_stmt = $pdo->query("SELECT id, company_name FROM partners ORDER BY company_name");
 $partners = $partners_stmt->fetchAll();
 
 // Company branding details
@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $new_company_name = trim($_POST['new_company_name']);
 
     if (!empty($new_company_name)) {
-        $sql = "INSERT INTO partners (company) VALUES (?)";
+        $sql = "INSERT INTO partners (company_name) VALUES (?)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$new_company_name]);
         $partner_id = $pdo->lastInsertId();
@@ -87,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($new_company_name)) {
         $partner_company_name = $new_company_name;
     } else {
-        $stmt = $pdo->prepare("SELECT company FROM partners WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT company_name FROM partners WHERE id = ?");
         $stmt->execute([$partner_id]);
         $partner_company_name = $stmt->fetchColumn();
     }
@@ -701,7 +701,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <select class="form-control" id="partner_id" name="partner_id">
                             <option value="">-- Or Add a New Company Below --</option>
                             <?php foreach ($partners as $partner): ?>
-                                <option value="<?= $partner['id'] ?>"><?= htmlspecialchars($partner['company']) ?></option>
+                                <option value="<?= $partner['id'] ?>"><?= htmlspecialchars($partner['company_name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
