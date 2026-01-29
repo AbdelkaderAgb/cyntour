@@ -100,9 +100,17 @@ include 'auth.php';
             gap: 1.5rem;
         }
 
+        .form-field-full {
+            grid-column: 1 / -1;
+        }
+
         @media (max-width: 640px) {
             .form-row {
                 grid-template-columns: 1fr;
+            }
+            
+            .form-field-full {
+                grid-column: auto;
             }
         }
 
@@ -135,7 +143,7 @@ include 'auth.php';
             <div class="form-card-body">
                 <form action="receipt.php" method="post">
                     <div class="form-row">
-                        <div class="cyn-form-group" style="grid-column: span 2;">
+                        <div class="cyn-form-group form-field-full">
                             <label class="cyn-form-label" for="company_name">
                                 <i class="fas fa-building"></i> Company Name
                             </label>

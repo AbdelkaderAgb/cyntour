@@ -3,14 +3,29 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Gerekli dosyaları dahil et
+// Start session for CSRF token
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Generate CSRF token if not exists
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
+
+// Include required files
 require_once 'database-config.php';
 require_once 'helpers.php';
 
-// Makbuz silme işlemini yönet
+// Handle receipt deletion
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_receipt_id'])) {
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        die('Invalid CSRF token');
+    }
+    
     $receipt_id_to_delete = intval($_POST['delete_receipt_id']);
-    // Yönlendirme için şirket kimliğini al
     $company_id_redirect = isset($_GET['company']) ? intval($_GET['company']) : 0;
 
     if ($receipt_id_to_delete > 0) {
@@ -19,12 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_receipt_id']))
         $stmt->execute([$receipt_id_to_delete]);
     }
 
-    // Formun yeniden gönderilmesini önlemek için aynı sayfaya yönlendir
+    // Redirect to prevent form resubmission
     header("Location: dashboard.php?company=" . $company_id_redirect);
     exit;
 }
 
-// Şirket kimliğini al
+// Get company ID
 $companyId = isset($_GET['company']) ? intval($_GET['company']) : 0;
 
 if ($companyId) {
@@ -394,6 +409,14 @@ if ($companyId) {
             color: var(--gray-700);
         }
 
+        .receipt-table .text-right {
+            text-align: right;
+        }
+
+        .receipt-table .text-center {
+            text-align: center;
+        }
+
         .receipt-table tbody tr {
             transition: all 0.2s ease;
         }
@@ -406,12 +429,27 @@ if ($companyId) {
             border-bottom: none;
         }
 
+        .receipt-table .receipt-row {
+            animation: fadeInUp 0.5s ease-out var(--delay, 0s) forwards;
+            opacity: 0;
+        }
+
         .payment-amount {
             font-weight: 600;
             color: var(--success);
         }
 
         /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .delete-form {
+            display: inline;
+        }
+
         .btn-action {
             display: inline-flex;
             align-items: center;
@@ -423,6 +461,7 @@ if ($companyId) {
             cursor: pointer;
             transition: all 0.2s ease;
             font-size: 0.9rem;
+            text-decoration: none;
         }
 
         .btn-view {
@@ -593,7 +632,7 @@ if ($companyId) {
                     </thead>
                     <tbody>
                     <?php foreach ($receipts as $i => $row): ?>
-                        <tr style="animation: fadeInUp 0.5s ease-out <?= 0.05 * $i ?>s forwards; opacity: 0;">
+                        <tr class="receipt-row" style="--delay: <?= 0.05 * $i ?>s;">
                             <td><strong>#<?= htmlspecialchars($row['id']) ?></strong></td>
                             <td><?= date('d M Y', strtotime($row['receipt_date'])) ?></td>
                             <td><?= htmlspecialchars($row['received_by'] ?: '-') ?></td>
@@ -608,7 +647,7 @@ if ($companyId) {
                                 }
                                 ?>
                             </td>
-                            <td style="text-align: right;">
+                            <td class="text-right">
                                 <?php if (!empty($receipt_payments)): ?>
                                     <?php foreach ($receipt_payments as $payment): ?>
                                         <div class="payment-amount"><?= get_currency_symbol($payment['currency']) . number_format($payment['amount'], 2) ?></div>
@@ -617,15 +656,16 @@ if ($companyId) {
                                     -
                                 <?php endif; ?>
                             </td>
-                            <td style="text-align: center;">
-                                <div style="display: flex; gap: 0.5rem; justify-content: center;">
-                                    <a class="btn-action btn-view" href="receipt-view.php?id=<?= $row['id'] ?>" target="_blank" title="View Receipt">
-                                        <i class="fas fa-eye"></i>
+                            <td class="text-center">
+                                <div class="action-buttons">
+                                    <a class="btn-action btn-view" href="receipt-view.php?id=<?= $row['id'] ?>" target="_blank" aria-label="View receipt #<?= $row['id'] ?>">
+                                        <i class="fas fa-eye" aria-hidden="true"></i>
                                     </a>
-                                    <form action="dashboard.php?company=<?= $companyId ?>" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete receipt #<?= $row['id'] ?>?');">
+                                    <form action="dashboard.php?company=<?= $companyId ?>" method="POST" class="delete-form" onsubmit="return confirm('Are you sure you want to delete receipt #<?= $row['id'] ?>?');">
+                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
                                         <input type="hidden" name="delete_receipt_id" value="<?= $row['id'] ?>">
-                                        <button type="submit" class="btn-action btn-delete" title="Delete Receipt">
-                                            <i class="fas fa-trash-alt"></i>
+                                        <button type="submit" class="btn-action btn-delete" aria-label="Delete receipt #<?= $row['id'] ?>">
+                                            <i class="fas fa-trash-alt" aria-hidden="true"></i>
                                         </button>
                                     </form>
                                 </div>
