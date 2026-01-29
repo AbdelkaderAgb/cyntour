@@ -32,17 +32,17 @@ $formData = [
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $conn = getMysqliConnection();
     
-    // Sanitize and validate inputs
+    // Sanitize and validate inputs (prepared statements handle SQL injection)
     $formData = [
-        'company_name' => trim(mysqli_real_escape_string($conn, $_POST['company_name'] ?? '')),
-        'first_name' => trim(mysqli_real_escape_string($conn, $_POST['first_name'] ?? '')),
-        'last_name' => trim(mysqli_real_escape_string($conn, $_POST['last_name'] ?? '')),
-        'email' => trim(mysqli_real_escape_string($conn, $_POST['email'] ?? '')),
-        'phone_number' => trim(mysqli_real_escape_string($conn, $_POST['phone_number'] ?? ''))
+        'company_name' => trim($_POST['company_name'] ?? ''),
+        'first_name' => trim($_POST['first_name'] ?? ''),
+        'last_name' => trim($_POST['last_name'] ?? ''),
+        'email' => trim($_POST['email'] ?? ''),
+        'phone_number' => trim($_POST['phone_number'] ?? '')
     ];
     
     $password = $_POST['password'] ?? '';
-    $confirmPassword = $_POST['confirm_password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
     
     // Validation
     if (empty($formData['company_name'])) {
@@ -79,32 +79,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $errors[] = "Password must be at least 8 characters";
     }
     
-    if ($password !== $confirmPassword) {
+    if ($password !== $confirm_password) {
         $errors[] = "Passwords do not match";
     }
     
-    // Check for existing email or company name
+    // Insert new user if no validation errors
+    // The database has UNIQUE constraints on email and company_name
+    // so we handle duplicates via the error response from INSERT
     if (empty($errors)) {
-        $checkStmt = $conn->prepare("SELECT email, company_name FROM users WHERE email = ? OR company_name = ?");
-        $checkStmt->bind_param("ss", $formData['email'], $formData['company_name']);
-        $checkStmt->execute();
-        $checkResult = $checkStmt->get_result();
-        
-        if ($checkResult->num_rows > 0) {
-            $existing = $checkResult->fetch_assoc();
-            if ($existing['email'] === $formData['email']) {
-                $errors[] = "Email already exists";
-            }
-            if ($existing['company_name'] === $formData['company_name']) {
-                $errors[] = "Company name already exists";
-            }
-        }
-        $checkStmt->close();
-    }
-    
-    // Insert new user if no errors
-    if (empty($errors)) {
-        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
         
         $stmt = $conn->prepare("INSERT INTO users (company_name, first_name, last_name, email, phone_number, password, role, status) VALUES (?, ?, ?, ?, ?, ?, 'user', 'active')");
         $stmt->bind_param("ssssss", 
@@ -113,14 +96,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $formData['last_name'], 
             $formData['email'], 
             $formData['phone_number'], 
-            $passwordHash
+            $password_hash
         );
         
         if ($stmt->execute()) {
             $_SESSION['registration_success'] = true;
+            $stmt->close();
+            $conn->close();
             safe_redirect('login.php');
         } else {
-            $errors[] = "Registration failed. Please try again.";
+            // Check for duplicate entry errors
+            if ($conn->errno === 1062) { // Duplicate entry error code
+                $error_msg = $conn->error;
+                if (stripos($error_msg, 'email') !== false) {
+                    $errors[] = "Email already exists";
+                } elseif (stripos($error_msg, 'company_name') !== false) {
+                    $errors[] = "Company name already exists";
+                } else {
+                    $errors[] = "This email or company name is already registered";
+                }
+            } else {
+                error_log('Registration error: ' . $conn->error);
+                $errors[] = "Registration failed. Please try again.";
+            }
         }
         
         $stmt->close();

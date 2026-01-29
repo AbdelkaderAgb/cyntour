@@ -29,7 +29,7 @@ if (isset($_SESSION['registration_success'])) {
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
     $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
     $password = $_POST['password'] ?? '';
-    $rememberMe = isset($_POST['remember_me']);
+    $remember_me = isset($_POST['remember_me']);
     
     // Validate inputs
     if (empty($email)) {
@@ -45,11 +45,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
     // Attempt login if no validation errors
     if (empty($errors)) {
         try {
-            $conn = getDbConnection();
+            $conn = getMysqliConnection();
             
-            $stmt = $conn->prepare("SELECT id, company_name, first_name, last_name, email, password, role, status FROM users WHERE email = :email LIMIT 1");
-            $stmt->execute(['email' => $email]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt = $conn->prepare("SELECT id, company_name, first_name, last_name, email, password, role, status FROM users WHERE email = ? LIMIT 1");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
+            $stmt->close();
             
             if ($user && password_verify($password, $user['password'])) {
                 // Check if account is active
@@ -67,27 +70,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
                     $_SESSION['user_role'] = $user['role'] ?? 'user';
                     
                     // Handle remember me
-                    if ($rememberMe) {
+                    if ($remember_me) {
                         $token = bin2hex(random_bytes(32));
-                        $mysqli = getMysqliConnection();
-                        $updateStmt = $mysqli->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
-                        $updateStmt->bind_param("si", $token, $user['id']);
-                        $updateStmt->execute();
-                        $updateStmt->close();
+                        $token_hash = hash('sha256', $token);
+                        
+                        $update_stmt = $conn->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
+                        $update_stmt->bind_param("si", $token_hash, $user['id']);
+                        $update_stmt->execute();
+                        $update_stmt->close();
                         
                         $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
                         setcookie('remember_me', $token, time() + (30 * 24 * 60 * 60), '/', '', $secure, true);
                     }
                     
                     // Redirect based on role
-                    $redirectUrl = ($user['role'] === 'admin') ? 'admin.php' : 'index.php';
+                    $redirect_url = ($user['role'] === 'admin') ? 'admin.php' : 'index.php';
                     session_write_close();
-                    safe_redirect($redirectUrl);
+                    safe_redirect($redirect_url);
                 }
             } else {
                 $errors[] = "Invalid email or password.";
             }
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             error_log('Login error: ' . $e->getMessage());
             $errors[] = "An error occurred. Please try again later.";
         }

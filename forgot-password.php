@@ -38,15 +38,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['reset'])) {
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($user) {
-                // Generate reset token
-                $token = bin2hex(random_bytes(32));
-                $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
-                
-                // Store token (for demo purposes, we show success message)
                 // In production, you would:
-                // 1. Store the token in database with expiry
-                // 2. Send email with reset link
+                // 1. Generate a token: $token = bin2hex(random_bytes(32));
+                // 2. Store the hashed token in database with expiry
+                // 3. Send email with reset link containing the unhashed token
                 
+                // For now, show a success message (always same response for security)
                 $success = "If an account exists with this email, you will receive password reset instructions shortly.";
             } else {
                 // Don't reveal if email exists or not (security)

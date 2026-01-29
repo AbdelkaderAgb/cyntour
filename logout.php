@@ -13,6 +13,12 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once 'helpers.php';
 
+// Clear remember me cookie first (always do this, regardless of database success)
+if (isset($_COOKIE['remember_me'])) {
+    $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+    setcookie('remember_me', '', time() - 3600, '/', '', $secure, true);
+}
+
 // Clear remember me token from database if user was logged in
 if (isset($_SESSION['user_id'])) {
     try {
@@ -25,12 +31,6 @@ if (isset($_SESSION['user_id'])) {
     } catch (Exception $e) {
         error_log('Logout error clearing token: ' . $e->getMessage());
     }
-}
-
-// Clear remember me cookie
-if (isset($_COOKIE['remember_me'])) {
-    $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-    setcookie('remember_me', '', time() - 3600, '/', '', $secure, true);
 }
 
 // Unset all session variables
