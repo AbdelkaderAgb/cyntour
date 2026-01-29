@@ -64,34 +64,75 @@ $conn->close();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Voucher Listesi ve Takvim</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <title>Hotel Calendar - CYN Tourism</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary-color: #2563eb;
-      --secondary-color: #1e40af;
-      --success-color: #059669;  /* Updated to a more professional green */
-      --warning-color: #d97706;  /* Updated to a more professional amber */
-      --danger-color: #dc2626;   /* Updated to a more professional red */
-      --light-bg: #f3f4f6;
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #818cf8;
+      --success-color: #059669;
+      --warning-color: #d97706;
+      --danger-color: #dc2626;
+      --light-bg: #f8fafc;
       --dark-bg: #1f2937;
       --calendar-bg: #ffffff;
       --day-hover: #f8fafc;
-      --border-color: #e5e7eb;
+      --border-color: #e2e8f0;
     }
 
     /* Global Styles */
     body {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Inter', sans-serif;
       margin: 0;
       background: var(--light-bg);
       color: #333;
       line-height: 1.5;
+      background-image: 
+          radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
+          radial-gradient(at 0% 100%, rgba(129, 140, 248, 0.05) 0px, transparent 50%);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .back-link {
+        color: rgba(255, 255, 255, 0.85);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .back-link:hover {
+        color: white;
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .header-logo {
+        height: 50px;
+        filter: brightness(0) invert(1);
     }
 
     .container {
@@ -99,23 +140,10 @@ $conn->close();
       padding: 15px;
     }
 
-    /* Header Styles */
-    .header-logo {
-      margin: 15px 0;
-      text-align: center;
-      transition: transform 0.3s ease;
-    }
-
-    .header-logo img {
-      max-width: 150px;
-      height: auto;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-    }
-
-    h1 {
+    h1.page-title {
       font-size: 1.8rem;
       font-weight: 600;
-      color: var(--dark-bg);
+      color: var(--primary);
       margin-bottom: 1.5rem;
       text-align: center;
       text-transform: uppercase;
@@ -132,7 +160,7 @@ $conn->close();
     }
 
     .navigation-buttons button {
-      background: var(--primary-color);
+      background: var(--primary);
       border: none;
       padding: 8px 12px;
       border-radius: 6px;
@@ -521,13 +549,23 @@ $conn->close();
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Header -->
-    <div class="header-logo">
-      <img src="logo.png" alt="Logo" class="img-fluid">
-    </div>
-    <h1>Voucher Takvimi</h1>
+  <!-- Page Header -->
+  <div class="page-header">
+      <div class="container">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+              <div>
+                  <a href="Vcdashboard.php" class="back-link">
+                      <i class="fas fa-arrow-left"></i>
+                      <span>Back to Dashboard</span>
+                  </a>
+                  <h1 class="mt-2"><i class="fas fa-building me-2"></i>Hotel Calendar</h1>
+              </div>
+              <img src="logo.png" alt="CYN Tourism" class="header-logo">
+          </div>
+      </div>
+  </div>
 
+  <div class="container">
     <!-- Navigation Buttons -->
     <div class="navigation-buttons">
       <button class="btn" id="prevYear"><i class="fas fa-chevron-left"></i> Önceki Yıl</button>

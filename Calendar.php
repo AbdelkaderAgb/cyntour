@@ -100,15 +100,15 @@ while ($row = $result->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voucher Management System</title>
+    <title>Transfer Calendar - CYN Tourism</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b5998;
-            --primary-light: #4c70ba;
-            --primary-dark: #2f477a;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
             --secondary: #5cb85c;
             --warning: #f0ad4e;
             --danger: #d9534f;
@@ -120,9 +120,9 @@ while ($row = $result->fetch_assoc()) {
             --gray-400: #ced4da;
             --gray-500: #adb5bd;
             --gray-800: #343a40;
-            --body-bg: #f5f7fb;
+            --body-bg: #f8fafc;
             --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --border-radius: 10px;
+            --border-radius: 12px;
             --transition: all 0.3s ease;
         }
 
@@ -133,12 +133,52 @@ while ($row = $result->fetch_assoc()) {
             line-height: 1.6;
             margin: 0;
             padding: 0;
+            background-image: 
+                radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(129, 140, 248, 0.05) 0px, transparent 50%);
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+        }
+        
+        .page-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .back-link {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .back-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .header-logo {
+            height: 50px;
+            filter: brightness(0) invert(1);
         }
 
         .app-container {
             max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+            margin: 0 auto;
+            padding: 0 1rem 2rem;
         }
 
         .dashboard-header {
@@ -475,12 +515,23 @@ while ($row = $result->fetch_assoc()) {
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <header class="dashboard-header">
-            <h1 class="dashboard-title">Rezervasyon Yönetim Sistemi</h1>
-            <img src="logo.png" alt="Şirket Logosu" class="company-logo">
-        </header>
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <a href="Vcdashboard.php" class="back-link">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Back to Dashboard</span>
+                    </a>
+                    <h1 class="mt-2"><i class="fas fa-calendar-alt me-2"></i>Transfer Calendar</h1>
+                </div>
+                <img src="logo.png" alt="CYN Tourism" class="header-logo">
+            </div>
+        </div>
+    </div>
 
+    <div class="app-container">
         <div class="app-card">
             <div class="card-header">
                 <h3>Transfer Takvimi</h3>
