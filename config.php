@@ -121,7 +121,6 @@ function getDbConnection() {
     global $db_dsn, $db_config, $db_options;
     
     static $pdo = null;
-    static $initialized = false;
     
     if ($pdo === null) {
         try {
@@ -131,12 +130,10 @@ function getDbConnection() {
             throw new PDOException('Database connection failed. Please check your configuration.');
         }
         
-        // Initialize database tables if needed (only once per process)
-        if (!$initialized) {
-            // Use mysqli for table initialization since it handles multi-query better
-            $mysqli = getMysqliConnection();
-            $initialized = true;
-        }
+        // Initialize database tables if needed by calling mysqli connection
+        // which handles table initialization. This ensures tables exist
+        // regardless of which connection type is used first.
+        getMysqliConnection();
     }
     
     return $pdo;
